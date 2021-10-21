@@ -1,0 +1,12 @@
+.notification-window{
+  border-radius: .375em;
+  bottom: 1em;
+  right: 1em;
+  width: 20rem;
+  background-color: #fff;
+  box-shadow: 0 0 1em rgb(0 0 0 / 10%);
+  padding: 1em 1.5em;
+  position: fixed;
+  z-index: 10;
+}
+
