@@ -1,80 +1,77 @@
 import React from "react";
-import { compose } from "redux";
-import { connect } from "react-redux";
-import { Link } from "react-router-dom";
-
-import "./style.css";
+// import "./style.css";
 
 import ButtonConnect from "../ButtonConnect";
-import Search from "./Search";
 
-const Navbar = ({state_wallet}) => {
+const Navbar = () => {
   return (
-    <nav className="main-navbar navbar is-fixed-top is-transparent">
-      <div className="the-blur"></div>
+    <nav className="navbar is-transparent">
       <div className="navbar-brand">
-        <a className="navbar-item" href="/">
-          <img src="/images/martify-logo-black-yellow-small.png" alt="Market place" width="112" height="28"/>
+        <a className="navbar-item" href="https://bulma.io">
+          <img src="https://bulma.io/images/bulma-logo.png" alt="Bulma: a modern CSS framework based on Flexbox" width="112" height="28"/>
         </a>
-        {/* <div className="navbar-burger" data-target="navbarExampleTransparentExample">
+        <div className="navbar-burger" data-target="navbarExampleTransparentExample">
           <span></span>
           <span></span>
           <span></span>
-        </div> */}
+        </div>
       </div>
 
-      <div className="navbar-menu">
-
+      <div id="navbarExampleTransparentExample" className="navbar-menu">
         <div className="navbar-start">
-
-          {/* <Link className="navbar-item" to="about">About</Link> */}
-          {/* <Link className="navbar-item" to="faq">FAQ</Link> */}
-          
+          <a className="navbar-item" href="https://bulma.io/">
+            Home
+          </a>
           <div className="navbar-item has-dropdown is-hoverable">
-            <a className="navbar-link">
-              How To...
+            <a className="navbar-link" href="https://bulma.io/documentation/overview/start/">
+              Docs
             </a>
             <div className="navbar-dropdown is-boxed">
-              <Link className="navbar-item" to="how-get-started">Get Started</Link>
-              <Link className="navbar-item" to="how-get-started">Get Started</Link>
-              <Link className="navbar-item" to="how-get-started">Get Started</Link>
+              <a className="navbar-item" href="https://bulma.io/documentation/overview/start/">
+                Overview
+              </a>
+              <a className="navbar-item" href="https://bulma.io/documentation/overview/modifiers/">
+                Modifiers
+              </a>
+              <a className="navbar-item" href="https://bulma.io/documentation/columns/basics/">
+                Columns
+              </a>
+              <a className="navbar-item" href="https://bulma.io/documentation/layout/container/">
+                Layout
+              </a>
+              <a className="navbar-item" href="https://bulma.io/documentation/form/general/">
+                Form
+              </a>
               <hr className="navbar-divider"/>
-              <Link className="navbar-item" to="how-get-started">Get Started</Link>
-              <Link className="navbar-item" to="how-get-started">Get Started</Link>
+              <a className="navbar-item" href="https://bulma.io/documentation/elements/box/">
+                Elements
+              </a>
+              <a className="navbar-item is-active" href="https://bulma.io/documentation/components/breadcrumb/">
+                Components
+              </a>
             </div>
           </div>
         </div>
 
         <div className="navbar-end">
-
-          <div className="navbar-item is-expanded">
-            <Search />
-          </div>
-          
           <div className="navbar-item">
             <div className="field is-grouped">
+              {/* <div className="control">
+                <a className="bd-tw-button button" data-social-network="Twitter" data-social-action="tweet" data-social-target="https://bulma.io" target="_blank" href="https://twitter.com/intent/tweet?text=Bulma: a modern CSS framework based on Flexbox&amp;hashtags=bulmaio&amp;url=https://bulma.io&amp;via=jgthms">
+                  <span>
+                    Tweet
+                  </span>
+                </a>
+              </div> */}
               <div className="control">
                 <ButtonConnect/>
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </nav>
   );
 };
 
-function mapStateToProps(state, props) {
-  return {
-    state_wallet: state.wallet
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    
-  };
-}
-
-export default compose(connect(mapStateToProps, mapDispatchToProps))(Navbar);
+export default Navbar;

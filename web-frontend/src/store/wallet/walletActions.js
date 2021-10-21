@@ -1,9 +1,8 @@
 import * as types from "./walletTypes";
 
-export function walletConnected(payload) {
+export function walletConnected() {
   return {
     type: types.WALLET_CONNECTED,
-    payload: payload
   };
 }
 export function setWalletNetwork(payload) {
@@ -43,12 +42,3 @@ export function setWalletLoading(payload) {
     payload: payload,
   };
 }
-
-export function setWalletAssets(payload) {
-  return {
-    type: types.SET_WALLET_ASSETS,
-    payload: payload,
-  };
-}
-
-

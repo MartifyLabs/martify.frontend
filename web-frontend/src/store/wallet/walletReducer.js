@@ -4,8 +4,6 @@ let walletobj = {
   connected: false,
   loading: false,
   data: {},
-  assets: {},
-  loaded_assets: false,
 };
 
 export default function walletReducer(state = walletobj, { type, payload }) {
@@ -15,8 +13,7 @@ export default function walletReducer(state = walletobj, { type, payload }) {
       return {
         ...state,
         connected: true,
-        loading: false,
-        data: payload
+        loading: false
       };
     
     case types.SET_WALLET_LOADING:
@@ -25,25 +22,50 @@ export default function walletReducer(state = walletobj, { type, payload }) {
         loading: payload,
       };
     
-    case types.SET_WALLET_ASSETS:
-      let tmp_assets = {};
-      for(var asset_id in payload){
-        if(asset_id!='lovelace'){
-          let this_asset = payload[asset_id];
-          tmp_assets[asset_id] = {
-            policy_id: this_asset.info.policyId,
-            quantity: this_asset.quantity,
-            asset_id: asset_id,
-          }
-        }
-      }
+    case types.SET_WALLET_NETWORK:
       return {
         ...state,
-        assets: tmp_assets,
-        loaded_assets: true,
-        loading: false,
+        data: {
+          ...state.data,
+          network: payload,
+        },
       };
-      
+    
+    case types.SET_WALLET_USEADDR:
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          used_addr: payload,
+        },
+      };
+    
+    case types.SET_WALLET_REWARDADDR:
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          reward_addr: payload,
+        },
+      };
+
+    case types.SET_WALLET_BALANCE:
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          balance: payload,
+        },
+      };
+    case types.SET_WALLET_UTXOS:
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          utxos: payload,
+        },
+      };
+
     default:
       return state;
   }
