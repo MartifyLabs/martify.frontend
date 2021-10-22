@@ -20,8 +20,10 @@ exports.create_txn = function(params) {
       const value = {};
       utxos.forEach((utxo) => {
         Object.keys(utxo.value).forEach((asset) => {
-          if (!value[asset]) value[asset] = 0;
-          value[asset] += utxo.value[asset];
+          if(utxo.value[asset]){
+            if (!value[asset]) value[asset] = 0;
+            value[asset] += utxo.value[asset];
+          }
         });
       });
     
@@ -46,6 +48,8 @@ exports.create_txn = function(params) {
     };
         
     txInfo.txOut[1].value.lovelace -= cardano.toLovelace(amount);
+
+    console.log("txInfo",JSON.stringify(txInfo, null, 2))
 
     const raw = cardano.transactionBuildRaw(txInfo);
     
