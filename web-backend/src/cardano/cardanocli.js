@@ -226,7 +226,7 @@ class CardanocliJs {
         if (v != " TxOutDatumHashNone") {
           let [quantity, asset] = v.trim().split(" ");
           quantity = parseInt(quantity);
-          value[asset] = quantity;
+          if(quantity) value[asset] = quantity;
         };
       });
       return {
