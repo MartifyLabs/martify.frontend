@@ -2,33 +2,29 @@ import React, { useState } from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
 
-import { create_txn, buyer_pay } from "../../store/wallet/api";
-import {urls} from "../../config";
+import { create_txn } from "../../store/wallet/api";
+import {cardanoscan_url} from "../../config";
 
-const ButtonPay = ({wallet, create_txn, buyer_pay}) => {
+const ButtonPay = ({wallet, create_txn}) => {
 
   const [showNotification, setShowNotification] = useState(false);
 
   async function begin_buy_process() {
 
-    // let amount = 2;
+    let amount = 2;
 
-    // if(amount){
-    //   create_txn(wallet.data.used_addr, amount, (res) => {
-    //     if(res.success){
-    //       setShowNotification({
-    //         type: "payment-success",
-    //         data: res.txn
-    //       });
-    //       setTimeout(function(){ setShowNotification(false); }, 30000);
-    //     }
-    //   });
-    // }
-
-    // buyer_pay(wallet.data.used_addr, (res) => {
-    //   console.log(res)
-    // });
-
+    if(amount){
+      create_txn(wallet.data.used_addr, amount, (res) => {
+        if(res.success){
+          setShowNotification({
+            type: "payment-success",
+            data: res.txn
+          });
+          setTimeout(function(){ setShowNotification(false); }, 30000);
+        }
+      });
+    
+    }
   }
 
   return (
@@ -47,7 +43,7 @@ const ButtonPay = ({wallet, create_txn, buyer_pay}) => {
                   showNotification.type === "payment-success" ? (
                     <p>
                       Payment successful.<br/>
-                      <a href={urls.cardanoscan+showNotification.data} target="_blank" rel="noreferrer">{showNotification.data}</a>.
+                      <a href={cardanoscan_url+showNotification.data} target="_blank" rel="noreferrer">{showNotification.data}</a>.
                     </p>
                   ) : <></>
                 }
@@ -70,8 +66,6 @@ function mapStateToProps(state, props) {
 function mapDispatchToProps(dispatch) {
   return {
     create_txn: (send_addr, amount, callback) => dispatch(create_txn(send_addr, amount, callback)),
-    buyer_pay: (send_addr, callback) => dispatch(buyer_pay(send_addr, callback)),
-    
   };
 }
 
