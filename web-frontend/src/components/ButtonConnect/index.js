@@ -18,7 +18,6 @@ const ButtonConnect = ({wallet, connectWallet}) => {
         setShowNotification("connected");
         setTimeout(function(){ setShowNotification(false); }, 3000);
 
-
       }else{
         if(res.error){
           if(res.error.code === -3){
@@ -37,9 +36,9 @@ const ButtonConnect = ({wallet, connectWallet}) => {
     <>
       {
         !wallet.connected ? (
-          <a className={"button is-primary" + (wallet.loading ? " is-loading" : "")} disabled={wallet.loading} onClick={() => connect_wallet()}>
+          <button className={"button is-primary" + (wallet.loading ? " is-loading" : "")} disabled={wallet.loading} onClick={() => connect_wallet()}>
             <span>Connect</span>
-          </a>
+          </button>
         ) : <></>
       }
       {

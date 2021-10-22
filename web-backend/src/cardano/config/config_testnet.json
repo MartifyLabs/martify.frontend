@@ -1,0 +1,7 @@
+{ 
+    "path_db_node_socket": "/Users/jingles/cardano-src/db_testnet/node.socket",
+    "shelleyGenesisPath": "./src/cardano/config/testnet-alonzo-genesis.json",
+    "path_working_dir": "./src/cardano/",
+    "network": "testnet-magic 1097911063",
+    "is_mainnet": false
+}
