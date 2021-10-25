@@ -1,4 +1,4 @@
-import { apiKey, cardanoUrl, ipfsUrl } from '../../config';
+import { apiKey, cardanoUrl, ipfsUrl } from "../../config";
 
 export const cardanoBlockfrost = async (endpoint, headers, body) => {
   return await request(cardanoUrl, endpoint, headers, body);
