@@ -1,5 +1,4 @@
 import Cardano from "../serialization-lib";
-import { contract } from "../contract";
 import { getCollateral, signTx, submitTx } from '../wallet'
 import { getProtocolParameters } from "../blockfrost-api";
 import CoinSelection from "./coinSelection";
@@ -45,6 +44,7 @@ export const finalizeTx = async ({
   metadata,
   scriptUtxo,
   action,
+  plutusScripts,
 }) => {
   const transactionWitnessSet = CARDANO.TransactionWitnessSet.new();
 
@@ -82,14 +82,14 @@ export const finalizeTx = async ({
     redeemers.add(action(redeemerIndex));
     txBuilder.set_redeemers(CARDANO.Redeemers.from_bytes(redeemers.to_bytes()));
     txBuilder.set_plutus_data(CARDANO.PlutusList.from_bytes(datums.to_bytes()));
-    txBuilder.set_plutus_scripts(contract());
+    txBuilder.set_plutus_scripts(plutusScripts);
     const collateral = (await getCollateral()).map((utxo) =>
       CARDANO.TransactionUnspentOutput.from_bytes(fromHex(utxo))
     );
 
     setCollateral(txBuilder, collateral);
 
-    transactionWitnessSet.set_plutus_scripts(contract());
+    transactionWitnessSet.set_plutus_scripts(plutusScripts);
     transactionWitnessSet.set_plutus_data(datums);
     transactionWitnessSet.set_redeemers(redeemers);
   }
