@@ -1,38 +1,55 @@
 import Cardano from "../serialization-lib";
+import { MARKET } from "./datums";
 import { finalizeTx, initializeTx } from "../transaction";
 import { getUsedAddresses, getUtxos } from "../wallet";
 import { contractHex } from "./script";
-import { fromHex } from "../../utils";
+import { fromAscii, fromHex, toHex } from "../../utils";
 
 const CARDANO = Cardano.Instance();
 
 export const buyToken = async (offerUtxo) => {
-  const { txBuilder, datums, outputs } = await initializeTx();
+  const { txBuilder, datums, metadata, outputs } = await initializeTx();
 
-  const walletAddress = CARDANO.BaseAddress.from_address(
-    CARDANO.Address.from_bytes(fromHex((await getUsedAddresses())[0]))
-  );
+  budId = budId.toString();
+  if (
+    CARDANO.BigNum.from_str(requestedAmount).compare(contractInfo.minPrice) ===
+    -1
+  )
+    throw new Error("Amount too small");
+
+  const sellerAddress = "";
 
   const utxos = (await getUtxos()).map((utxo) =>
     CARDANO.TransactionUnspentOutput.from_bytes(fromHex(utxo))
   );
 
-  datums.add(offerUtxo.datum);
+  const marketDatum = MARKET({
+    tn,
+    cs,
+    price,
+    sellerAddress: toHex(sellerAddress.payment_cred().to_keyhash().to_bytes()),
+  });
+  outputs.add(
+    createOutput(
+      contractAddress(),
+      assetsToValue([
+        {
+          unit:
+            contractInfo.policySpaceBudz +
+            fromAscii(contractInfo.prefixSpaceBud + budId),
+          quantity: "1",
+        },
+      ]),
+      {
+        datum: marketDatum,
+        index: 0,
+        tradeOwnerAddress: walletAddress,
+        metadata,
+      }
+    )
+  );
 
-  const datumType = offerUtxo.datum.as_constr_plutus_data().tag().as_i32();
-  const tradeDetails = getTradeDetails(offerUtxo.datum);
-  const value = offerUtxo.utxo.output().amount();
-  const lovelaceAmount = tradeDetails.requestedAmount;
-  if (datumType !== DATUM_TYPE.Offer)
-    throw new Error("Datum needs to be Offer");
-
-  splitAmount(lovelaceAmount, offerUtxo.tradeOwnerAddress, outputs);
-
-  outputs.add(createOutput(walletAddress.to_address(), value)); // buyer receiving SpaceBud
-
-  const requiredSigners = CARDANO.Ed25519KeyHashes.new();
-  requiredSigners.add(walletAddress.payment_cred().to_keyhash());
-  txBuilder.set_required_signers(requiredSigners);
+  datums.add(marketDatum);
 
   const txHash = await finalizeTx({
     txBuilder,
@@ -40,14 +57,17 @@ export const buyToken = async (offerUtxo) => {
     utxos,
     outputs,
     datums,
-    scriptUtxo: offerUtxo.utxo,
-    action: BUY,
+    metadata,
+    plutusScripts: contractScripts(),
   });
+
   return txHash;
 };
 
 export const contractAddress = () => {
-  CARDANO.Address.from_bech32("addr_test1wq2m8ul5twkj8c0mc2nyxgr8ylk2u07rj882hs90a5yrhzgwgatvu");
+  CARDANO.Address.from_bech32(
+    "addr_test1wq2m8ul5twkj8c0mc2nyxgr8ylk2u07rj882hs90a5yrhzgwgatvu"
+  );
 };
 
 export const contractScripts = () => {
