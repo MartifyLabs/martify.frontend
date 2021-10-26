@@ -1,5 +1,6 @@
 import Cardano from "../serialization-lib";
 import { contract } from "../contract";
+import { getCollateral, signTx, submitTx } from '../wallet'
 import { getProtocolParameters } from "../blockfrost-api";
 import CoinSelection from "./coinSelection";
 import { languageViews } from "./languageViews";
@@ -82,7 +83,7 @@ export const finalizeTx = async ({
     txBuilder.set_redeemers(CARDANO.Redeemers.from_bytes(redeemers.to_bytes()));
     txBuilder.set_plutus_data(CARDANO.PlutusList.from_bytes(datums.to_bytes()));
     txBuilder.set_plutus_scripts(contract());
-    const collateral = (await window.cardano.getCollateral()).map((utxo) =>
+    const collateral = (await getCollateral()).map((utxo) =>
       CARDANO.TransactionUnspentOutput.from_bytes(fromHex(utxo))
     );
 
@@ -178,7 +179,7 @@ export const finalizeTx = async ({
 
   if (size > PROTOCOL_PARAMETERS.maxTxSize) throw new Error("MAX_SIZE_REACHED");
 
-  let txVkeyWitnesses = await window.cardano.signTx(toHex(tx.to_bytes()), true);
+  let txVkeyWitnesses = await signTx(toHex(tx.to_bytes()), true);
   txVkeyWitnesses = CARDANO.TransactionWitnessSet.from_bytes(
     fromHex(txVkeyWitnesses)
   );
@@ -191,7 +192,7 @@ export const finalizeTx = async ({
     tx.auxiliary_data()
   );
 
-  const txHash = await window.cardano.submitTx(toHex(signedTx.to_bytes()));
+  const txHash = await submitTx(toHex(signedTx.to_bytes()));
 
   return txHash;
 };
