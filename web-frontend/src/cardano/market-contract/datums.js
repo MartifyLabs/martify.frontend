@@ -1,35 +1,19 @@
 import Cardano from "../serialization-lib";
-import { fromHex, toHex } from "../../utils";
+import { fromHex } from "../../utils";
 
-export const serialize = ({ tn, cs, sa, price }) => {
-  const fields = Cardano.Instance.PlutusList.new();
+const CARDANO = Cardano.Instance();
 
-  fields.add(Cardano.Instance.PlutusData.new_bytes(fromHex(sa)));
-  fields.add(
-    Cardano.Instance.PlutusData.new_integer(
-      Cardano.Instance.BigInt.from_str(`${price}`)
-    )
-  );
-  fields.add(Cardano.Instance.PlutusData.new_bytes(fromHex(cs)));
-  fields.add(Cardano.Instance.PlutusData.new_bytes(fromHex(tn)));
+export const MARKET = ({ tn, cs, sellerAddress, price }) => {
+  const fields = CARDANO.PlutusList.new();
 
-  const datum = Cardano.Instance.PlutusData.new_constr_plutus_data(
-    Cardano.Instance.ConstrPlutusData.new(
-      Cardano.Instance.Int.new_i32(0),
-      fields
-    )
+  fields.add(CARDANO.PlutusData.new_bytes(fromHex(tn)));
+  fields.add(CARDANO.PlutusData.new_bytes(fromHex(cs)));
+  fields.add(CARDANO.PlutusData.new_bytes(fromHex(sellerAddress)));
+  fields.add(CARDANO.PlutusData.new_integer(CARDANO.BigInt.from_str(price)));
+
+  const datum = CARDANO.PlutusData.new_constr_plutus_data(
+    CARDANO.ConstrPlutusData.new(CARDANO.Int.new_i32(0), fields)
   );
 
   return datum;
-};
-
-export const deserialize = (datum) => {
-  const details = datum.as_constr_plutus_data().data();
-
-  return {
-    tn: toHex(details.get(3).as_bytes()),
-    cs: toHex(details.get(2).as_bytes()),
-    sa: toHex(details.get(0).as_bytes()),
-    price: details.get(1).as_integer().to_str(),
-  };
 };
