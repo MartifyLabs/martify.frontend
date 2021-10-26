@@ -47,7 +47,7 @@ export const buyToken = async (offerUtxo) => {
 };
 
 export const contractAddress = () => {
-  CARDANO.Address.from_bech32("MARKET_CONTRACT_ADDRESS");
+  CARDANO.Address.from_bech32("addr_test1wq2m8ul5twkj8c0mc2nyxgr8ylk2u07rj882hs90a5yrhzgwgatvu");
 };
 
 export const contractScripts = () => {
