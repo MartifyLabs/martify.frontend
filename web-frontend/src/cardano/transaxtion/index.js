@@ -1,6 +1,7 @@
 import Cardano from "../serialization-lib";
 import { contract } from "../contract";
 import { getProtocolParameters } from "../blockfrost-api";
+import CoinSelection from "./coinSelection";
 import { languageViews } from "./languageViews";
 import { fromHex, toHex } from "../../utils";
 
@@ -46,6 +47,13 @@ export const finalizeTx = async ({
 }) => {
   const transactionWitnessSet = CARDANO.TransactionWitnessSet.new();
 
+  CoinSelection.setProtocolParameters(
+    PROTOCOL_PARAMETERS.minUtxo,
+    PROTOCOL_PARAMETERS.linearFee.minFeeA,
+    PROTOCOL_PARAMETERS.linearFee.minFeeB,
+    PROTOCOL_PARAMETERS.maxTxSize.toString()
+  );
+
   let { input, change } = CoinSelection.randomImprove(
     utxos,
     outputs,
@@ -77,7 +85,8 @@ export const finalizeTx = async ({
     const collateral = (await window.cardano.getCollateral()).map((utxo) =>
       CARDANO.TransactionUnspentOutput.from_bytes(fromHex(utxo))
     );
-    this.setCollateral(txBuilder, collateral);
+
+    setCollateral(txBuilder, collateral);
 
     transactionWitnessSet.set_plutus_scripts(contract());
     transactionWitnessSet.set_plutus_data(datums);
@@ -108,7 +117,7 @@ export const finalizeTx = async ({
   // check if change value is too big for single output
   if (
     changeMultiAssets &&
-    change.to_bytes().length * 2 > this.protocolParameters.maxValSize
+    change.to_bytes().length * 2 > PROTOCOL_PARAMETERS.maxValSize
   ) {
     const partialChange = CARDANO.Value.new(CARDANO.BigNum.from_str("0"));
 
@@ -133,7 +142,7 @@ export const finalizeTx = async ({
           checkValue.set_multiasset(checkMultiAssets);
           if (
             checkValue.to_bytes().length * 2 >=
-            this.protocolParameters.maxValSize
+            PROTOCOL_PARAMETERS.maxValSize
           ) {
             partialMultiAssets.insert(policy, assets);
             return;
@@ -146,7 +155,7 @@ export const finalizeTx = async ({
     partialChange.set_multiasset(partialMultiAssets);
     const minAda = CARDANO.min_ada_required(
       partialChange,
-      CARDANO.BigNum.from_str(this.protocolParameters.minUtxo)
+      CARDANO.BigNum.from_str(PROTOCOL_PARAMETERS.minUtxo)
     );
     partialChange.set_coin(minAda);
 
@@ -167,8 +176,7 @@ export const finalizeTx = async ({
 
   const size = tx.to_bytes().length * 2;
 
-  if (size > this.protocolParameters.maxTxSize)
-    throw new Error("MAX_SIZE_REACHED");
+  if (size > PROTOCOL_PARAMETERS.maxTxSize) throw new Error("MAX_SIZE_REACHED");
 
   let txVkeyWitnesses = await window.cardano.signTx(toHex(tx.to_bytes()), true);
   txVkeyWitnesses = CARDANO.TransactionWitnessSet.from_bytes(
@@ -186,4 +194,14 @@ export const finalizeTx = async ({
   const txHash = await window.cardano.submitTx(toHex(signedTx.to_bytes()));
 
   return txHash;
+};
+
+const setCollateral = (txBuilder, utxos) => {
+  const inputs = CARDANO.TransactionInputs.new();
+
+  utxos.forEach((utxo) => {
+    inputs.add(utxo.input());
+  });
+
+  txBuilder.set_collateral(inputs);
 };
