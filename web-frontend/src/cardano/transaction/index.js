@@ -1,5 +1,5 @@
 import Cardano from "../serialization-lib";
-import { getCollateral, signTx, submitTx } from '../wallet'
+import { getCollateral, signTx, submitTx } from "../wallet";
 import { getProtocolParameters } from "../blockfrost-api";
 import CoinSelection from "./coinSelection";
 import { languageViews } from "./languageViews";
@@ -195,6 +195,36 @@ export const finalizeTx = async ({
   const txHash = await submitTx(toHex(signedTx.to_bytes()));
 
   return txHash;
+};
+
+export const createOutput = (
+  address,
+  value,
+  { datum, index, tradeOwnerAddress, metadata } = {}
+) => {
+  const v = value;
+
+  const minAda = CARDANO.min_ada_required(
+    v,
+    CARDANO.BigNum.from_str(PROTOCOL_PARAMETERS.minUtxo),
+    datum && CARDANO.hash_plutus_data(datum)
+  );
+
+  if (minAda.compare(v.coin()) === 1) v.set_coin(minAda);
+
+  const output = CARDANO.TransactionOutput.new(address, v);
+
+  if (datum) {
+    output.set_data_hash(CARDANO.hash_plutus_data(datum));
+    metadata[DATUM_LABEL][index] = "0x" + toHex(datum.to_bytes());
+  }
+
+  if (tradeOwnerAddress) {
+    metadata[ADDRESS_LABEL].address =
+      "0x" + toHex(tradeOwnerAddress.to_address().to_bytes());
+  }
+
+  return output;
 };
 
 const setCollateral = (txBuilder, utxos) => {
