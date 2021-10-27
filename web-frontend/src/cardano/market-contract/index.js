@@ -1,64 +1,48 @@
 import Cardano from "../serialization-lib";
-import { MARKET } from "./datums";
-import { finalizeTx, initializeTx } from "../transaction";
+import { BUY } from './redeemers'
+import { cbor } from "./script";
+import { createOutput, finalizeTx, initializeTx } from "../transaction";
 import { getUsedAddresses, getUtxos } from "../wallet";
-import { contractHex } from "./script";
-import { fromAscii, fromHex, toHex } from "../../utils";
+import { fromHex } from "../../utils";
 
 const CARDANO = Cardano.Instance();
 
-export const buyToken = async (offerUtxo) => {
-  const { txBuilder, datums, metadata, outputs } = await initializeTx();
+export const offer = async () => {};
 
-  budId = budId.toString();
-  if (
-    CARDANO.BigNum.from_str(requestedAmount).compare(contractInfo.minPrice) ===
-    -1
-  )
-    throw new Error("Amount too small");
+export const cancel = async () => {};
 
-  const sellerAddress = "";
+export const purchase = async (tokenUtxo) => {
+  const { txBuilder, datums, outputs } = await initializeTx();
+
+  const walletAddress = CARDANO.BaseAddress.from_address(
+    CARDANO.Address.from_bytes(
+      fromHex((await getUsedAddresses())[0])
+    )
+  );
 
   const utxos = (await getUtxos()).map((utxo) =>
     CARDANO.TransactionUnspentOutput.from_bytes(fromHex(utxo))
   );
 
-  const marketDatum = MARKET({
-    tn,
-    cs,
-    price,
-    sellerAddress: toHex(sellerAddress.payment_cred().to_keyhash().to_bytes()),
-  });
-  outputs.add(
-    createOutput(
-      contractAddress(),
-      assetsToValue([
-        {
-          unit:
-            contractInfo.policySpaceBudz +
-            fromAscii(contractInfo.prefixSpaceBud + budId),
-          quantity: "1",
-        },
-      ]),
-      {
-        datum: marketDatum,
-        index: 0,
-        tradeOwnerAddress: walletAddress,
-        metadata,
-      }
-    )
-  );
+  datums.add(tokenUtxo.datum);
 
-  datums.add(marketDatum);
+  const token = tokenUtxo.utxo.output().amount();
+
+  outputs.add(createOutput(walletAddress.to_address(), token));
+
+  const requiredSigners = CARDANO.Ed25519KeyHashes.new();
+  requiredSigners.add(walletAddress.payment_cred().to_keyhash());
+  txBuilder.set_required_signers(requiredSigners);
 
   const txHash = await finalizeTx({
     txBuilder,
-    changeAddress: walletAddress,
     utxos,
     outputs,
     datums,
-    metadata,
+    scriptUtxo: tokenUtxo.utxo,
+    changeAddress: walletAddress,
     plutusScripts: contractScripts(),
+    action: BUY,
   });
 
   return txHash;
@@ -73,7 +57,7 @@ export const contractAddress = () => {
 export const contractScripts = () => {
   const scripts = CARDANO.PlutusScripts.new();
 
-  scripts.add(CARDANO.PlutusScript.new(fromHex(contractHex)));
+  scripts.add(CARDANO.PlutusScript.new(fromHex(cbor)));
 
   return scripts;
 };
