@@ -1,43 +1,22 @@
 import Cardano from "../serialization-lib";
 
+const CARDANO = Cardano.Instance();
+
 export const BUY = (index) => {
-  const data = Cardano.Instance.PlutusData.new_constr_plutus_data(
-    Cardano.Instance.ConstrPlutusData.new(
-      Cardano.Instance.Int.new_i32(0),
-      Cardano.Instance.PlutusList.new()
+  const redeemerData = CARDANO.PlutusData.new_constr_plutus_data(
+    CARDANO.ConstrPlutusData.new(
+      CARDANO.Int.new_i32(0),
+      CARDANO.PlutusList.new()
     )
   );
-
-  const redeemer = Cardano.Instance.Redeemer.new(
-    Cardano.Instance.RedeemerTag.new_spend(),
-    Cardano.Instance.BigNum.from_str(index),
-    data,
-    Cardano.Instance.ExUnits.new(
-      Cardano.Instance.BigNum.from_str("2500000"),
-      Cardano.Instance.BigNum.from_str("800000000")
+  const redeemer = CARDANO.Redeemer.new(
+    CARDANO.RedeemerTag.new_spend(),
+    CARDANO.BigNum.from_str(index),
+    redeemerData,
+    CARDANO.ExUnits.new(
+      CARDANO.BigNum.from_str("7000000"),
+      CARDANO.BigNum.from_str("3000000000")
     )
   );
-
-  return redeemer;
-};
-
-export const CANCEL = (index) => {
-  const data = Cardano.Instance.PlutusData.new_constr_plutus_data(
-    Cardano.Instance.ConstrPlutusData.new(
-      Cardano.Instance.Int.new_i32(1),
-      Cardano.Instance.PlutusList.new()
-    )
-  );
-
-  const redeemer = Cardano.Instance.Redeemer.new(
-    Cardano.Instance.RedeemerTag.new_spend(),
-    Cardano.Instance.BigNum.from_str(index),
-    data,
-    Cardano.Instance.ExUnits.new(
-      Cardano.Instance.BigNum.from_str("2500000"),
-      Cardano.Instance.BigNum.from_str("800000000")
-    )
-  );
-
   return redeemer;
 };
