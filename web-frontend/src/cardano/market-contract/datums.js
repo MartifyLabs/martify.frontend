@@ -1,9 +1,9 @@
 import Cardano from "../serialization-lib";
-import { fromHex } from "../../utils";
+import { fromHex, toHex } from "../../utils";
 
 const CARDANO = Cardano.Instance();
 
-export const MARKET = ({ tn, cs, sellerAddress, price }) => {
+export const serialize = ({ tn, cs, sellerAddress, price }) => {
   const fields = CARDANO.PlutusList.new();
 
   fields.add(CARDANO.PlutusData.new_bytes(fromHex(tn)));
@@ -16,4 +16,17 @@ export const MARKET = ({ tn, cs, sellerAddress, price }) => {
   );
 
   return datum;
+};
+
+export const deserialize = (datum) => {
+  const details = datum.as_constr_plutus_data().data();
+
+  return {
+    tn: toHex(details.get(0).as_bytes()),
+    cs: toHex(details.get(1).as_bytes()),
+    sellerAddress: toHex(
+      CARDANO.Ed25519KeyHash.from_bytes(details.get(2).as_bytes())
+    ),
+    price: details.get(3).as_integer().as_u64(),
+  };
 };
