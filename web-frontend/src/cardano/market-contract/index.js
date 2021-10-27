@@ -1,13 +1,51 @@
 import Cardano from "../serialization-lib";
-import { BUY } from './redeemers'
+import { serialize } from "./datums";
+import { BUY } from "./redeemers";
 import { cbor } from "./script";
 import { createOutput, finalizeTx, initializeTx } from "../transaction";
 import { getUsedAddresses, getUtxos } from "../wallet";
-import { fromHex } from "../../utils";
+import { fromHex, toHex } from "../../utils";
 
 const CARDANO = Cardano.Instance();
 
-export const offer = async () => {};
+export const offer = async (tn, cs, price) => {
+  const { txBuilder, datums, metadata, outputs } = await initializeTx();
+
+  const walletAddress = CARDANO.BaseAddress.from_address(
+    CARDANO.Address.from_bytes(fromHex((await getUsedAddresses())[0]))
+  );
+
+  const utxos = (await getUtxos()).map((utxo) =>
+    CARDANO.TransactionUnspentOutput.from_bytes(fromHex(utxo))
+  );
+
+  const offerDatum = serialize({
+    tn,
+    cs,
+    price,
+    sellerAddress: toHex(walletAddress.payment_cred().to_keyhash().to_bytes()),
+  });
+
+  outputs.add(
+    createOutput(contractAddress(), undefined /* to be defined */, {
+      datum: offerDatum,
+      index: 0,
+      tradeOwnerAddress: walletAddress,
+      metadata,
+    })
+  );
+  datums.add(offerDatum);
+
+  const txHash = await finalizeTx({
+    txBuilder,
+    changeAddress: walletAddress,
+    utxos,
+    outputs,
+    datums,
+    metadata,
+  });
+  return txHash;
+};
 
 export const cancel = async () => {};
 
@@ -15,9 +53,7 @@ export const purchase = async (tokenUtxo) => {
   const { txBuilder, datums, outputs } = await initializeTx();
 
   const walletAddress = CARDANO.BaseAddress.from_address(
-    CARDANO.Address.from_bytes(
-      fromHex((await getUsedAddresses())[0])
-    )
+    CARDANO.Address.from_bytes(fromHex((await getUsedAddresses())[0]))
   );
 
   const utxos = (await getUtxos()).map((utxo) =>
