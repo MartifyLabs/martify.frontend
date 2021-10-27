@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
-import {urls} from "../../config";
 
-const ButtonBuy = ({wallet, purchase_this_token}) => {
+import { create_txn, buyer_pay } from "../../store/wallet/api";
+import {cardanoscan_url} from "../../config";
+
+const ButtonBuy = ({wallet, create_txn, buyer_pay}) => {
 
   const [showNotification, setShowNotification] = useState(false);
 
   async function begin_buy_process() {
-    purchase_this_token();
 
     // let amount = 2;
 
@@ -46,7 +47,7 @@ const ButtonBuy = ({wallet, purchase_this_token}) => {
                   showNotification.type === "payment-success" ? (
                     <p>
                       Payment successful.<br/>
-                      <a href={urls.cardanoscan+showNotification.data} target="_blank" rel="noreferrer">{showNotification.data}</a>.
+                      <a href={cardanoscan_url+showNotification.data} target="_blank" rel="noreferrer">{showNotification.data}</a>.
                     </p>
                   ) : <></>
                 }

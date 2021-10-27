@@ -2,168 +2,102 @@ import {
   collections_loaded,
   collections_add_tokens,
   collections_loading,
-  collections_top_projects,
 } from "./collectionActions";
 
 import data_collections from "../../data/collections.json";
-import data_collections_cnft from "../../data/collections-cnft.json";
-
-import {
-  getAssets,
-  getAsset,
-  saveAsset,
-  getRandomAssets,
-} from "../../database";
-
-import { getWalletAddresses } from "../../cardano/wallet";
-import { getAssetsPolicy , getAssetTransactions } from "../../cardano/blockfrost-api";
 
 export const load_collection = (callback) => async (dispatch) => {
-
-  let all_collections = {};
-
-  for(var collection_id in data_collections){
-    var tmp = data_collections[collection_id];
-    tmp.is_martify_verified = true;
-
-    if(tmp.style){
-      if(tmp.style.banner) tmp.style.banner_path = `/images/collections/${tmp.id}/${tmp.style.banner}`;
-      if(tmp.style.logo) tmp.style.logo_path = `/images/collections/${tmp.id}/${tmp.style.logo}`;
-    }
-    all_collections[collection_id] = tmp;
-  }
-
-  for(var collection_id in data_collections_cnft){
-    var tmp = data_collections_cnft[collection_id];
-    if(tmp.id in all_collections){
-      all_collections[tmp.id].policy_ids = [...all_collections[tmp.id].policy_ids, ...tmp.policy_ids];
-    }else{
-      tmp.is_cnft_verified = true;
-      all_collections[collection_id] = tmp;
-    }
-    
-  }
-
-  dispatch(collections_loaded(all_collections));
-  callback({all_collections});
+  dispatch(collections_loaded(data_collections));
+  callback({data_collections});
 }
+
+let mock = {
+  "6c880f643a86d6f5b86871952b36999bbf7e9619ca54953abd2acf62": {
+    "PixelHead010": {
+      price: 3499,
+      meta: {
+        "creature name": "Aether",
+         image: "Qmdk5vhzDkL7CsXgUkHdM2x6xEiR28E2YXT4LVyxk6t7zY",
+         mediaType: "image/gif",
+         name: "PixelHead #010",
+         narrative: [
+            "A Controller of the Sentibot legion, this being is the epitome",
+            "of cybernetics technology. What remains of it's original self?",
+            "--",
+            "The Pixel Head Squad"
+         ]
+      }
+    },
+    "PixelHead016": {
+      price: 22222,
+      meta: {
+        "creature name": "Armanto",
+        image: "QmTHzijixVhiizqgEK1hzC4M45qJjjXs2byymiY2qugR36",
+        mediaType: "image/gif",
+        name: "PixelHead #016",
+        narrative: [
+          "Always skiving off plugging herself into the metaverse, she has",
+          "since grown bored of cutting edge entertainment and instead",
+          "prefers more vintage selections.",
+          "---",
+          "The Pixel Head Squad"
+        ]
+      }
+    },
+    "PixelHead017": {
+      price: 7777,
+      meta: {
+        "creature name": "High Roller",
+        image: "QmWjkMf31dbJcAA4WE4vD9CTVmqXSzMpmRpKeDdMojAKWW",
+        mediaType: "image/gif",
+        name: "PixelHead #017",
+        narrative: [
+          "This guy seems too well-kempt to be in this part of the town,",
+          "until he whips his deck of cards out for no apparent reason.",
+          "Just another weirdo here in Lumion.",
+          "---",
+          "The Pixel Head Squad"
+        ]
+      },
+    },
+  },
+  "abc": {
+    "Naru03343": {
+      price: 1500,
+      meta: {
+        name: "Yummi Universe - Naru 03343",
+        image: "QmXTL9tzs72vjYhkKdaEPqYM2fhPGms2MuKFmp9vowT97q",
+      }
+    },
+  }
+};
 
 export const get_listings = (policy_id, callback) => async (dispatch) => {
 
+  // query policy ID, get data
   dispatch(collections_loading(true));
-
+  
   let output = {
     "policy_id": policy_id,
-    "listing": {}
-  };
-
-  let policyids_projectid = {}
-  let assets = await getAssets(policy_id);
-  for(var i in assets){
-    let asset = assets[i];
-    if(asset){
-      if(asset.info){
-        output.listing[asset.info.asset] = asset;
-      }
-    }
-  }
-  
-  if(output.policy_id && output.listing){
-    dispatch(collections_add_tokens(output));
-  }
-
+    "listing": mock[policy_id]
+  };  
   callback(true);
-}
-
-function add_token(asset, dispatch){
-  let output = {
-    "policy_id": asset.info.policyId,
-    "listing": {
-      [asset.info.asset]: asset
-    }
-  };
   dispatch(collections_add_tokens(output));
+  
 }
 
-export const get_asset = (asset_id, callback) => async (dispatch) => {
+export const get_token = (policy_id, token_id, callback) => async (dispatch) => {
 
+  // query, get data
   dispatch(collections_loading(true));
   
-  let asset = await getAsset(asset_id);
-
-  if(asset) add_token(asset, dispatch);
+  let output = {
+    "policy_id": policy_id,
+    "listing": {
+      [token_id]: mock[policy_id][token_id]
+    }
+  };  
   callback(true);
-}
-
-
-export const asset_add_offer = (asset_id, price, callback) => async (dispatch) => {
-  let asset = await getAsset(asset_id);
-
-  let wallet_address = await getWalletAddresses();
-
-  if(!("offers" in asset)){
-    asset.offers = {};
-  }
-
-  let offer = {
-    t: new Date().getTime(),
-    p: price,
-  }
-
-  asset.offers[wallet_address] = offer;
+  dispatch(collections_add_tokens(output));
   
-  await saveAsset(asset);
-
-  add_token(asset, dispatch)
-
-  callback(true);
-}
-
-export const get_random_assets = (callback) => async (dispatch) => {
-  let assets = await getRandomAssets(10);
-  callback(assets);
-}
-
-
-
-export const opencnft_get_top_projects = (time, callback) => async (dispatch) => {
-  fetch('https://api.opencnft.io/1/rank?window='+time, {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-  })
-  .then(res => res.json())
-  .then((res) => {
-    callback({success: true, data: res.ranking});
-  });
-}
-
-export const opencnft_get_policy = (policy_id, callback) => async (dispatch) => {
-  fetch(`https://api.opencnft.io/1/policy/${policy_id}`, {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-  })
-  .then(res => res.json())
-  .then((res) => {
-    callback({success: true, data: res});
-  });
-}
-
-export const opencnft_get_asset_tx = (asset_id, callback) => async (dispatch) => {
-  fetch(`https://api.opencnft.io/1/asset/${asset_id}/tx`, {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-  })
-  .then(res => res.json())
-  .then((res) => {
-    callback({success: true, data: res});
-  });
 }

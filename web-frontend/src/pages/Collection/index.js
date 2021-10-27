@@ -1,99 +1,146 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState} from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
 
-import { load_collection, get_listings, opencnft_get_policy } from "../../store/collection/api";
-import AssetCard from "../../components/AssetCard";
-import CollectionAbout from "../../components/CollectionAbout";
-import CollectionBanner from "../../components/CollectionBanner";
-import { numFormatter } from "../../utils";
+import { load_collection, get_listings } from "../../store/collection/api";
+import Card from "./Card";
+import AboutCollection from "../../components/AboutCollection";
 
 import "./style.css";
 
-const Collection = ({state_collection, collection_id, get_listings, opencnft_get_policy}) => {
+const Collection = ({state_collection, collection_id, get_listings}) => {
   
+  // const [collectionId, setCollectionId] = useState(false);
+  const [policyId, setPolicyId] = useState(false);
+  // const [listingPolicyId, setListingPolicyId] = useState(false);
+  // const [listings, setListings] = useState([]);
+
   const default_meta = {
-    id: "",
+    is_verified: false,
     meta: {
 
     },
     style: {
-      font_color_title: false,
-      banner_path: false
+      font_color_title: "#fff",
+      banner_path: "/images/collection/banner.jpg"
     },
     links: {}
   };
-
-  const [policyIds, setPolicyIds] = useState(false);
   const [thisCollection, setThisCollection] = useState(default_meta);
-  
+
   useEffect(() => {
-    if(state_collection.loaded){
-      
-      let policy_ids = false;
-      var this_collection = false;
-
-      if(collection_id in state_collection.collections){
-        this_collection = {...default_meta, ...state_collection.collections[collection_id]};
-        policy_ids = this_collection.policy_ids;
-      }
-      else if(collection_id in state_collection.policies_collections){
-        this_collection = {...default_meta, ...state_collection.policies_collections[collection_id]};
-        policy_ids = [collection_id];
-      }
-      else{
-        this_collection = {...default_meta, id:collection_id, policy_id: collection_id};
-        policy_ids = [collection_id];
-      }
-      
-      if(this_collection.id != thisCollection.id){
-        setPolicyIds(policy_ids);
-        setThisCollection({...this_collection});
-
-        for(var i in policy_ids){
-          var policy_id = policy_ids[i];
-          opencnft_get_policy(policy_id, (res) => {
-            if(res.data.statusCode==404){}else{
-              if(!("opencnft" in this_collection)){
-                this_collection.opencnft = [];
-              }
-              this_collection.opencnft.push(res.data);
-              setThisCollection({...this_collection});
-            }
-          });
-        }
-      }
+    if(collection_id in state_collection.collections){
+      setPolicyId(state_collection.collections[collection_id].policy_id);
+      var tmp = {...state_collection.collections[collection_id]};
+      tmp.style.banner_path = `/collections/${tmp.id}/${tmp.style.banner}`;
+      tmp.style.logo_path = `/collections/${tmp.id}/${tmp.style.logo}`;
+      tmp.is_verified = true;
+      setThisCollection(tmp);
+    }else{
+      var tmp = {...default_meta};
+      tmp.meta.name = collection_id;
+      setPolicyId(collection_id);
+      setThisCollection(tmp);
     }
   }, [state_collection, collection_id]);
-  
+
+  // useEffect(() => {
+  //   if(collectionId!=collection_id){
+  //     setCollectionId(collection_id);
+  //   }
+  // }, [collection_id]);
+
   useEffect(() => {
-    if(policyIds){
-      for(var i in policyIds){
-        get_listings(policyIds[i], (res) => {});
-      }
+    // if(collectionId in state_collection.collections){
+    //   if(!("listing"in state_collection.collections[collectionId])){
+    //     get_listings(policy_id, (res) => {
+    //       console.log(res)
+    //       setListingPolicyId(res.policy_id);
+    //       console.log(res.listing)
+    //       setListings(res.listing);
+    //     });
+    //   }
+    // }
+
+    if(policyId){
+      get_listings(policyId, (res) => {
+        // console.log(res)
+        // setListingPolicyId(res.policy_id);
+        // console.log(res.listing)
+        // setListings(res.listing);
+      });
     }
-  }, [policyIds]);
+    
+  }, [policyId]);
+
   
   return (
     <div className="collection">
+      <section className="hero is-medium" style={{backgroundImage: `url(${thisCollection.style.banner_path})`}}>
+        <div className="hero-body">
+        
+          <nav className="level">
+            <div className="level-left">
+              {
+                thisCollection.style.logo_path ? (
+                  <div className="level-item">
+                    <figure className="image is-128x128">
+                      <img className="collection_logo is-rounded image is-128x128" src={thisCollection.style.logo_path} />
+                    </figure>
+                  </div>
+                ) : <></>
+              }
+              <div className="level-item">
+                <div className="collection_title">
+                  <p className="title is-size-1" style={{color: thisCollection.style.font_color_title}}>
+                    {thisCollection.meta.name}
+                  </p>
+                </div>
+              </div>
+            </div>
 
-      <CollectionBanner thisCollection={thisCollection} size={thisCollection.is_martify_verified?"is-medium":"is-small"} />
+            <div className="level-right">
+              <div className="level-item">
+                <div className="field has-addons social-links">
+                {
+                  Object.keys(thisCollection.links).map(function (key) {
+                    var icon = "";
+                    if(key=='discord')icon="fab fa-discord";
+                    if(key=='twitter')icon="fab fa-twitter";
+                    if(key=='website')icon="fas fa-laptop";
+                    return (
+                      <p className="control" key={key}>
+                        <a className="button" href={thisCollection.links[key]} rel="noreferrer" target="_blank">
+                          <span className="icon">
+                            <i className={icon}></i>
+                          </span>
+                        </a>
+                      </p>
+                    )
+                  })
+                }
+                </div>
+              </div>
+            </div>
+          </nav>
+
+        </div>
+      </section>
       
       <section className="section">
         <div className="columns">
-          
-          { thisCollection.is_martify_verified || thisCollection.is_cnft_verified ? 
-            <div className="column is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
-              <div className="block">
-                <CollectionAbout thisCollection={thisCollection} />
+          {
+            thisCollection.is_verified ? (
+              <div className="column is-three-quarters-mobile is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
+                <div className="block">
+                  { thisCollection ? <AboutCollection thisCollection={thisCollection} /> : <></> }
+                </div>
               </div>
-            </div>
-           : <></> }
-      
+            ) : <></>
+          }
           <div className="column">
-            <ListingSection state_collection={state_collection} policyIds={policyIds} />
+            <ListingSection state_collection={state_collection} policyId={policyId} />
           </div>
-
         </div>
       </section>
 
@@ -101,72 +148,44 @@ const Collection = ({state_collection, collection_id, get_listings, opencnft_get
   );
 };
 
-const ListingSection = ({state_collection, policyIds}) => {
+const ListingSection = ({state_collection, policyId}) => {
 
   const [listings, setListings] = useState([]);
+  const [searchText, setSearchText] = useState("");
+  const [sortby, setSortby] = useState("");
+  const sort_options = [
+    {"value": 1, "label": "Price: Low to High"},
+    {"value": 2, "label": "Price: High to Low"},
+  ]
 
   function load(){
-    setListings([]);
-    let tmp_list = [];
-    for(var i in policyIds){
-      var policy_id = policyIds[i];
-      if(policy_id in state_collection.policies_assets){
-        let tmp = Object.values(state_collection.policies_assets[policy_id]);
-        tmp_list.push(...tmp);
-      }
+    if(policyId in state_collection.policies_tokens){
+      let tmp = Object.values(state_collection.policies_tokens[policyId]);
+      setListings(tmp);
     }
-    setListings(tmp_list);
   }
 
   useEffect(() => {
     load()
-  }, [policyIds, state_collection]);
+  }, [policyId, state_collection]);
 
   useEffect(() => {
     load()
   }, []);
 
-return (
-  <>
-    {
-      listings.length > 0 ? <DisplayListing listings={listings} /> : <></>
-    }
-    {
-      listings.length == 0 ? <NoAssetFound state_collection={state_collection} policyIds={policyIds} /> : <></>
-    }
-  </>
-  );
-}
-
-const DisplayListing = ({listings}) => {
-
-  //pagination
-  const pageSize = 16;
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // search and filter
-  const [searchText, setSearchText] = useState("");
-  const [sortby, setSortby] = useState('lowtohigh');
-  const sort_options = [
-    {"value": 'lowtohigh', "label": "Price: Low to High"},
-    {"value": 'hightolow', "label": "Price: High to Low"},
-  ];
 
   const searchingFor = searchText => {
     return x => {
       let return_this = false;
-
-      if(x.info.onchainMetadata==null){
-        return false
-      }
-
       if (searchText === "") {
         return_this = true;
       }
       else if (
         searchText !== "" &&
         (
-          x.info.onchainMetadata.name.toLowerCase().includes(searchText.toLowerCase())
+          x.token_id.toLowerCase().includes(searchText.toLowerCase()) || 
+          x.meta.name.toLowerCase().includes(searchText.toLowerCase())
+          // x.properties.some(x => x.toLowerCase().includes(searchText.toLowerCase()))
         )
       ) {
         return_this = true;
@@ -178,29 +197,19 @@ const DisplayListing = ({listings}) => {
   let matchedtokens = listings.filter(searchingFor(searchText));
 
   const filtered_listing = matchedtokens
-  .filter((this_nft, i) => {
-    let current_index_min = ((currentPage-1)*pageSize)
-    let current_index_max = (currentPage*pageSize)
-    if(i>=current_index_min && i<current_index_max){
-      return true;
-    }
-    return false;
-  })
   .sort((a, b) => {
-    let a_price = a.listing.price!=undefined ? a.listing.price : 999999;
-    let b_price = b.listing.price!=undefined ? b.listing.price : 999999;
-
-    if(sortby==='lowtohigh'){
-      return a_price - b_price;
+    if(sortby==1){
+      return a.price > b.price ? 1 : -1
     }
-    if(sortby==='hightolow'){
-      return b_price - a_price;
+    if(sortby==2){
+      return a.price > b.price ? -1 : 1
     }
-    
   })
   .map((this_nft, i) => {
     return(
-      <AssetCard asset={this_nft} key={i} />
+      <div className="column is-one-full-mobile is-half-tablet one-quarter-desktop is-one-quarter-widescreen is-one-quarter-fullhd" key={i}>
+        <Card token={this_nft} />
+      </div>
     )
   });
 
@@ -238,98 +247,9 @@ return (
     <div className="columns is-multiline">
       {filtered_listing}
     </div>
-    
-    {
-      (matchedtokens.length/pageSize) > 1 ? (
-        <nav className="pagination is-rounded" role="navigation" aria-label="pagination">
-          <button className="pagination-previous" onClick={() => setCurrentPage(currentPage-1)} disabled={currentPage==1}>Previous</button>
-          <button className="pagination-next" onClick={() => setCurrentPage(currentPage+1)} disabled={currentPage==(matchedtokens.length/pageSize)}>Next page</button>
-          <ul className="pagination-list">
-            {
-              currentPage!=1?(
-                <li><a className="pagination-link" aria-label="Goto page 1" onClick={() => setCurrentPage(1)}>1</a></li>
-              ) : <></>
-            }
-            {
-              currentPage > 3 ? (
-                <li><span className="pagination-ellipsis">&hellip;</span></li>
-              ) : <></>
-            }
-            { 
-              currentPage > 2 ? 
-                <li><a className="pagination-link" aria-label="Goto page 45" onClick={() => setCurrentPage(currentPage-1)}>{currentPage-1}</a></li>
-              : <></>
-            }
-            <li><a className="pagination-link is-current" aria-label="Page 46" aria-current="page">{currentPage}</a></li>
-            {
-              currentPage < (matchedtokens.length/pageSize) ? (
-                <li><a className="pagination-link" aria-label="Goto page 47" onClick={() => setCurrentPage(currentPage+1)}>{currentPage+1}</a></li>
-              ) : <></>
-            }
-            {
-              currentPage < (matchedtokens.length/pageSize)-2 ? (
-                <>
-                  <li><span className="pagination-ellipsis">&hellip;</span></li>
-                </>
-              ) : <></>
-            }
-            {
-              currentPage < (matchedtokens.length/pageSize)-1 ? (
-                <li><a className="pagination-link" aria-label="Goto page 86" onClick={() => setCurrentPage(parseInt(matchedtokens.length/pageSize)+1)}>{parseInt(matchedtokens.length/pageSize)+1}</a></li>
-              ) : <></>
-            }
-          </ul>
-        </nav>
-      ) : <></>
-    }
 
   </div>
   );
-}
-
-const NoAssetFound = ({state_collection, policyIds}) => {
-  return (
-    <section className="hero is-medium">
-      <div className="hero-body">
-        <div className="container has-text-centered">
-          {
-            state_collection.loading ? (
-              <>
-                <h1>
-                  <span className="icon" style={{fontSize:"100px", marginBottom:"50px"}}>
-                    <i className="fas fa-truck-loading"></i>
-                  </span>
-                </h1>
-                <p className="title">
-                  Fetching assets
-                </p>
-                <p className="subtitle">
-                  This may take awhile...
-                </p>
-              </>
-            ) : <></>
-          }
-          {
-            !state_collection.loading && policyIds ? policyIds.some(r=> Object.keys(state_collection.policies_collections).indexOf(r) >= 0) ? (
-              <>
-                <h1>
-                  <span className="icon" style={{fontSize:"100px", marginBottom:"50px"}}>
-                    <i className="far fa-times-circle"></i>
-                  </span>
-                </h1>
-                <p className="title">
-                  No assets
-                </p>
-                <p className="subtitle">
-                  This policy ID does not exist or does not contain any assets.
-                </p>
-              </>
-            ) : <></> : <></>
-          }
-        </div>
-      </div>
-    </section>
-  )
 }
 
 function mapStateToProps(state, props) {
@@ -343,7 +263,6 @@ function mapDispatchToProps(dispatch) {
   return {
     load_collection: (callback) => dispatch(load_collection(callback)),
     get_listings: (policy_id, callback) => dispatch(get_listings(policy_id, callback)),
-    opencnft_get_policy: (policy_id, callback) => dispatch(opencnft_get_policy(policy_id, callback)),
   };
 }
 

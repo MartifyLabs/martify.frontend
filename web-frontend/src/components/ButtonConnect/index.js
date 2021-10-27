@@ -36,7 +36,7 @@ const ButtonConnect = ({wallet, connectWallet}) => {
     <>
       {
         !wallet.connected ? (
-          <button className={"button is-primary" + (wallet.loading ? " is-loading" : "")} disabled={wallet.loading} onClick={() => connect_wallet()}>
+          <button className={"button is-rounded is-info" + (wallet.loading ? " is-loading" : "")} disabled={wallet.loading} onClick={() => connect_wallet()}>
             <span>Connect</span>
           </button>
         ) : <></>

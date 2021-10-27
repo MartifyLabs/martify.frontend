@@ -2,152 +2,126 @@ import React, { useState, useRef } from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
 import { useHistory } from 'react-router-dom';
-import Autosuggest from 'react-autosuggest';
-import Fuse from 'fuse.js'
 
-import "./style.css";
-
-const Search = ({state_collection, size, placeholder}) => {
-
-  let data = [];
-  for(var collection_id in state_collection.collections){
-    // data.push({
-    //   label: state_collection.collections[collection_id].meta.name, value: collection_id
-    // })
-    let item = {
-      id: collection_id,
-      meta: state_collection.collections[collection_id].meta,
-      policy_ids: state_collection.collections[collection_id].policy_ids,
-    };
-    data.push(item);
-  }
+const Search = ({state_collection}) => {
 
   const history = useHistory();
+  const [state, setState] = useState({
+    matches: [],
+    query: "",
+    selected: false
+  });
+  const searchTbRef = useRef();
 
-  const [value, setValue] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
+  let data = [];
 
-  const options = {
-    // isCaseSensitive: false,
-    includeScore: true,
-    shouldSort: true,
-    // includeMatches: true,
-    // findAllMatches: true,
-    minMatchCharLength: 2,
-    // location: 0,
-    threshold: 0.5,
-    // distance: 20,
-    // useExtendedSearch: true,
-    // ignoreLocation: true,
-    // ignoreFieldNorpixm: false,
-    keys: [
-      {
-        name: 'meta.name',
-        weight: 2
-      },
-      {
-        name: 'meta.description',
-        weight: 0.5
-      },
-      {
-        name: 'policy_ids',
-        weight: 0.1
-      },
-    ]
-  };
-  const fuse = new Fuse(data, options);
+  for(var collection_id in state_collection.collections){
+    data.push({label: state_collection.collections[collection_id].meta.name, value: state_collection.collections[collection_id].id})
+  }
 
-  const onChange = (event, { newValue }) => {
-    setValue(newValue);
-  };
-
-  const onSuggestionSelected = (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) => {
-    console.log(suggestion, suggestionValue, suggestionIndex, sectionIndex, method)
-    if(method=="click" || method=="enter"){
-      history.push("/collection/"+suggestion.value);
-    }
-  };
-
-  const onSuggestionsFetchRequested = ({ value }) => {
-    setSuggestions(getSuggestions(value));
-  };
-
-  const onSuggestionsClearRequested = () => {
-    setSuggestions([]);
-  };
-
-  const getSuggestions = value => {
-    const inputValue = value.trim().toLowerCase();
-    const inputLength = inputValue.length;
-
-    if(inputLength >= 2){
-      let selected_rows = fuse.search(inputValue);      
-      let filtered = [];
-      // let debug = [];
-      for(var i=0; i<Math.min(selected_rows.length,10); i++){
-        filtered.push({
-          label: selected_rows[i].item.meta.name, value: selected_rows[i].item.id
+  function handleKeyPress(event) {
+    
+    switch (event.which) {
+      case 13: // Enter key
+        if (state.matches.length) {
+          setState({
+            activeIndex: 0,
+            matches: [],
+            query: state.matches[state.activeIndex].label,
+            selected: true
+          });
+          history.push("/collection/"+state.matches[0].value);
+        }else{
+          history.push("/collection/"+state.query);
+        }
+        searchTbRef.current.blur();
+        break;
+      case 38: // Up arrow
+        setState({
+          ...state,
+          activeIndex: state.activeIndex >= 1 ? state.activeIndex - 1 : 0
         });
-        // debug.push(selected_rows[i]);
-      }
-      // console.log(inputValue, debug)
-      return filtered;
+        break;
+      case 40: // Down arrow
+        setState({
+          ...state,
+          activeIndex:
+            state.activeIndex < state.matches.length - 1
+              ? state.activeIndex + 1
+              : state.matches.length - 1
+        });
+        break;
+      default:
+        break;
     }
-    return [];
-  };
+  }
 
-  const getSuggestionValue = suggestion => suggestion.label;
+  function handleSelection(event, selection) {
+    event.preventDefault();
+    setState({
+      activeIndex: 0,
+      query: selection,
+      matches: [],
+      selected: true
+    });
+  }
 
-  // Use your imagination to render suggestions.
-  const renderSuggestion = suggestion => (
-    <div>
-      {suggestion.label}
-    </div>
-  );
-
-  const inputProps = {
-    placeholder: placeholder ? placeholder : "Search...",
-    value: value,
-    onChange: onChange
-  };
-  
-  const theme = {
-    container:                'react-autosuggest__container',
-    containerOpen:            'react-autosuggest__container--open',
-    input:                    "input is-rounded " +(size?size:""),
-    inputOpen:                'react-autosuggest__input--open',
-    inputFocused:             'react-autosuggest__input--focused',
-    suggestionsContainer:     'react-autosuggest__suggestions-container',
-    suggestionsContainerOpen: 'react-autosuggest__suggestions-container--open',
-    suggestionsList:          'react-autosuggest__suggestions-list',
-    suggestion:               'react-autosuggest__suggestion',
-    suggestionFirst:          'react-autosuggest__suggestion--first',
-    suggestionHighlighted:    'react-autosuggest__suggestion--highlighted',
-    sectionContainer:         'react-autosuggest__section-container',
-    sectionContainerFirst:    'react-autosuggest__section-container--first',
-    sectionTitle:             'react-autosuggest__section-title'
+  function updateQuery(e) {
+    if (!state.selected) {
+      const query = e.target.value;
+      setState({
+        matches:
+          query.length >= 2
+            ? data.filter(
+                item => item.label.toUpperCase().indexOf(query.toUpperCase()) >= 0
+              )
+            : [],
+        query
+      });
+    } else {
+      if (e.nativeEvent.inputType === "deleteContentBackward") {
+        setState({
+          matches: [],
+          query: "",
+          selected: false
+        });
+      }
+    }
   }
 
   return (
-    <div className={"search control has-icons-left is-expanded " +(size?size:"")}>
-      <div className={`dropdown ${suggestions.length > 0 ? "is-active" : ""}`} style={{width:"100%"}}>
-        <div className="dropdown-trigger" style={{width:"100%"}}>
-          <Autosuggest
-            suggestions={suggestions}
-            onSuggestionsFetchRequested={onSuggestionsFetchRequested}
-            onSuggestionsClearRequested={onSuggestionsClearRequested}
-            getSuggestionValue={getSuggestionValue}
-            onSuggestionSelected={onSuggestionSelected}
-            renderSuggestion={renderSuggestion}
-            inputProps={inputProps}
-            theme={theme}
-            highlightFirstSuggestion={true}
+    <div className="control">
+      <div className={`dropdown ${state.matches.length > 0 ? "is-active" : ""}`}>
+        <div className="dropdown-trigger">
+          <input
+            type="text"
+            className="input"
+            value={state.query}
+            onChange={updateQuery}
+            onKeyDown={handleKeyPress}
+            placeholder="Search"
+            ref={searchTbRef}
           />
         </div>
+        <div className="dropdown-menu">
+          {state.matches.length > 0 && (
+            <div className="dropdown-content">
+              {state.matches.map((match, index) => (
+                <a
+                  className={`dropdown-item ${
+                    index === state.activeIndex ? "is-active" : ""
+                  }`}
+                  href="/"
+                  key={match.value}
+                  onClick={event => handleSelection(event, match)}
+                >
+                  {match.label}
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-      <span className={"icon is-left"} style={size ? size=="is-large" ? {height:"60px",width:"60px"} : {} : {}}>
-        <i className="fa fa-search" style={size ? size=="is-large" ? {fontSize:"25px"} : {} : {}}></i>
-      </span>
     </div>
   );
 };
