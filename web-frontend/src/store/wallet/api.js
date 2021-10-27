@@ -137,6 +137,40 @@ export const connectWallet = (callback) => async (dispatch) => {
 };
 
 
+export const buyer_pay = (send_addr, callback) => async (dispatch) => {
+  try {
+
+    window.cardano.enable().then((namiIsEnabled) => {
+
+      if (namiIsEnabled && send_addr) {
+
+        fetch(api_host+'/buyer_pay', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            address: send_addr,
+          })
+        })
+        .then(res => res.json())
+        .then((res) => {
+          console.log(res)
+        },
+        (error) => {
+          console.log(error)
+        })
+
+      }
+    })
+  } catch (err) {
+    console.log({ err });
+    callback({ success: false, error: err });
+  }
+};
+
+
 export const create_txn = (send_addr, amount, callback) => async (dispatch) => {
   try {
 

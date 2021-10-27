@@ -1,0 +1,7 @@
+.asset .price{
+  font-size: 26px;
+}
+
+.asset .attr{
+  text-transform:capitalize
+}

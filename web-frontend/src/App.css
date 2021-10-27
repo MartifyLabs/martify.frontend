@@ -10,3 +10,6 @@
   z-index: 10;
 }
 
+.collection_logo{
+  object-fit: cover;
+}
