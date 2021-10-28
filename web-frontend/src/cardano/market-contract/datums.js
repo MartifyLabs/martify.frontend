@@ -1,7 +1,7 @@
 import Cardano from "../serialization-lib";
 import { fromHex, toHex } from "../../utils";
 
-const CARDANO = Cardano.Instance();
+const CARDANO = Cardano.Instance;
 
 export const serialize = ({ tn, cs, sellerAddress, price }) => {
   const fields = CARDANO.PlutusList.new();

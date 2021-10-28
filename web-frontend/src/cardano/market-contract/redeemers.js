@@ -1,6 +1,6 @@
 import Cardano from "../serialization-lib";
 
-const CARDANO = Cardano.Instance();
+const CARDANO = Cardano.Instance;
 
 export const BUY = (index) => {
   const data = CARDANO.PlutusData.new_constr_plutus_data(
