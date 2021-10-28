@@ -42,3 +42,12 @@ export function setWalletLoading(payload) {
     payload: payload,
   };
 }
+
+export function setWalletAssets(payload) {
+  return {
+    type: types.SET_WALLET_ASSETS,
+    payload: payload,
+  };
+}
+
+

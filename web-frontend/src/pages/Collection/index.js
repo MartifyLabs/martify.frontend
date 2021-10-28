@@ -3,7 +3,7 @@ import { compose } from "redux";
 import { connect } from "react-redux";
 
 import { load_collection, get_listings } from "../../store/collection/api";
-import Card from "./Card";
+import AssetCard from "../../components/AssetCard";
 import AboutCollection from "../../components/AboutCollection";
 import CollectionBanner from "../../components/CollectionBanner";
 
@@ -158,7 +158,7 @@ const ListingSection = ({state_collection, policyId}) => {
   .map((this_nft, i) => {
     return(
       <div className="column is-one-full-mobile is-half-tablet one-quarter-desktop is-one-quarter-widescreen is-one-quarter-fullhd" key={i}>
-        <Card token={this_nft} />
+        <AssetCard token={this_nft} />
       </div>
     )
   });
