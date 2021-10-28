@@ -1,8 +1,3 @@
-import {
-  TransactionUnspentOutput,
-  TransactionOutputs,
-  Value,
-} from "@emurgo/cardano-serialization-lib-browser";
 import Cardano from "../serialization-lib";
 
 const CARDANO = Cardano.Instance;
