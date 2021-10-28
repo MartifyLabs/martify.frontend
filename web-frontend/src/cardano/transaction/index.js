@@ -7,7 +7,7 @@ import { fromHex, toHex } from "../../utils";
 
 const DATUM_LABEL = 405;
 const ADDRESS_LABEL = 406;
-const CARDANO = Cardano.Instance();
+const CARDANO = Cardano.Instance;
 const PROTOCOL_PARAMETERS = getProtocolParameters();
 
 export const initializeTx = () => {

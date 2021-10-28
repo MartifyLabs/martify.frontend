@@ -2,10 +2,10 @@ import {
   TransactionUnspentOutput,
   TransactionOutputs,
   Value,
-} from "../serialization-lib/@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib";
+} from "@emurgo/cardano-serialization-lib-browser";
 import Cardano from "../serialization-lib";
 
-const CARDANO = Cardano.Instance();
+const CARDANO = Cardano.Instance;
 const BigInt = typeof window !== "undefined" && window.BigInt;
 
 /**

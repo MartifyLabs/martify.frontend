@@ -6,7 +6,7 @@ import { createOutput, finalizeTx, initializeTx } from "../transaction";
 import { getUsedAddresses, getUtxos } from "../wallet";
 import { fromHex, toHex } from "../../utils";
 
-const CARDANO = Cardano.Instance();
+const CARDANO = Cardano.Instance;
 
 export const offer = async (tn, cs, price) => {
   const { txBuilder, datums, metadata, outputs } = await initializeTx();
