@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^6.4.0",
+    "@emurgo/cardano-serialization-lib-browser": "file:./src/cardano/serialization-lib/@emurgo/cardano-serialization-lib-browser",
     "@fortawesome/fontawesome-free": "^5.15.4",
     "cbor": "^8.0.0",
     "font-awesome": "^4.7.0",
@@ -15,12 +17,13 @@
     "react-scripts": "4.0.3",
     "redux": "^4.1.1",
     "redux-devtools-extension": "^2.13.9",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "wasm-loader": "^1.3.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

@@ -1,7 +1,8 @@
-import React, { useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
 import { Switch, Route } from "react-router-dom";
+import Cardano from "./cardano/serialization-lib";
 
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -9,17 +10,23 @@ import Collection from "./pages/Collection";
 import Asset from "./pages/Asset";
 import Account from "./pages/Account";
 
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import './App.css';
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import "./App.css";
 
 import { load_collection } from "./store/collection/api";
 
-const App = ({state_collection, load_collection}) => {
+const App = ({ state_collection, load_collection }) => {
+  useEffect(() => {
+    const loadCardanoSerializationLib = async () => {
+      await Cardano.load();
+    };
+
+    loadCardanoSerializationLib();
+  }, []);
 
   useEffect(() => {
-    if(!state_collection.loaded && !state_collection.loading){
-      load_collection((res) => {
-      });
+    if (!state_collection.loaded && !state_collection.loading) {
+      load_collection((res) => {});
     }
   }, [state_collection]);
 
@@ -34,11 +41,11 @@ const App = ({state_collection, load_collection}) => {
       </Switch>
     </>
   );
-}
+};
 
 function mapStateToProps(state, props) {
   return {
-    state_collection: state.collection
+    state_collection: state.collection,
   };
 }
 
