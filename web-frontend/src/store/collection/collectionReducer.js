@@ -1,4 +1,5 @@
 import * as types from "./collectionTypes";
+import * as walletTypes from "../wallet/walletTypes";
 
 let collectionobj = {
   loaded: false,
@@ -8,8 +9,8 @@ let collectionobj = {
   policies_tokens: {},
 };
 
-function update_tokens(token, token_id, policy_id){
-  token.token_id = token_id;
+function update_tokens(token, asset_id, policy_id){
+  token.id = asset_id;
   token.policy_id = policy_id;
   return token;
 }
@@ -51,20 +52,43 @@ export default function collectionReducer(state = collectionobj, { type, payload
       
       let new_tokens = {...payload.listing};
 
-      for(var token_id in new_tokens){
-        new_tokens[token_id] = update_tokens(new_tokens[token_id], token_id, payload.policy_id);
+      for(var asset_id in new_tokens){
+        new_tokens[asset_id] = update_tokens(new_tokens[asset_id], asset_id, payload.policy_id);
       }
       if(!(payload.policy_id in tmp)){
         tmp[payload.policy_id] = {};
       }
-
+      
       tmp[payload.policy_id] = {
         ...new_tokens
       };
+
       return {
         ...state,
         loading: false,
         policies_tokens: tmp
+      };
+
+
+    case walletTypes.SET_WALLET_ASSETS:
+      let tmp_policies_tokens = {...state.policies_tokens};
+
+      for(var policy_id in payload){
+        var tmp_policies_tokens_policy = {};
+        if(policy_id in tmp_policies_tokens){
+          tmp_policies_tokens_policy = {...tmp_policies_tokens[policy_id]};
+        }
+
+        for(var asset_id in payload[policy_id]){
+          tmp_policies_tokens_policy[asset_id] = payload[policy_id][asset_id];
+        }
+        
+        tmp_policies_tokens[policy_id] = tmp_policies_tokens_policy;
+      }
+      
+      return {
+        ...state,
+        policies_tokens: tmp_policies_tokens,
       };
     
     default:

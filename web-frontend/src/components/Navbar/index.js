@@ -1,11 +1,14 @@
 import React from "react";
+import { compose } from "redux";
+import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 
 // import "./style.css";
 
 import ButtonConnect from "../ButtonConnect";
 import Search from "./Search";
 
-const Navbar = () => {
+const Navbar = ({state_wallet}) => {
   return (
     <nav className="navbar is-fixed-top is-transparent has-shadow">
       <div className="navbar-brand">
@@ -21,11 +24,6 @@ const Navbar = () => {
 
       <div className="navbar-menu">
 
-        
-
-
-
-        
         {/* <div className="navbar-start">
           <a className="navbar-item" href="https://bulma.io/">
             Home
@@ -67,47 +65,50 @@ const Navbar = () => {
           <div className="navbar-item is-expanded">
             <div className="control has-icons-left is-expanded">
               {/* <input className="input" type="search" placeholder="Search..."/> */}
-              <Search
-                placeholder="Search"
-                data={["Apple", "Banana", "Orange", "Peach", "Blueberry", "Pear"]}
-              />
+              <Search />
               <span className="icon is-small is-left">
                 <i className="fa fa-search"></i>
               </span>
             </div>
           </div>
           
-          <div className="navbar-item">
-            <div className="field is-grouped">
-              <div className="control">
-                <ButtonConnect/>
+          {
+            state_wallet.connected ? (
+              <div className="navbar-item">
+                <div className="field is-grouped">
+                  <div className="control">
+                    <Link className="button is-rounded is-info" to="/account">
+                      <span>Account</span>
+                    </Link>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            ) : (
+              <div className="navbar-item">
+                <div className="field is-grouped">
+                  <div className="control">
+                    <ButtonConnect/>
+                  </div>
+                </div>
+              </div>
+            )
+          }
         </div>
       </div>
     </nav>
   );
 };
 
-// const Search = ({}) => {
-//   const [searchText, setSearchText] = useState("");
-//   return (
-//     <div className="field">
-//       <div className="control has-icons-left is-expanded">
-//         <input
-//           className="input"
-//           type="text"
-//           placeholder={"Search"}
-//           value={searchText}
-//           onChange={(e) => setSearchText(e.target.value)}
-//         />
-//         <span className="icon is-small is-left">
-//           <i className="fa fa-search"></i>
-//         </span>
-//       </div>
-//     </div>
-//   )
-// }
+function mapStateToProps(state, props) {
+  return {
+    state_wallet: state.wallet
+  };
+}
 
-export default Navbar;
+function mapDispatchToProps(dispatch) {
+  return {
+    
+  };
+}
+
+export default compose(connect(mapStateToProps, mapDispatchToProps))(Navbar);

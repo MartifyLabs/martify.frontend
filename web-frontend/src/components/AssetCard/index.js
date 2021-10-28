@@ -2,10 +2,10 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./style.css";
 
-const Card = ({token}) => {  
+const AssetCard = ({token}) => {  
   return (
-    <Link to={`/assets/${token.policy_id}/${token.token_id}`}>
-      <div className="card">
+    <Link to={`/assets/${token.policy_id}/${token.id}`}>
+      <div className="card asset_card">
         <div className="card-image">
           <figure className="image is-square">
             <img src={"https://ipfs.blockfrost.dev/ipfs/"+token.meta.image} alt={token.meta.name}/>
@@ -15,7 +15,9 @@ const Card = ({token}) => {
           <div className="media">
             <div className="media-content">
               <p className="title is-4">{token.meta.name}</p>
-              <p className="subtitle is-6">₳{token.price}</p>
+              {
+                token.price ? <p className="subtitle is-6">₳{token.price}</p> : <></>
+              }
             </div>
           </div>
   {/* 
@@ -30,4 +32,4 @@ const Card = ({token}) => {
   )
 };
 
-export default Card;
+export default AssetCard;

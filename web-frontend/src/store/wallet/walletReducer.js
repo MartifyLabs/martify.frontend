@@ -4,6 +4,8 @@ let walletobj = {
   connected: false,
   loading: false,
   data: {},
+  assets: {},
+  loaded_assets: false,
 };
 
 export default function walletReducer(state = walletobj, { type, payload }) {
@@ -65,6 +67,32 @@ export default function walletReducer(state = walletobj, { type, payload }) {
           utxos: payload,
         },
       };
+    case types.SET_WALLET_ASSETS:
+      let tmp_assets = {...state.assets};
+
+      for(var policy_id in payload){
+        var tmp_assets_policy = [];
+        if(policy_id in tmp_assets){
+          tmp_assets_policy = [...tmp_assets[policy_id]];
+        }
+
+        for(var asset_id in payload[policy_id]){
+        //   tmp_assets_policy[asset_id] = payload[policy_id][asset_id];
+          if(!(tmp_assets_policy.includes(asset_id))){
+            tmp_assets_policy.push(asset_id);
+          }
+        }
+        
+        tmp_assets[policy_id] = tmp_assets_policy;
+      }
+      
+      return {
+        ...state,
+        assets: tmp_assets,
+        loaded_assets: true,
+      };
+
+      
 
     default:
       return state;

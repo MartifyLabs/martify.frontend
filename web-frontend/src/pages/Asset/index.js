@@ -9,7 +9,7 @@ import CollectionBanner from "../../components/CollectionBanner";
 
 import "./style.css";
 
-const Asset = ({state_collection, policy_id, token_id, get_token}) => {
+const Asset = ({state_collection, policy_id, asset_id, get_token}) => {
 
   const [token, setToken] = useState(false);
   const [thisCollection, setThisCollection] = useState(false);
@@ -20,8 +20,8 @@ const Asset = ({state_collection, policy_id, token_id, get_token}) => {
     // get_token
 
     if(policy_id in state_collection.policies_tokens){
-      if(token_id in state_collection.policies_tokens[policy_id]){
-        setToken(state_collection.policies_tokens[policy_id][token_id]);
+      if(asset_id in state_collection.policies_tokens[policy_id]){
+        setToken(state_collection.policies_tokens[policy_id][asset_id]);
 
         if(policy_id in state_collection.policies_collections){
 
@@ -39,11 +39,11 @@ const Asset = ({state_collection, policy_id, token_id, get_token}) => {
     }
 
     if(query_token && !state_collection.loading){
-      get_token(policy_id, token_id, (res) => {
+      get_token(policy_id, asset_id, (res) => {
 
       });
     }
-  }, [policy_id, token_id, state_collection]);
+  }, [policy_id, asset_id, state_collection]);
 
   return (
     <>
@@ -154,7 +154,7 @@ const AboutToken = ({thisCollection, token}) => {
 function mapStateToProps(state, props) {
   return {
     policy_id: props.match.params.policy_id,
-    token_id: props.match.params.token_id,
+    asset_id: props.match.params.asset_id,
     state_collection: state.collection
   };
 }
@@ -162,7 +162,7 @@ function mapStateToProps(state, props) {
 function mapDispatchToProps(dispatch) {
   return {
     load_collection: (callback) => dispatch(load_collection(callback)),
-    get_token: (policy_id, token_id, callback) => dispatch(get_token(policy_id, token_id, callback)),
+    get_token: (policy_id, asset_id, callback) => dispatch(get_token(policy_id, asset_id, callback)),
   };
 }
 

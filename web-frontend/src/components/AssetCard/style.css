@@ -1,0 +1,3 @@
+.asset_card .card .card-image img{
+  object-fit: cover;
+}

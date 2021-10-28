@@ -12,12 +12,10 @@ const ButtonConnect = ({wallet, connectWallet}) => {
 
   function connect_wallet(){
     connectWallet((res) => {
-      console.log(res)
-      if (res.success){
 
+      if (res.success){
         setShowNotification("connected");
         setTimeout(function(){ setShowNotification(false); }, 3000);
-
       }else{
         if(res.error){
           if(res.error.code === -3){
