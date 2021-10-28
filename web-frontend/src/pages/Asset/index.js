@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { load_collection, get_token} from "../../store/collection/api";
 import ButtonBuy from "../../components/ButtonBuy";
 import AboutCollection from "../../components/AboutCollection";
+import CollectionBanner from "../../components/CollectionBanner";
 
 import "./style.css";
 
@@ -44,9 +45,11 @@ const Asset = ({state_collection, policy_id, token_id, get_token}) => {
     }
   }, [policy_id, token_id, state_collection]);
 
-
   return (
     <>
+      {
+        thisCollection ? <CollectionBanner thisCollection={thisCollection} size="is-small" /> : <></>
+      }
       {
         token ? (
           <div className="container asset">

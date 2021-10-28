@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { load_collection, get_listings } from "../../store/collection/api";
 import Card from "./Card";
 import AboutCollection from "../../components/AboutCollection";
+import CollectionBanner from "../../components/CollectionBanner";
 
 import "./style.css";
 
@@ -32,9 +33,6 @@ const Collection = ({state_collection, collection_id, get_listings}) => {
     if(collection_id in state_collection.collections){
       setPolicyId(state_collection.collections[collection_id].policy_id);
       var tmp = {...state_collection.collections[collection_id]};
-      tmp.style.banner_path = `/collections/${tmp.id}/${tmp.style.banner}`;
-      tmp.style.logo_path = `/collections/${tmp.id}/${tmp.style.logo}`;
-      tmp.is_verified = true;
       setThisCollection(tmp);
     }else{
       var tmp = {...default_meta};
@@ -76,56 +74,8 @@ const Collection = ({state_collection, collection_id, get_listings}) => {
   
   return (
     <div className="collection">
-      <section className="hero is-medium" style={{backgroundImage: `url(${thisCollection.style.banner_path})`}}>
-        <div className="hero-body">
-        
-          <nav className="level">
-            <div className="level-left">
-              {
-                thisCollection.style.logo_path ? (
-                  <div className="level-item">
-                    <figure className="image is-128x128">
-                      <img className="collection_logo is-rounded image is-128x128" src={thisCollection.style.logo_path} />
-                    </figure>
-                  </div>
-                ) : <></>
-              }
-              <div className="level-item">
-                <div className="collection_title">
-                  <p className="title is-size-1" style={{color: thisCollection.style.font_color_title}}>
-                    {thisCollection.meta.name}
-                  </p>
-                </div>
-              </div>
-            </div>
 
-            <div className="level-right">
-              <div className="level-item">
-                <div className="field has-addons social-links">
-                {
-                  Object.keys(thisCollection.links).map(function (key) {
-                    var icon = "";
-                    if(key=='discord')icon="fab fa-discord";
-                    if(key=='twitter')icon="fab fa-twitter";
-                    if(key=='website')icon="fas fa-laptop";
-                    return (
-                      <p className="control" key={key}>
-                        <a className="button" href={thisCollection.links[key]} rel="noreferrer" target="_blank">
-                          <span className="icon">
-                            <i className={icon}></i>
-                          </span>
-                        </a>
-                      </p>
-                    )
-                  })
-                }
-                </div>
-              </div>
-            </div>
-          </nav>
-
-        </div>
-      </section>
+      <CollectionBanner thisCollection={thisCollection} />
       
       <section className="section">
         <div className="columns">
