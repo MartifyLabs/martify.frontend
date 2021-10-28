@@ -227,6 +227,13 @@ export const createOutput = (
   return output;
 };
 
+export const getTransactionUnspentOutputHash = (hexEncodedBytes, prefix) => {
+  return CARDANO.TransactionUnspentOutput.from_bytes(fromHex(hexEncodedBytes))
+    .input()
+    .transaction_id()
+    .to_bech32(prefix);
+};
+
 const setCollateral = (txBuilder, utxos) => {
   const inputs = CARDANO.TransactionInputs.new();
 
