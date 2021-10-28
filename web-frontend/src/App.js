@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Collection from "./pages/Collection";
 import Asset from "./pages/Asset";
+import Wallet from "./pages/Wallet";
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import './App.css';
@@ -29,6 +30,7 @@ const App = ({state_collection, load_collection}) => {
         <Route exact path="/" component={Home} />
         <Route exact path="/collection/:collection_id" component={Collection} />
         <Route exact path="/assets/:policy_id/:token_id" component={Asset} />
+        <Route exact path="/wallet" component={Wallet} />
       </Switch>
     </>
   );

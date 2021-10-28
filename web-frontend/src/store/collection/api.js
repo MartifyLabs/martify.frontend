@@ -7,6 +7,15 @@ import {
 import data_collections from "../../data/collections.json";
 
 export const load_collection = (callback) => async (dispatch) => {
+
+  for(var collection_id in data_collections){
+    var tmp = data_collections[collection_id];
+    tmp.style.banner_path = `/collections/${tmp.id}/${tmp.style.banner}`;
+    tmp.style.logo_path = `/collections/${tmp.id}/${tmp.style.logo}`;
+    tmp.is_verified = true;
+    data_collections[collection_id] = tmp;
+  }
+
   dispatch(collections_loaded(data_collections));
   callback({data_collections});
 }
@@ -15,6 +24,7 @@ let mock = {
   "6c880f643a86d6f5b86871952b36999bbf7e9619ca54953abd2acf62": {
     "PixelHead010": {
       price: 3499,
+      utxo: {},
       meta: {
         "creature name": "Aether",
          image: "Qmdk5vhzDkL7CsXgUkHdM2x6xEiR28E2YXT4LVyxk6t7zY",
@@ -30,6 +40,7 @@ let mock = {
     },
     "PixelHead016": {
       price: 22222,
+      utxo: {},
       meta: {
         "creature name": "Armanto",
         image: "QmTHzijixVhiizqgEK1hzC4M45qJjjXs2byymiY2qugR36",
@@ -46,6 +57,7 @@ let mock = {
     },
     "PixelHead017": {
       price: 7777,
+      utxo: {},
       meta: {
         "creature name": "High Roller",
         image: "QmWjkMf31dbJcAA4WE4vD9CTVmqXSzMpmRpKeDdMojAKWW",
@@ -64,6 +76,7 @@ let mock = {
   "abc": {
     "Naru03343": {
       price: 1500,
+      utxo: {},
       meta: {
         name: "Yummi Universe - Naru 03343",
         image: "QmXTL9tzs72vjYhkKdaEPqYM2fhPGms2MuKFmp9vowT97q",

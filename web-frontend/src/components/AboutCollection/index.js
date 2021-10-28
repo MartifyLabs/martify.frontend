@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 const AboutCollection = ({thisCollection}) => {
   return (
@@ -10,9 +10,9 @@ const AboutCollection = ({thisCollection}) => {
           <div className="card">
             <header className="card-header">
               <p className="card-header-title">
-                <Link to={`/collection/${thisCollection.id}`}>
+                {/* <Link to={`/collection/${thisCollection.id}`}> */}
                   About {thisCollection.meta.name}
-                </Link>
+                {/* </Link> */}
               </p>
             </header>
             <div className="card-content">

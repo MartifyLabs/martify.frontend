@@ -1,13 +1,17 @@
-.collection .collection_title .title{
+.collection_title .title{
   text-shadow: 1px 1px 2px grey, 0 0 1em grey, 0 0 0.2em grey;
+}
+
+.collection_title .title:hover{
+  text-shadow: 4px 4px 4px grey, 0 0 1em grey, 0 0 0.2em grey;
 }
 
 .collection .card .card-image img{
   object-fit: cover;
 }
 
-.collection .hero{
-  -webkit-mask-image: -webkit-gradient(linear, left 60%, left bottom, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)))
+.hero.collection_name{
+  -webkit-mask-image: -webkit-gradient(linear, left 80%, left bottom, from(rgba(0,0,0,1)), to(rgba(0,0,0,0)))
 }
 
 .collection .social-links{
