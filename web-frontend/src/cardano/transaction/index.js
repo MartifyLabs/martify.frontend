@@ -228,10 +228,11 @@ export const createOutput = (
 };
 
 export const getTransactionUnspentOutputHash = (hexEncodedBytes) => {
-  return CARDANO.Ed25519KeyHash.from_bytes(
-    CARDANO.TransactionUnspentOutput.from_bytes(
-      fromHex(hexEncodedBytes)
-    ).to_bytes()
+  return toHex(
+    CARDANO.TransactionUnspentOutput.from_bytes(fromHex(hexEncodedBytes))
+      .input()
+      .transaction_id()
+      .to_bytes()
   );
 };
 
