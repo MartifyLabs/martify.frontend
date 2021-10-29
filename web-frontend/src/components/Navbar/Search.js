@@ -19,8 +19,11 @@ const Search = ({state_collection}) => {
     data.push({label: state_collection.collections[collection_id].meta.name, value: state_collection.collections[collection_id].id})
   }
 
+  function selected(){
+
+  }
+
   function handleKeyPress(event) {
-    
     switch (event.which) {
       case 13: // Enter key
         if (state.matches.length) {
@@ -60,10 +63,12 @@ const Search = ({state_collection}) => {
     event.preventDefault();
     setState({
       activeIndex: 0,
-      query: selection,
+      query: selection.label,
       matches: [],
       selected: true
     });
+    history.push("/collection/"+selection.value);
+    searchTbRef.current.blur();
   }
 
   function updateQuery(e) {

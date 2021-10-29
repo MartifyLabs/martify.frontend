@@ -21,7 +21,7 @@ const Account = ({state_wallet, state_collection, get_wallet_assets, get_wallet_
   return (
     <section className="section">
 
-      <ListingSection state_wallet={state_wallet} state_collection={state_collection} get_wallet_assets={get_wallet_assets_mock} />
+      <ListingSection state_wallet={state_wallet} state_collection={state_collection} get_wallet_assets={get_wallet_assets} />
 
       {/* <button className={"button is-primary" + (state_wallet.loading ? " is-loading" : "")} disabled={state_wallet.loading || !state_wallet.connected} onClick={() => debug()}>
         <span>debug</span>
