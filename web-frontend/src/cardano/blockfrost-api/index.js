@@ -1,8 +1,35 @@
 import { apiKey, cardanoUrl, ipfsUrl } from "../../config";
 
-export const getProtocolParameters = async () => {
-  const response = await cardanoBlockfrost(`/epochs/latest/parameters`);
+// asset is a Concatenation of the policy_id and hex-encoded asset_name.
+export const getAssetInfo = async (asset) => {
+  const response = await cardano(`assets/${asset}`);
+
+  return {
+    asset: response.asset,
+    policyId: response.policy_id,
+    assetName: response.asset_name,
+    fingerprint: response.fingerprint,
+    quantity: parseInt(response.quantity),
+    initialMintTxHash: response.initial_mint_tx_hash,
+    mintOrBurnCount: parseInt(response.mint_or_burn_count),
+    onchainMetadata: response.onchain_metadata,
+    metadata: response.metadata,
+  };
+};
+
+export const getTxDetails = async (hash) => {
+  const response = await cardano(`txs/${hash}/utxos`);
   
+  return {
+    hash: response.hash,
+    inputs: response.inputs,
+    outputs: response.outputs,
+  };
+};
+
+export const getProtocolParameters = async () => {
+  const response = await cardano(`epochs/latest/parameters`);
+
   return {
     linearFee: {
       minFeeA: response.min_fee_a.toString(),
@@ -18,12 +45,12 @@ export const getProtocolParameters = async () => {
   };
 };
 
-export const cardanoBlockfrost = async (endpoint, headers, body) => {
-  return await request(cardanoUrl, endpoint, headers, body);
-};
-
 export const ipfsBlockfrost = async (endpoint, headers, body) => {
   return await request(ipfsUrl, endpoint, headers, body);
+};
+
+const cardano = async (endpoint, headers, body) => {
+  return await request(cardanoUrl, endpoint, headers, body);
 };
 
 const request = async (base, endpoint, headers, body) => {
