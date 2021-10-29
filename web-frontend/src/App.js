@@ -16,12 +16,13 @@ import "./App.css";
 import { load_collection } from "./store/collection/api";
 
 const App = ({ state_collection, load_collection }) => {
+
   useEffect(() => {
     const loadCardanoSerializationLib = async () => {
       await Cardano.load();
     };
-
     loadCardanoSerializationLib();
+
   }, []);
 
   useEffect(() => {

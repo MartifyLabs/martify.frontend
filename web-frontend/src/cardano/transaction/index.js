@@ -228,6 +228,7 @@ export const createOutput = (
 };
 
 export const getTransactionUnspentOutputHash = (hexEncodedBytes) => {
+  console.log(33)
   return toHex(
     CARDANO.TransactionUnspentOutput.from_bytes(fromHex(hexEncodedBytes))
       .input()
