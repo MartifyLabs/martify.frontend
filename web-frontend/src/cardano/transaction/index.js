@@ -197,7 +197,7 @@ export const finalizeTx = async ({
   return txHash;
 };
 
-export const createOutput = (
+export const createTxOutput = (
   address,
   value,
   { datum, index, tradeOwnerAddress, metadata } = {}
@@ -227,8 +227,7 @@ export const createOutput = (
   return output;
 };
 
-export const getTransactionUnspentOutputHash = (hexEncodedBytes) => {
-  console.log(33)
+export const getTxUnspentOutputHash = (hexEncodedBytes) => {
   return toHex(
     CARDANO.TransactionUnspentOutput.from_bytes(fromHex(hexEncodedBytes))
       .input()

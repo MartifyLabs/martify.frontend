@@ -2,7 +2,7 @@ import Cardano from "../serialization-lib";
 import { serialize } from "./datums";
 import { BUY } from "./redeemers";
 import { cbor } from "./script";
-import { createOutput, finalizeTx, initializeTx } from "../transaction";
+import { createTxOutput, finalizeTx, initializeTx } from "../transaction";
 import { getUsedAddresses, getUtxos } from "../wallet";
 import { fromHex, toHex } from "../../utils";
 
@@ -27,7 +27,7 @@ export const offer = async (tn, cs, price) => {
   });
 
   outputs.add(
-    createOutput(contractAddress(), undefined /* to be defined */, {
+    createTxOutput(contractAddress(), undefined /* to be defined */, {
       datum: offerDatum,
       index: 0,
       tradeOwnerAddress: walletAddress,
@@ -64,7 +64,7 @@ export const purchase = async (tokenUtxo) => {
 
   const token = tokenUtxo.utxo.output().amount();
 
-  outputs.add(createOutput(walletAddress.to_address(), token));
+  outputs.add(createTxOutput(walletAddress.to_address(), token));
 
   const requiredSigners = CARDANO.Ed25519KeyHashes.new();
   requiredSigners.add(walletAddress.payment_cred().to_keyhash());
