@@ -1,6 +1,8 @@
 import { apiKey, cardanoUrl, ipfsUrl } from "../../config";
 
-// asset is a Concatenation of the policy_id and hex-encoded asset_name.
+/**
+ * @param {string} asset - asset is a Concatenation of the policy_id and hex-encoded asset_name.
+ */
 export const getAssetInfo = async (asset) => {
   const response = await cardano(`assets/${asset}`);
 
@@ -19,7 +21,7 @@ export const getAssetInfo = async (asset) => {
 
 export const getTxDetails = async (hash) => {
   const response = await cardano(`txs/${hash}/utxos`);
-  
+
   return {
     hash: response.hash,
     inputs: response.inputs,
