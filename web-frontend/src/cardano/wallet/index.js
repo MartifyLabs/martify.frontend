@@ -1,8 +1,16 @@
 import { getAssetInfo, getTxDetails } from "../blockfrost-api";
 import { getTxUnspentOutputHash } from "../transaction";
 
+export const getBalance = async () => {
+  return await window.cardano.getBalance();
+};
+
 export const getCollateral = async () => {
   return await window.cardano.getCollateral();
+};
+
+export const getNetworkId = async () => {
+  return await window.cardano.getNetworkId();
 };
 
 export const getOwnedAssets = async () => {
