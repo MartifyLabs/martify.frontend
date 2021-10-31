@@ -148,10 +148,10 @@ const ListingSection = ({state_collection, policyId}) => {
 
   const filtered_listing = matchedtokens
   .sort((a, b) => {
-    if(sortby==1){
+    if(sortby===1){
       return a.price > b.price ? 1 : -1
     }
-    if(sortby==2){
+    if(sortby===2){
       return a.price > b.price ? -1 : 1
     }
   })

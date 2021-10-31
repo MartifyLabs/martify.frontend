@@ -19,17 +19,23 @@ function buf2hex(buffer) {
 
 export const listToken = () => async (dispatch) => {
   try {
-  } catch (err) {}
+  } catch (error) {
+    console.error(`Unexpected error in listToken. [Message: ${error.message}]`);
+  }
 };
 
 export const delistToken = () => async (dispatch) => {
   try {
-  } catch (err) {}
+  } catch (error) {
+    console.error(`Unexpected error in delistToken. [Message: ${error.message}]`);
+  }
 };
 
-export const buyToken = () => async (dispatch) => {
+export const purchaseToken = () => async (dispatch) => {
   try {
-  } catch (err) {}
+  } catch (error) {
+    console.error(`Unexpected error in purchaseToken. [Message: ${error.message}]`);
+  }
 };
 
 export const get_wallet_assets = (callback) => async (dispatch) => {
