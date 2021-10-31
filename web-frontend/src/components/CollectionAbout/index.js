@@ -1,7 +1,7 @@
 import React from "react";
-// import { Link } from "react-router-dom";
+import CollectionLinks from "../CollectionLinks";
 
-const AboutCollection = ({thisCollection}) => {
+const CollectionAbout = ({thisCollection}) => {
   return (
     <>
     {
@@ -10,15 +10,14 @@ const AboutCollection = ({thisCollection}) => {
           <div className="card">
             <header className="card-header">
               <p className="card-header-title">
-                {/* <Link to={`/collection/${thisCollection.id}`}> */}
-                  About {thisCollection.meta.name}
-                {/* </Link> */}
+                About {thisCollection.meta.name}
               </p>
             </header>
             <div className="card-content">
               <div className="content">
                 {thisCollection.meta.description}
               </div>
+              <CollectionLinks collection={thisCollection} />
             </div>
           </div>
         </div>
@@ -28,4 +27,4 @@ const AboutCollection = ({thisCollection}) => {
   );
 };
 
-export default AboutCollection;
+export default CollectionAbout;

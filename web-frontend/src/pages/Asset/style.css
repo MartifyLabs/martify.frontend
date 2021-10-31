@@ -5,3 +5,7 @@
 .asset .attr{
   text-transform:capitalize
 }
+
+.asset th{
+  white-space: nowrap;
+}

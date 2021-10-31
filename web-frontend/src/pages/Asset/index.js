@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 
 import { load_collection, get_token} from "../../store/collection/api";
 import ButtonBuy from "../../components/ButtonBuy";
-import AboutCollection from "../../components/AboutCollection";
+import CollectionAbout from "../../components/CollectionAbout";
 import CollectionBanner from "../../components/CollectionBanner";
 
 import "./style.css";
@@ -69,7 +69,7 @@ const Asset = ({state_collection, policy_id, asset_id, get_token}) => {
 
                     <AboutToken thisCollection={thisCollection} token={token} />
 
-                    { thisCollection ? <AboutCollection thisCollection={thisCollection} /> : <></> }
+                    { thisCollection ? <CollectionAbout thisCollection={thisCollection} /> : <></> }
                     
                   </div>
                 </div>
@@ -96,14 +96,14 @@ const PriceBuy = ({token}) => {
         <div className="level-left">
           <div className="level-item">
             <h1>{token.meta.name}</h1>
+            <span>project name</span>
           </div>
         </div>
 
         <div className="level-right">
           <div className="level-item">
             <div className="media-content">
-              <p className="title is-4">₳{token.price}</p>
-              {/* <p className="subtitle is-6">Current price</p> */}
+              <p className="title is-4">{token.listing.price}<span className="ada_symbol">₳</span></p>
             </div>
           </div>
           <div className="level-item">

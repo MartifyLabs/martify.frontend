@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import CollectionLinks from "../CollectionLinks";
 
 const CollectionBanner = ({thisCollection, size}) => {
   return (
@@ -30,25 +31,7 @@ const CollectionBanner = ({thisCollection, size}) => {
 
             <div className="level-right">
               <div className="level-item">
-                <div className="field has-addons social-links">
-                {
-                  Object.keys(thisCollection.links).map(function (key) {
-                    var icon = "";
-                    if(key=='discord')icon="fab fa-discord";
-                    if(key=='twitter')icon="fab fa-twitter";
-                    if(key=='website')icon="fas fa-laptop";
-                    return (
-                      <p className="control" key={key}>
-                        <a className="button" href={thisCollection.links[key]} rel="noreferrer" target="_blank">
-                          <span className="icon">
-                            <i className={icon}></i>
-                          </span>
-                        </a>
-                      </p>
-                    )
-                  })
-                }
-                </div>
+                <CollectionLinks collection={thisCollection} />
               </div>
             </div>
           </nav>

@@ -4,9 +4,9 @@ import { connect } from "react-redux";
 
 import AssetCard from "../../components/AssetCard";
 
-import {get_wallet_assets, get_wallet_assets_mock} from "../../store/market/api";
+import {get_wallet_assets} from "../../store/market/api";
 
-const Account = ({state_wallet, state_collection, get_wallet_assets, get_wallet_assets_mock}) => {
+const Account = ({state_wallet, state_collection, get_wallet_assets}) => {
 
   // function debug(){
   //   if(state_wallet.connected && !state_wallet.loading){
@@ -39,7 +39,7 @@ const ListingSection = ({state_wallet, state_collection, get_wallet_assets}) => 
 
   function load(){
     if(state_wallet.connected && !state_wallet.loading && !state_wallet.loaded_assets){
-      get_wallet_assets(state_wallet.data.utxos, (res) => {
+      get_wallet_assets((res) => {
         // console.log(res)
       });
     }
@@ -68,7 +68,6 @@ const ListingSection = ({state_wallet, state_collection, get_wallet_assets}) => 
   useEffect(() => {
     load()
   }, []);
-
 
   const searchingFor = searchText => {
     return x => {
@@ -135,8 +134,7 @@ function mapStateToProps(state, props) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    get_wallet_assets: (utxos, callback) => dispatch(get_wallet_assets(utxos, callback)),
-    get_wallet_assets_mock: (utxos, callback) => dispatch(get_wallet_assets_mock(utxos, callback)),
+    get_wallet_assets: (callback) => dispatch(get_wallet_assets(callback)),
   };
 }
 
