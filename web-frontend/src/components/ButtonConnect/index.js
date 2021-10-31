@@ -12,20 +12,19 @@ const ButtonConnect = ({wallet, connectWallet}) => {
 
   function connect_wallet(){
     connectWallet((res) => {
-
-      if (res.success){
-        setShowNotification("connected");
-        setTimeout(function(){ setShowNotification(false); }, 3000);
-      }else{
-        if(res.error){
-          if(res.error.code === -3){
-            setShowNotification("no-accept");
-          }
-          else{
-            setShowNotification("no-nami");
-          }
-        }
-      }
+      // if (res.success){
+      //   setShowNotification("connected");
+      //   setTimeout(function(){ setShowNotification(false); }, 3000);
+      // }else{
+      //   if(res.error){
+      //     if(res.error.code === -3){
+      //       setShowNotification("no-accept");
+      //     }
+      //     else{
+      //       setShowNotification("no-nami");
+      //     }
+      //   }
+      // }
     });
   }
   

@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 
 import { load_collection, get_listings } from "../../store/collection/api";
 import AssetCard from "../../components/AssetCard";
-import AboutCollection from "../../components/AboutCollection";
+import CollectionAbout from "../../components/CollectionAbout";
 import CollectionBanner from "../../components/CollectionBanner";
 
 import "./style.css";
@@ -83,7 +83,7 @@ const Collection = ({state_collection, collection_id, get_listings}) => {
             thisCollection.is_verified ? (
               <div className="column is-three-quarters-mobile is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
                 <div className="block">
-                  { thisCollection ? <AboutCollection thisCollection={thisCollection} /> : <></> }
+                  { thisCollection ? <CollectionAbout thisCollection={thisCollection} /> : <></> }
                 </div>
               </div>
             ) : <></>

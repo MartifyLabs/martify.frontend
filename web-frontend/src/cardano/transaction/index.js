@@ -1,9 +1,10 @@
 import Cardano from "../serialization-lib";
-import { getCollateral, signTx, submitTx } from "../wallet";
+import { getCollateral, signTx, submitTx, getUtxos } from "../wallet";
 import { getProtocolParameters } from "../blockfrost-api";
 import CoinSelection from "./coinSelection";
 import { languageViews } from "./languageViews";
 import { fromHex, toHex } from "../../utils";
+import { getAssetInfo, getTxDetails } from "../blockfrost-api";
 
 const DATUM_LABEL = 405;
 const ADDRESS_LABEL = 406;
@@ -227,13 +228,52 @@ export const createTxOutput = (
   return output;
 };
 
-export const getTxUnspentOutputHash = (hexEncodedBytes) => {
+export const getTxUnspentOutputHash = async (hexEncodedBytes) => {
   return toHex(
     CARDANO.TransactionUnspentOutput.from_bytes(fromHex(hexEncodedBytes))
       .input()
       .transaction_id()
       .to_bytes()
   );
+};
+
+
+export const getWalletAssets = async () => {
+
+  const utxos = await getUtxos();
+  console.log("utxos 1", utxos);
+
+  let assets = {};
+
+  for(var u_i in utxos){
+    let utxo_hex_byte_string = utxos[u_i];
+    let utxo_hash = await getTxUnspentOutputHash(utxo_hex_byte_string);
+    
+    // console.log("utxo_hash", typeof utxo_hash, utxo_hash)
+    let utxo = await getTxDetails(utxo_hash);
+    // console.log(utxo);
+
+    for(var o_i in utxo.outputs){
+      let this_tx_out = utxo.outputs[o_i];
+      // console.log(this_tx_out)
+      for(var a_i in this_tx_out.amount){
+        let this_unit = this_tx_out.amount[a_i].unit;
+        if(!(this_unit in assets)) assets[this_unit] = {quantity:0};
+        assets[this_unit].quantity += parseInt(this_tx_out.amount[a_i].quantity);
+      } 
+    }
+  }
+
+  for(var asset_id in assets){
+    if(asset_id!="lovelace"){
+      let asset_info = await getAssetInfo(asset_id);
+      assets[asset_id].info = asset_info;
+    }
+  }
+  
+  // console.log(assets)
+  
+  return assets;
 };
 
 const setCollateral = (txBuilder, utxos) => {

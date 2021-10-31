@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
 import { Switch, Route } from "react-router-dom";
@@ -22,7 +22,6 @@ const App = ({ state_collection, load_collection }) => {
       await Cardano.load();
     };
     loadCardanoSerializationLib();
-
   }, []);
 
   useEffect(() => {
