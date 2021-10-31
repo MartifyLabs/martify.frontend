@@ -1,4 +1,4 @@
-import { apiKey, cardanoUrl, ipfsUrl } from "../../config";
+import { apiKey, cardanoUrl } from "../../config";
 
 /**
  * @param {string} asset - asset is a Concatenation of the policy_id and hex-encoded asset_name.
@@ -45,10 +45,6 @@ export const getProtocolParameters = async () => {
     priceMem: parseFloat(response.price_mem),
     priceStep: parseFloat(response.price_step),
   };
-};
-
-export const ipfsBlockfrost = async (endpoint, headers, body) => {
-  return await request(ipfsUrl, endpoint, headers, body);
 };
 
 const cardano = async (endpoint, headers, body) => {

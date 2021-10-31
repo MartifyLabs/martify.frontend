@@ -1,7 +1,11 @@
 import { getAssetInfo, getTxDetails } from "../blockfrost-api";
 import { getTxUnspentOutputHash } from "../transaction";
 
-export const getAssets = async () => {
+export const getCollateral = async () => {
+  return await window.cardano.getCollateral();
+};
+
+export const getOwnedAssets = async () => {
   // TODO: refactor using map, filter and reduce.
   let assets = {};
   const utxos = await getUtxos();
@@ -32,10 +36,6 @@ export const getAssets = async () => {
   }
 
   return assets;
-};
-
-export const getCollateral = async () => {
-  return await window.cardano.getCollateral();
 };
 
 export const getUsedAddresses = async () => {
