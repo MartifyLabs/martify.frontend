@@ -1,5 +1,5 @@
 import cbor from "cbor";
-import { getWalletAssets } from "../../cardano/transaction";
+import { getAssets } from "../../cardano/wallet";
 
 import {
   walletConnected,
@@ -210,7 +210,7 @@ export const get_wallet_assets = (callback) => async (dispatch) => {
   
   dispatch(setWalletLoading(true));
 
-  const wallet_assets = await getWalletAssets();
+  const wallet_assets = await getAssets();
   console.log(wallet_assets);
 
   // dispatch(setWalletAssets(wallet_assets));

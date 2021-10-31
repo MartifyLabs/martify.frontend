@@ -1,7 +1,6 @@
 import cbor from "cbor";
-import { getAssetInfo, getTxDetails } from "../../cardano/blockfrost-api";
 import { setWalletAssets } from "../wallet/walletActions";
-import { getWalletAssets } from "../../cardano/transaction";
+import { getAssets } from "../../cardano/wallet";
 
 
 const convertCbor = (txRaw) => {
@@ -39,7 +38,7 @@ export const get_wallet_assets = (callback) => async (dispatch) => {
 
     // console.log("wallet utxos", utxos);
 
-    const wallet_assets = await getWalletAssets();
+    const wallet_assets = await getAssets();
     console.log(wallet_assets)
 
     // https://github.com/Berry-Pool/nami-wallet#cardanogetutxosamount-paginate
