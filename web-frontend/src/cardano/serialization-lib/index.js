@@ -14,4 +14,14 @@ class Cardano {
   }
 }
 
-export default new Cardano();
+export default (async () => {
+  try {
+    const cardano = new Cardano();
+    await cardano.load();
+    return cardano.Instance;
+  } catch (error) {
+    console.error(
+      `Unexpected error while loading cardano-serialization-lib. [Message: ${error.message}]`
+    );
+  }
+})();

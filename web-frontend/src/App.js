@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
 import { Switch, Route } from "react-router-dom";
-import Cardano from "./cardano/serialization-lib";
 
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
@@ -16,19 +15,11 @@ import "./App.css";
 import { load_collection } from "./store/collection/api";
 
 const App = ({ state_collection, load_collection }) => {
-
-  useEffect(() => {
-    const loadCardanoSerializationLib = async () => {
-      await Cardano.load();
-    };
-    loadCardanoSerializationLib();
-  }, []);
-
   useEffect(() => {
     if (!state_collection.loaded && !state_collection.loading) {
       load_collection((res) => {});
     }
-  }, [state_collection]);
+  }, [load_collection, state_collection]);
 
   return (
     <>

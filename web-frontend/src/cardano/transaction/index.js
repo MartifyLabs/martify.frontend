@@ -1,4 +1,4 @@
-import Cardano from "../serialization-lib";
+import CardanoInstance from "../serialization-lib";
 import { getCollateral, signTx, submitTx } from "../wallet";
 import { getProtocolParameters } from "../blockfrost-api";
 import CoinSelection from "./coinSelection";
@@ -7,30 +7,30 @@ import { fromHex, toHex } from "../../utils";
 
 const DATUM_LABEL = 405;
 const ADDRESS_LABEL = 406;
-const CARDANO = Cardano.Instance;
 const PROTOCOL_PARAMETERS = getProtocolParameters();
 
-export const initializeTx = () => {
+export const initializeTx = async () => {
+  const instance = await CardanoInstance;
   const metadata = { [DATUM_LABEL]: {}, [ADDRESS_LABEL]: {} };
 
-  const txBuilder = CARDANO.TransactionBuilder.new(
-    CARDANO.LinearFee.new(
-      CARDANO.BigNum.from_str(PROTOCOL_PARAMETERS.linearFee.minFeeA),
-      CARDANO.BigNum.from_str(PROTOCOL_PARAMETERS.linearFee.minFeeB)
+  const txBuilder = instance.TransactionBuilder.new(
+    instance.LinearFee.new(
+      instance.BigNum.from_str(PROTOCOL_PARAMETERS.linearFee.minFeeA),
+      instance.BigNum.from_str(PROTOCOL_PARAMETERS.linearFee.minFeeB)
     ),
-    CARDANO.BigNum.from_str(PROTOCOL_PARAMETERS.minUtxo),
-    CARDANO.BigNum.from_str(PROTOCOL_PARAMETERS.poolDeposit),
-    CARDANO.BigNum.from_str(PROTOCOL_PARAMETERS.keyDeposit),
+    instance.BigNum.from_str(PROTOCOL_PARAMETERS.minUtxo),
+    instance.BigNum.from_str(PROTOCOL_PARAMETERS.poolDeposit),
+    instance.BigNum.from_str(PROTOCOL_PARAMETERS.keyDeposit),
     PROTOCOL_PARAMETERS.maxValSize,
     PROTOCOL_PARAMETERS.maxTxSize,
     PROTOCOL_PARAMETERS.priceMem,
     PROTOCOL_PARAMETERS.priceStep,
-    CARDANO.LanguageViews.new(Buffer.from(languageViews, "hex"))
+    instance.LanguageViews.new(Buffer.from(languageViews, "hex"))
   );
 
-  const datums = CARDANO.PlutusList.new();
+  const datums = instance.PlutusList.new();
 
-  const outputs = CARDANO.TransactionOutputs.new();
+  const outputs = instance.TransactionOutputs.new();
 
   return { metadata, txBuilder, datums, outputs };
 };
@@ -46,7 +46,8 @@ export const finalizeTx = async ({
   action,
   plutusScripts,
 }) => {
-  const transactionWitnessSet = CARDANO.TransactionWitnessSet.new();
+  const instance = await CardanoInstance;
+  const transactionWitnessSet = instance.TransactionWitnessSet.new();
 
   CoinSelection.setProtocolParameters(
     PROTOCOL_PARAMETERS.minUtxo,
@@ -75,16 +76,20 @@ export const finalizeTx = async ({
   }
 
   if (scriptUtxo) {
-    const redeemers = CARDANO.Redeemers.new();
+    const redeemers = instance.Redeemers.new();
     const redeemerIndex = txBuilder
       .index_of_input(scriptUtxo.input())
       .toString();
     redeemers.add(action(redeemerIndex));
-    txBuilder.set_redeemers(CARDANO.Redeemers.from_bytes(redeemers.to_bytes()));
-    txBuilder.set_plutus_data(CARDANO.PlutusList.from_bytes(datums.to_bytes()));
+    txBuilder.set_redeemers(
+      instance.Redeemers.from_bytes(redeemers.to_bytes())
+    );
+    txBuilder.set_plutus_data(
+      instance.PlutusList.from_bytes(datums.to_bytes())
+    );
     txBuilder.set_plutus_scripts(plutusScripts);
     const collateral = (await getCollateral()).map((utxo) =>
-      CARDANO.TransactionUnspentOutput.from_bytes(fromHex(utxo))
+      instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
     );
 
     setCollateral(txBuilder, collateral);
@@ -97,13 +102,13 @@ export const finalizeTx = async ({
   let aux_data;
 
   if (metadata) {
-    aux_data = CARDANO.AuxiliaryData.new();
-    const generalMetadata = CARDANO.GeneralTransactionMetadata.new();
+    aux_data = instance.AuxiliaryData.new();
+    const generalMetadata = instance.GeneralTransactionMetadata.new();
     Object.keys(metadata).forEach((label) => {
       Object.keys(metadata[label]).length > 0 &&
         generalMetadata.insert(
-          CARDANO.BigNum.from_str(label),
-          CARDANO.encode_json_str_to_metadatum(
+          instance.BigNum.from_str(label),
+          instance.encode_json_str_to_metadatum(
             JSON.stringify(metadata[label]),
             1
           )
@@ -120,26 +125,26 @@ export const finalizeTx = async ({
     changeMultiAssets &&
     change.to_bytes().length * 2 > PROTOCOL_PARAMETERS.maxValSize
   ) {
-    const partialChange = CARDANO.Value.new(CARDANO.BigNum.from_str("0"));
+    const partialChange = instance.Value.new(instance.BigNum.from_str("0"));
 
-    const partialMultiAssets = CARDANO.MultiAsset.new();
+    const partialMultiAssets = instance.MultiAsset.new();
     const policies = changeMultiAssets.keys();
     const makeSplit = () => {
       for (let j = 0; j < changeMultiAssets.len(); j++) {
         const policy = policies.get(j);
         const policyAssets = changeMultiAssets.get(policy);
         const assetNames = policyAssets.keys();
-        const assets = CARDANO.Assets.new();
+        const assets = instance.Assets.new();
         for (let k = 0; k < assetNames.len(); k++) {
           const policyAsset = assetNames.get(k);
           const quantity = policyAssets.get(policyAsset);
           assets.insert(policyAsset, quantity);
           //check size
-          const checkMultiAssets = CARDANO.MultiAsset.from_bytes(
+          const checkMultiAssets = instance.MultiAsset.from_bytes(
             partialMultiAssets.to_bytes()
           );
           checkMultiAssets.insert(policy, assets);
-          const checkValue = CARDANO.Value.new(CARDANO.BigNum.from_str("0"));
+          const checkValue = instance.Value.new(instance.BigNum.from_str("0"));
           checkValue.set_multiasset(checkMultiAssets);
           if (
             checkValue.to_bytes().length * 2 >=
@@ -154,14 +159,14 @@ export const finalizeTx = async ({
     };
     makeSplit();
     partialChange.set_multiasset(partialMultiAssets);
-    const minAda = CARDANO.min_ada_required(
+    const minAda = instance.min_ada_required(
       partialChange,
-      CARDANO.BigNum.from_str(PROTOCOL_PARAMETERS.minUtxo)
+      instance.BigNum.from_str(PROTOCOL_PARAMETERS.minUtxo)
     );
     partialChange.set_coin(minAda);
 
     txBuilder.add_output(
-      CARDANO.TransactionOutput.new(changeAddress.to_address(), partialChange)
+      instance.TransactionOutput.new(changeAddress.to_address(), partialChange)
     );
   }
 
@@ -169,9 +174,9 @@ export const finalizeTx = async ({
 
   const txBody = txBuilder.build();
 
-  const tx = CARDANO.Transaction.new(
+  const tx = instance.Transaction.new(
     txBody,
-    CARDANO.TransactionWitnessSet.from_bytes(transactionWitnessSet.to_bytes()),
+    instance.TransactionWitnessSet.from_bytes(transactionWitnessSet.to_bytes()),
     aux_data
   );
 
@@ -180,13 +185,13 @@ export const finalizeTx = async ({
   if (size > PROTOCOL_PARAMETERS.maxTxSize) throw new Error("MAX_SIZE_REACHED");
 
   let txVkeyWitnesses = await signTx(toHex(tx.to_bytes()), true);
-  txVkeyWitnesses = CARDANO.TransactionWitnessSet.from_bytes(
+  txVkeyWitnesses = instance.TransactionWitnessSet.from_bytes(
     fromHex(txVkeyWitnesses)
   );
 
   transactionWitnessSet.set_vkeys(txVkeyWitnesses.vkeys());
 
-  const signedTx = CARDANO.Transaction.new(
+  const signedTx = instance.Transaction.new(
     tx.body(),
     transactionWitnessSet,
     tx.auxiliary_data()
@@ -197,25 +202,26 @@ export const finalizeTx = async ({
   return txHash;
 };
 
-export const createTxOutput = (
+export const createTxOutput = async (
   address,
   value,
   { datum, index, tradeOwnerAddress, metadata } = {}
 ) => {
+  const instance = await CardanoInstance;
   const v = value;
 
-  const minAda = CARDANO.min_ada_required(
+  const minAda = instance.min_ada_required(
     v,
-    CARDANO.BigNum.from_str(PROTOCOL_PARAMETERS.minUtxo),
-    datum && CARDANO.hash_plutus_data(datum)
+    instance.BigNum.from_str(PROTOCOL_PARAMETERS.minUtxo),
+    datum && instance.hash_plutus_data(datum)
   );
 
   if (minAda.compare(v.coin()) === 1) v.set_coin(minAda);
 
-  const output = CARDANO.TransactionOutput.new(address, v);
+  const output = instance.TransactionOutput.new(address, v);
 
   if (datum) {
-    output.set_data_hash(CARDANO.hash_plutus_data(datum));
+    output.set_data_hash(instance.hash_plutus_data(datum));
     metadata[DATUM_LABEL][index] = "0x" + toHex(datum.to_bytes());
   }
 
@@ -228,9 +234,11 @@ export const createTxOutput = (
 };
 
 export const getTxUnspentOutputHash = async (hexEncodedBytes) => {
+  const instance = await CardanoInstance;
+
   try {
     return toHex(
-      CARDANO.TransactionUnspentOutput.from_bytes(fromHex(hexEncodedBytes))
+      instance.TransactionUnspentOutput.from_bytes(fromHex(hexEncodedBytes))
         .input()
         .transaction_id()
         .to_bytes()
@@ -242,8 +250,9 @@ export const getTxUnspentOutputHash = async (hexEncodedBytes) => {
   }
 };
 
-const setCollateral = (txBuilder, utxos) => {
-  const inputs = CARDANO.TransactionInputs.new();
+const setCollateral = async (txBuilder, utxos) => {
+  const instance = await CardanoInstance;
+  const inputs = instance.TransactionInputs.new();
 
   utxos.forEach((utxo) => {
     inputs.add(utxo.input());
