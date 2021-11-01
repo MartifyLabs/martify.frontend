@@ -110,8 +110,8 @@ const ListingSection = ({state_collection, policyId}) => {
   ]
 
   function load(){
-    if(policyId in state_collection.policies_tokens){
-      let tmp = Object.values(state_collection.policies_tokens[policyId]);
+    if(policyId in state_collection.policies_assets){
+      let tmp = Object.values(state_collection.policies_assets[policyId]);
       setListings(tmp);
     }
   }
@@ -157,7 +157,7 @@ const ListingSection = ({state_collection, policyId}) => {
   .map((this_nft, i) => {
     return(
       <div className="column is-one-full-mobile is-half-tablet one-quarter-desktop is-one-quarter-widescreen is-one-quarter-fullhd" key={i}>
-        <AssetCard token={this_nft} />
+        <AssetCard asset={this_nft} />
       </div>
     )
   });

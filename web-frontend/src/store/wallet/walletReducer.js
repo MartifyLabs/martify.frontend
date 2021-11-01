@@ -67,6 +67,7 @@ export default function walletReducer(state = walletobj, { type, payload }) {
           utxos: payload,
         },
       };
+
     // case types.SET_WALLET_ASSETS:
     //   let tmp_assets = {...state.assets};
 
@@ -92,8 +93,6 @@ export default function walletReducer(state = walletobj, { type, payload }) {
     //     loaded_assets: true,
     //   };
 
-    
-    
     case types.SET_WALLET_ASSETS:
       let tmp_assets = {};
       for(var asset_id in payload){
@@ -106,15 +105,13 @@ export default function walletReducer(state = walletobj, { type, payload }) {
           }
         }
       }
-
       return {
         ...state,
         assets: tmp_assets,
         loaded_assets: true,
+        loading: false,
       };
-
       
-
     default:
       return state;
   }

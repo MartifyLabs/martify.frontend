@@ -4,59 +4,31 @@ import { connect } from "react-redux";
 
 import AssetCard from "../../components/AssetCard";
 
-import {get_wallet_assets} from "../../store/wallet/api";
-
-const Account = ({state_wallet, state_collection, get_wallet_assets}) => {
-
-  // function debug(){
-  //   if(state_wallet.connected && !state_wallet.loading){
-  //     console.log(state_wallet.data)
-
-  //     get_wallet_assets_mock(state_wallet.data.utxos, (res) => {
-  //       console.log(res)
-  //     });
-  //   }
-  // }
+const Account = ({state_wallet, state_collection}) => {
 
   return (
     <section className="section">
-
-      <ListingSection state_wallet={state_wallet} state_collection={state_collection} get_wallet_assets={get_wallet_assets} />
-
-      {/* <button className={"button is-primary" + (state_wallet.loading ? " is-loading" : "")} disabled={state_wallet.loading || !state_wallet.connected} onClick={() => debug()}>
-        <span>debug</span>
-      </button> */}
-
+      <ListingSection state_wallet={state_wallet} state_collection={state_collection} />
     </section>
   );
 };
 
-
-const ListingSection = ({state_wallet, state_collection, get_wallet_assets}) => {
+const ListingSection = ({state_wallet, state_collection}) => {
 
   const [listings, setListings] = useState([]);
   const [searchText, setSearchText] = useState("");
 
   function load(){
-    if(state_wallet.connected && !state_wallet.loading && !state_wallet.loaded_assets){
-      get_wallet_assets((res) => {
-        // console.log(res)
-      });
-    }
 
     if(state_wallet.loaded_assets){
       let list_nfts = [];
-      for(var policy_id in state_wallet.assets){
-        for(var i in state_wallet.assets[policy_id]){
-          let asset_id = state_wallet.assets[policy_id][i];
-          if(policy_id in state_collection.policies_tokens){
-            if(asset_id in state_collection.policies_tokens[policy_id]){
-              let this_asset = state_collection.policies_tokens[policy_id][asset_id];
-              list_nfts.push(this_asset);
-            }
-          }
-        }
+
+      for(var asset_id in state_wallet.assets){
+        let this_asset_ids = state_wallet.assets[asset_id];
+        let this_asset = state_collection.policies_assets[this_asset_ids.policy_id][this_asset_ids.asset_id];
+        list_nfts.push(this_asset);
       }
+
       setListings(list_nfts);
     }
   }
@@ -75,14 +47,12 @@ const ListingSection = ({state_wallet, state_collection, get_wallet_assets}) => 
       if (searchText === "") {
         return_this = true;
       }
-      else if (
-        searchText !== "" &&
-        (
-          x.meta.name.toLowerCase().includes(searchText.toLowerCase())
-          // x.properties.some(x => x.toLowerCase().includes(searchText.toLowerCase()))
-        )
-      ) {
-        return_this = true;
+      else if (searchText !== "" && x.info.onchainMetadata){
+        if(
+          x.info.onchainMetadata.name.toLowerCase().includes(searchText.toLowerCase())
+        ){
+          return_this = true;
+        }
       }
       return return_this;
     };
@@ -91,11 +61,17 @@ const ListingSection = ({state_wallet, state_collection, get_wallet_assets}) => 
   let matchedtokens = listings.filter(searchingFor(searchText));
 
   const filtered_listing = matchedtokens
-  .map((this_nft, i) => {
+  .map((asset, i) => {
     return(
-      <div className="column is-one-full-mobile is-half-tablet one-quarter-desktop is-one-quarter-widescreen is-one-quarter-fullhd" key={i}>
-        <AssetCard token={this_nft} />
-      </div>
+      <>
+      {
+        asset.info.onchainMetadata ? (
+          <div className="column is-one-full-mobile is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd" key={i}>
+            <AssetCard asset={asset} />
+          </div>
+        ) : <></>
+      }
+      </>
     )
   });
 
@@ -134,7 +110,6 @@ function mapStateToProps(state, props) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    get_wallet_assets: (callback) => dispatch(get_wallet_assets(callback)),
   };
 }
 
