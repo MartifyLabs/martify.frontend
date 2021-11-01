@@ -1,28 +1,9 @@
 {
   "pixelhead": {
     "id": "pixelhead",
-    "policy_id": "6c880f643a86d6f5b86871952b36999bbf7e9619ca54953abd2acf62",
-    "meta": {
-      "name": "The Pixel Head Squad",
-      "description": "The Pixel Head Squad was created by a team of Cardano NFT enthusiasts. After many months in the space, we were spurred to explore new ways to bring an exciting twist to collectable NFT pieces, both in the form of art and tech."
-    },
-    "style": {
-      "logo": "logo.png",
-      "banner": "banner.gif",
-      "font_color_title": "#f5f3db"
-    },
-    "links": {
-      "discord": "http://discord.gg/rpDtw4JTxD",
-      "twitter": "https://twitter.com/PixelHeadSquad",
-      "website": "https://pixelhead.io/"
-    },
-    "asset_attributes": ["creature name", "narrative"]
-  },
-  "pixelhead_testnet": {
-    "id": "pixelhead_testnet",
     "policy_id": "9236a326ec65243627d89f60921a42314d0cd407c002280499e1f88b",
     "meta": {
-      "name": "The Pixel Head Squad Testnet",
+      "name": "The Pixel Head Squad",
       "description": "The Pixel Head Squad was created by a team of Cardano NFT enthusiasts. After many months in the space, we were spurred to explore new ways to bring an exciting twist to collectable NFT pieces, both in the form of art and tech."
     },
     "style": {

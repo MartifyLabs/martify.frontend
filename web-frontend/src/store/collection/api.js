@@ -31,7 +31,8 @@ export const get_listings = (policy_id, callback) => async (dispatch) => {
     "policy_id": policy_id,
     "listing": data_assets[policy_id]
   };
-
+  console.log(22, policy_id)
+  console.log(11, data_assets)
   if(output.policy_id && output.listing){
     dispatch(collections_add_tokens(output));
   }
