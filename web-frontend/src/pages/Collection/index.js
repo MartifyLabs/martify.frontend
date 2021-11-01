@@ -31,8 +31,9 @@ const Collection = ({state_collection, collection_id, get_listings}) => {
 
   useEffect(() => {
     if(collection_id in state_collection.collections){
-      setPolicyId(state_collection.collections[collection_id].policy_id);
-      var tmp = {...state_collection.collections[collection_id]};
+      let policy_id = state_collection.collections[collection_id];
+      setPolicyId(policy_id);
+      var tmp = {...state_collection.policies_collections[policy_id]};
       setThisCollection(tmp);
     }else{
       var tmp = {...default_meta};
@@ -133,9 +134,7 @@ const ListingSection = ({state_collection, policyId}) => {
       else if (
         searchText !== "" &&
         (
-          x.token_id.toLowerCase().includes(searchText.toLowerCase()) || 
-          x.meta.name.toLowerCase().includes(searchText.toLowerCase())
-          // x.properties.some(x => x.toLowerCase().includes(searchText.toLowerCase()))
+          x.info.onchainMetadata.name.toLowerCase().includes(searchText.toLowerCase())
         )
       ) {
         return_this = true;

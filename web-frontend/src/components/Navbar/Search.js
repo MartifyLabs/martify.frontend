@@ -16,7 +16,10 @@ const Search = ({state_collection}) => {
   let data = [];
 
   for(var collection_id in state_collection.collections){
-    data.push({label: state_collection.collections[collection_id].meta.name, value: state_collection.collections[collection_id].id})
+    let policy_id = state_collection.collections[collection_id];
+    data.push({
+      label: state_collection.policies_collections[policy_id].meta.name, value: collection_id
+    })
   }
 
   function selected(){

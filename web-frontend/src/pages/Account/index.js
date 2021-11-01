@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 
 import AssetCard from "../../components/AssetCard";
 
-import {get_wallet_assets} from "../../store/market/api";
+import {get_wallet_assets} from "../../store/wallet/api";
 
 const Account = ({state_wallet, state_collection, get_wallet_assets}) => {
 
