@@ -42,7 +42,7 @@ export const get_listings = (policy_id, callback) => async (dispatch) => {
   
 }
 
-export const get_token = (policy_id, asset_id, callback) => async (dispatch) => {
+export const get_asset = (policy_id, asset_id, callback) => async (dispatch) => {
 
   // query, get data
   dispatch(collections_loading(true));

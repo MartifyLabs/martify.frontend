@@ -8,6 +8,8 @@ import {
   signTx,
 } from "../../cardano/wallet";
 
+import {WALLET_STATE} from "./walletTypes";
+
 import {
   walletConnected,
   setWalletNetwork,
@@ -69,7 +71,7 @@ function receive_txn_for_user_sign(res, callback) {
 
 export const connectWallet = (callback) => async (dispatch) => {
   try {
-    dispatch(setWalletLoading(true));
+    dispatch(setWalletLoading(WALLET_STATE.CONNECTING));
 
     window.cardano
       .enable()
@@ -201,8 +203,10 @@ export const create_txn = (send_addr, amount, callback) => async (dispatch) => {
 };
 
 export const get_wallet_assets = (callback) => async (dispatch) => {
-  dispatch(setWalletLoading(true));
-  console.log("query")
+
+  console.log("getting wallet assets")
+  dispatch(setWalletLoading(WALLET_STATE.GETTING_ASSETS));
+
   const wallet_assets = await getOwnedAssets();
   console.log("gotten wallet_assets", wallet_assets); 
   

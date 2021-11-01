@@ -2,44 +2,40 @@ import React, { useEffect, useState} from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
 
-import { load_collection, get_token} from "../../store/collection/api";
+import { load_collection, get_asset} from "../../store/collection/api";
 import ButtonBuy from "../../components/ButtonBuy";
 import CollectionAbout from "../../components/CollectionAbout";
 import CollectionBanner from "../../components/CollectionBanner";
 
 import "./style.css";
 
-const Asset = ({state_collection, policy_id, asset_id, get_token}) => {
+const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset}) => {
 
-  const [token, setToken] = useState(false);
+  const [asset, setAsset] = useState(false);
   const [thisCollection, setThisCollection] = useState(false);
-
+  
   useEffect(() => {
-    let query_token = false;
+    let query_asset = false;
 
-    // get_token
-
-    if(policy_id in state_collection.policies_tokens){
-      if(asset_id in state_collection.policies_tokens[policy_id]){
-        setToken(state_collection.policies_tokens[policy_id][asset_id]);
+    if(policy_id in state_collection.policies_assets){
+      if(asset_id in state_collection.policies_assets[policy_id]){
+        setAsset(state_collection.policies_assets[policy_id][asset_id]);
 
         if(policy_id in state_collection.policies_collections){
-
-          var tmp = {...state_collection.collections[ state_collection.policies_collections[policy_id] ]}
+          var tmp = {...state_collection.policies_collections[policy_id]}
           tmp.style.logo_path = `/collections/${tmp.id}/${tmp.style.logo}`;
-          
           setThisCollection(tmp);
         }
 
       }else{
-        query_token = true;
+        query_asset = true;
       }
     }else{
-      query_token = true;
+      query_asset = true;
     }
 
-    if(query_token && !state_collection.loading){
-      get_token(policy_id, asset_id, (res) => {
+    if(query_asset && !state_collection.loading){
+      get_asset(policy_id, asset_id, (res) => {
 
       });
     }
@@ -51,24 +47,29 @@ const Asset = ({state_collection, policy_id, asset_id, get_token}) => {
         thisCollection ? <CollectionBanner thisCollection={thisCollection} size="is-small" /> : <></>
       }
       {
-        token ? (
+        asset ? (
           <div className="container asset">
             <section className="section">
               <div className="columns">
                 <div className="column is-two-fifths">
                   <div className="block">
                     <figure className="image is-square">
-                      <img src={"https://ipfs.blockfrost.dev/ipfs/"+token.meta.image} alt={token.meta.name}/>
+                      <img src={"https://ipfs.blockfrost.dev/ipfs/"+asset.info.onchainMetadata.image} alt={asset.info.onchainMetadata.name}/>
                     </figure>
                   </div>
+
+                  
+
                 </div>
                 <div className="column">
                   <div className="content">
 
-                    <PriceBuy token={token} />
+                    <PriceBuy asset={asset} />
 
-                    <AboutToken thisCollection={thisCollection} token={token} />
+                    { asset_id in state_wallet.assets ? <OwnerList asset={asset} /> : <></> }
 
+                    <AboutAsset thisCollection={thisCollection} asset={asset} />
+                    
                     { thisCollection ? <CollectionAbout thisCollection={thisCollection} /> : <></> }
                     
                   </div>
@@ -79,7 +80,7 @@ const Asset = ({state_collection, policy_id, asset_id, get_token}) => {
           </div>
         ) : (
           <div>
-            no token
+            no asset
           </div>
         )
       }
@@ -88,35 +89,66 @@ const Asset = ({state_collection, policy_id, asset_id, get_token}) => {
   )
 };
 
-const PriceBuy = ({token}) => {
+const PriceBuy = ({asset}) => {
   return (
     <div className="block">
       <nav className="level">
 
         <div className="level-left">
           <div className="level-item">
-            <h1>{token.meta.name}</h1>
-            <span>project name</span>
+            <h1>{asset.info.onchainMetadata.name}</h1>
           </div>
         </div>
 
-        <div className="level-right">
-          <div className="level-item">
-            <div className="media-content">
-              <p className="title is-4">{token.listing.price}<span className="ada_symbol">₳</span></p>
+        {
+          asset.listing.is_listed ? (
+            <div className="level-right">
+              <div className="level-item">
+                <div className="media-content">
+                  <p className="title is-4">{asset.listing.price}<span className="ada_symbol">₳</span></p>
+                </div>
+              </div>
+              <div className="level-item">
+                <ButtonBuy />
+              </div>
             </div>
-          </div>
-          <div className="level-item">
-            <ButtonBuy />
-          </div>
-        </div>
-
+          ) : <></>
+        }
       </nav>
     </div>
   )
 }
 
-const AboutToken = ({thisCollection, token}) => {
+const OwnerList = ({asset}) => {
+  return (
+    <div className="block">
+      <div className="card">
+        <header className="card-header">
+          <p className="card-header-title">
+            Sell
+          </p>
+        </header>
+        <div className="card-content">
+          
+          <div className="field has-addons">
+            <div className="control has-icons-left is-expanded">
+              <input className="input" type="number" placeholder="Price" />
+              <span className="icon is-medium is-left">₳</span>
+            </div>
+            <div className="control">
+              <a className="button is-info">
+                List this!
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const AboutAsset = ({thisCollection, asset}) => {
   return (
     <div className="block">
       <div className="card">
@@ -133,7 +165,7 @@ const AboutToken = ({thisCollection, token}) => {
                           <th className="attr">{attr}</th>
                           <td>
                             {
-                              typeof(token.meta[attr])=="object" ? token.meta[attr].join(" ") : token.meta[attr]
+                              typeof(asset.info.onchainMetadata[attr])=="object" ? asset.info.onchainMetadata[attr].join(" ") : asset.info.onchainMetadata[attr]
                             }
                           </td>
                         </tr>
@@ -155,14 +187,15 @@ function mapStateToProps(state, props) {
   return {
     policy_id: props.match.params.policy_id,
     asset_id: props.match.params.asset_id,
-    state_collection: state.collection
+    state_collection: state.collection,
+    state_wallet: state.wallet,
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     load_collection: (callback) => dispatch(load_collection(callback)),
-    get_token: (policy_id, asset_id, callback) => dispatch(get_token(policy_id, asset_id, callback)),
+    get_asset: (policy_id, asset_id, callback) => dispatch(get_asset(policy_id, asset_id, callback)),
   };
 }
 

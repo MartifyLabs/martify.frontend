@@ -4,7 +4,7 @@ import CollectionLinks from "../CollectionLinks";
 
 const CollectionBanner = ({thisCollection, size}) => {
   return (
-    <section className={"hero collection_name " + (size=undefined ? size : "is-medium")} style={{backgroundImage: `url(${thisCollection.style.banner_path})`}}>
+    <section className={"hero collection_name " + (size!=undefined ? size : "is-medium")} style={{backgroundImage: `url(${thisCollection.style.banner_path})`}}>
         <div className="hero-body">
         
           <nav className="level">
