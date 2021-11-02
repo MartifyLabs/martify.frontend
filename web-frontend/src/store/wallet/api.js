@@ -77,15 +77,22 @@ export const connectWallet = (callback) => async (dispatch) => {
       .enable()
       .then((res) => {
         getNetworkId().then((network) => {
+          
+          let connected_wallet = {};
+
+          connected_wallet.network = network;
+
           // console.log("getNetworkId", network);
-          dispatch(setWalletNetwork(network));
+          // dispatch(setWalletNetwork(network));
 
           getUtxos().then((res_utxos) => {
-            dispatch(setWalletUtxos(res_utxos));
+            connected_wallet.utxos = res_utxos;
+            // dispatch(setWalletUtxos(res_utxos));
 
             getUsedAddresses().then((res) => {
               let used_address = res[0];
-              dispatch(setWalletUsedAddr(used_address));
+              // dispatch(setWalletUsedAddr(used_address));
+              connected_wallet.used_addr = used_address;
 
               getBalance().then((res) => {
                 const balance = cbor.decode(res);
@@ -102,19 +109,15 @@ export const connectWallet = (callback) => async (dispatch) => {
                     }
                   }
                 }
+                
+                connected_wallet.wallet_balance = wallet_balance;
+                // dispatch(setWalletBalance(wallet_balance));
 
-                dispatch(setWalletBalance(wallet_balance));
-
-                dispatch(walletConnected());
+                dispatch(walletConnected(connected_wallet));
 
                 callback({
                   success: true,
-                  data: {
-                    used_addr: used_address,
-                    network: network,
-                    wallet_balance: wallet_balance,
-                    utxos: res_utxos,
-                  },
+                  data: connected_wallet,
                 });
               });
             });
@@ -204,7 +207,7 @@ export const create_txn = (send_addr, amount, callback) => async (dispatch) => {
 
 export const get_wallet_assets = (callback) => async (dispatch) => {
 
-  console.log("getting wallet assets")
+  console.log("getting wallet assets", WALLET_STATE.GETTING_ASSETS)
   dispatch(setWalletLoading(WALLET_STATE.GETTING_ASSETS));
 
   const wallet_assets = await getOwnedAssets();

@@ -1,8 +1,9 @@
 import * as types from "./walletTypes";
 
-export function walletConnected() {
+export function walletConnected(payload) {
   return {
     type: types.WALLET_CONNECTED,
+    payload: payload
   };
 }
 export function setWalletNetwork(payload) {

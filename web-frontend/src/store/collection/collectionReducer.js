@@ -10,12 +10,16 @@ let collectionobj = {
 };
 
 function update_tokens(token, asset_id, policy_id, state_policies_collections){
-  if(policy_id in state_policies_collections){
-    token.collection = state_policies_collections[policy_id];
-  }else{
-    token.collection = {policy_id: policy_id};
+
+  if(token){
+    if(policy_id in state_policies_collections){
+      token.collection = state_policies_collections[policy_id];
+    }else{
+      token.collection = {policy_id: policy_id};
+    }
+    token.listing = {};
   }
-  token.listing = {};
+  
   return token;
 }
 
