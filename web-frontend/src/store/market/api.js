@@ -1,7 +1,11 @@
+import { offer } from "../../cardano/market-contract/";
+
 export const listToken = (policy_id, asset_id, price, callback) => async (dispatch) => {
   try {
     console.log("listToken", policy_id, asset_id, price);
-    
+    let txHash = await offer(asset_id, policy_id, price.toString());
+    console.log("txHash", txHash)
+
     callback({success: true});
   } catch (error) {
     console.error(`Unexpected error in listToken. [Message: ${error.message}]`);
