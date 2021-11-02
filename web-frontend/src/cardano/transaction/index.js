@@ -1,4 +1,4 @@
-import CardanoInstance from "../serialization-lib";
+import Cardano from "../serialization-lib";
 import { getCollateral, signTx, submitTx } from "../wallet";
 import { getProtocolParameters } from "../blockfrost-api";
 import CoinSelection from "./coinSelection";
@@ -7,30 +7,30 @@ import { fromHex, toHex } from "../../utils";
 
 const DATUM_LABEL = 405;
 const ADDRESS_LABEL = 406;
-const PROTOCOL_PARAMETERS = getProtocolParameters();
 
 export const initializeTx = async () => {
-  const instance = await CardanoInstance;
+  await Cardano.load();
+  const Parameters = await getProtocolParameters();
   const metadata = { [DATUM_LABEL]: {}, [ADDRESS_LABEL]: {} };
 
-  const txBuilder = instance.TransactionBuilder.new(
-    instance.LinearFee.new(
-      instance.BigNum.from_str(PROTOCOL_PARAMETERS.linearFee.minFeeA),
-      instance.BigNum.from_str(PROTOCOL_PARAMETERS.linearFee.minFeeB)
+  const txBuilder = Cardano.Instance.TransactionBuilder.new(
+    Cardano.Instance.LinearFee.new(
+      Cardano.Instance.BigNum.from_str(Parameters.linearFee.minFeeA),
+      Cardano.Instance.BigNum.from_str(Parameters.linearFee.minFeeB)
     ),
-    instance.BigNum.from_str(PROTOCOL_PARAMETERS.minUtxo),
-    instance.BigNum.from_str(PROTOCOL_PARAMETERS.poolDeposit),
-    instance.BigNum.from_str(PROTOCOL_PARAMETERS.keyDeposit),
-    PROTOCOL_PARAMETERS.maxValSize,
-    PROTOCOL_PARAMETERS.maxTxSize,
-    PROTOCOL_PARAMETERS.priceMem,
-    PROTOCOL_PARAMETERS.priceStep,
-    instance.LanguageViews.new(Buffer.from(languageViews, "hex"))
+    Cardano.Instance.BigNum.from_str(Parameters.minUtxo),
+    Cardano.Instance.BigNum.from_str(Parameters.poolDeposit),
+    Cardano.Instance.BigNum.from_str(Parameters.keyDeposit),
+    Parameters.maxValSize,
+    Parameters.maxTxSize,
+    Parameters.priceMem,
+    Parameters.priceStep,
+    Cardano.Instance.LanguageViews.new(Buffer.from(languageViews, "hex"))
   );
 
-  const datums = instance.PlutusList.new();
+  const datums = Cardano.Instance.PlutusList.new();
 
-  const outputs = instance.TransactionOutputs.new();
+  const outputs = Cardano.Instance.TransactionOutputs.new();
 
   return { metadata, txBuilder, datums, outputs };
 };
@@ -46,17 +46,18 @@ export const finalizeTx = async ({
   action,
   plutusScripts,
 }) => {
-  const instance = await CardanoInstance;
-  const transactionWitnessSet = instance.TransactionWitnessSet.new();
+  await Cardano.load();
+  const Parameters = await getProtocolParameters();
+  const transactionWitnessSet = Cardano.Instance.TransactionWitnessSet.new();
 
   CoinSelection.setProtocolParameters(
-    PROTOCOL_PARAMETERS.minUtxo,
-    PROTOCOL_PARAMETERS.linearFee.minFeeA,
-    PROTOCOL_PARAMETERS.linearFee.minFeeB,
-    PROTOCOL_PARAMETERS.maxTxSize.toString()
+    Parameters.minUtxo,
+    Parameters.linearFee.minFeeA,
+    Parameters.linearFee.minFeeB,
+    Parameters.maxTxSize.toString()
   );
 
-  let { input, change } = CoinSelection.randomImprove(
+  let { input, change } = await CoinSelection.randomImprove(
     utxos,
     outputs,
     8,
@@ -76,20 +77,20 @@ export const finalizeTx = async ({
   }
 
   if (scriptUtxo) {
-    const redeemers = instance.Redeemers.new();
+    const redeemers = Cardano.Instance.Redeemers.new();
     const redeemerIndex = txBuilder
       .index_of_input(scriptUtxo.input())
       .toString();
     redeemers.add(action(redeemerIndex));
     txBuilder.set_redeemers(
-      instance.Redeemers.from_bytes(redeemers.to_bytes())
+      Cardano.Instance.Redeemers.from_bytes(redeemers.to_bytes())
     );
     txBuilder.set_plutus_data(
-      instance.PlutusList.from_bytes(datums.to_bytes())
+      Cardano.Instance.PlutusList.from_bytes(datums.to_bytes())
     );
     txBuilder.set_plutus_scripts(plutusScripts);
     const collateral = (await getCollateral()).map((utxo) =>
-      instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
+      Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
     );
 
     setCollateral(txBuilder, collateral);
@@ -102,13 +103,13 @@ export const finalizeTx = async ({
   let aux_data;
 
   if (metadata) {
-    aux_data = instance.AuxiliaryData.new();
-    const generalMetadata = instance.GeneralTransactionMetadata.new();
+    aux_data = Cardano.Instance.AuxiliaryData.new();
+    const generalMetadata = Cardano.Instance.GeneralTransactionMetadata.new();
     Object.keys(metadata).forEach((label) => {
       Object.keys(metadata[label]).length > 0 &&
         generalMetadata.insert(
-          instance.BigNum.from_str(label),
-          instance.encode_json_str_to_metadatum(
+          Cardano.Instance.BigNum.from_str(label),
+          Cardano.Instance.encode_json_str_to_metadatum(
             JSON.stringify(metadata[label]),
             1
           )
@@ -123,32 +124,32 @@ export const finalizeTx = async ({
   // check if change value is too big for single output
   if (
     changeMultiAssets &&
-    change.to_bytes().length * 2 > PROTOCOL_PARAMETERS.maxValSize
+    change.to_bytes().length * 2 > Parameters.maxValSize
   ) {
-    const partialChange = instance.Value.new(instance.BigNum.from_str("0"));
+    const partialChange = Cardano.Instance.Value.new(Cardano.Instance.BigNum.from_str("0"));
 
-    const partialMultiAssets = instance.MultiAsset.new();
+    const partialMultiAssets = Cardano.Instance.MultiAsset.new();
     const policies = changeMultiAssets.keys();
     const makeSplit = () => {
       for (let j = 0; j < changeMultiAssets.len(); j++) {
         const policy = policies.get(j);
         const policyAssets = changeMultiAssets.get(policy);
         const assetNames = policyAssets.keys();
-        const assets = instance.Assets.new();
+        const assets = Cardano.Instance.Assets.new();
         for (let k = 0; k < assetNames.len(); k++) {
           const policyAsset = assetNames.get(k);
           const quantity = policyAssets.get(policyAsset);
           assets.insert(policyAsset, quantity);
           //check size
-          const checkMultiAssets = instance.MultiAsset.from_bytes(
+          const checkMultiAssets = Cardano.Instance.MultiAsset.from_bytes(
             partialMultiAssets.to_bytes()
           );
           checkMultiAssets.insert(policy, assets);
-          const checkValue = instance.Value.new(instance.BigNum.from_str("0"));
+          const checkValue = Cardano.Instance.Value.new(Cardano.Instance.BigNum.from_str("0"));
           checkValue.set_multiasset(checkMultiAssets);
           if (
             checkValue.to_bytes().length * 2 >=
-            PROTOCOL_PARAMETERS.maxValSize
+            Parameters.maxValSize
           ) {
             partialMultiAssets.insert(policy, assets);
             return;
@@ -159,14 +160,14 @@ export const finalizeTx = async ({
     };
     makeSplit();
     partialChange.set_multiasset(partialMultiAssets);
-    const minAda = instance.min_ada_required(
+    const minAda = Cardano.Instance.min_ada_required(
       partialChange,
-      instance.BigNum.from_str(PROTOCOL_PARAMETERS.minUtxo)
+      Cardano.Instance.BigNum.from_str(Parameters.minUtxo)
     );
     partialChange.set_coin(minAda);
 
     txBuilder.add_output(
-      instance.TransactionOutput.new(changeAddress.to_address(), partialChange)
+      Cardano.Instance.TransactionOutput.new(changeAddress.to_address(), partialChange)
     );
   }
 
@@ -174,24 +175,24 @@ export const finalizeTx = async ({
 
   const txBody = txBuilder.build();
 
-  const tx = instance.Transaction.new(
+  const tx = Cardano.Instance.Transaction.new(
     txBody,
-    instance.TransactionWitnessSet.from_bytes(transactionWitnessSet.to_bytes()),
+    Cardano.Instance.TransactionWitnessSet.from_bytes(transactionWitnessSet.to_bytes()),
     aux_data
   );
 
   const size = tx.to_bytes().length * 2;
 
-  if (size > PROTOCOL_PARAMETERS.maxTxSize) throw new Error("MAX_SIZE_REACHED");
+  if (size > Parameters.maxTxSize) throw new Error("MAX_SIZE_REACHED");
 
   let txVkeyWitnesses = await signTx(toHex(tx.to_bytes()), true);
-  txVkeyWitnesses = instance.TransactionWitnessSet.from_bytes(
+  txVkeyWitnesses = Cardano.Instance.TransactionWitnessSet.from_bytes(
     fromHex(txVkeyWitnesses)
   );
 
   transactionWitnessSet.set_vkeys(txVkeyWitnesses.vkeys());
 
-  const signedTx = instance.Transaction.new(
+  const signedTx = Cardano.Instance.Transaction.new(
     tx.body(),
     transactionWitnessSet,
     tx.auxiliary_data()
@@ -207,21 +208,22 @@ export const createTxOutput = async (
   value,
   { datum, index, tradeOwnerAddress, metadata } = {}
 ) => {
-  const instance = await CardanoInstance;
+  await Cardano.load();
+  const Parameters = await getProtocolParameters();
   const v = value;
 
-  const minAda = instance.min_ada_required(
+  const minAda = Cardano.Instance.min_ada_required(
     v,
-    instance.BigNum.from_str(PROTOCOL_PARAMETERS.minUtxo),
-    datum && instance.hash_plutus_data(datum)
+    Cardano.Instance.BigNum.from_str(Parameters.minUtxo),
+    datum && Cardano.Instance.hash_plutus_data(datum)
   );
 
   if (minAda.compare(v.coin()) === 1) v.set_coin(minAda);
 
-  const output = instance.TransactionOutput.new(address, v);
+  const output = Cardano.Instance.TransactionOutput.new(address, v);
 
   if (datum) {
-    output.set_data_hash(instance.hash_plutus_data(datum));
+    output.set_data_hash(Cardano.Instance.hash_plutus_data(datum));
     metadata[DATUM_LABEL][index] = "0x" + toHex(datum.to_bytes());
   }
 
@@ -234,11 +236,11 @@ export const createTxOutput = async (
 };
 
 export const getTxUnspentOutputHash = async (hexEncodedBytes) => {
-  const instance = await CardanoInstance;
+  await Cardano.load();
 
   try {
     return toHex(
-      instance.TransactionUnspentOutput.from_bytes(fromHex(hexEncodedBytes))
+      Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(hexEncodedBytes))
         .input()
         .transaction_id()
         .to_bytes()
@@ -251,8 +253,9 @@ export const getTxUnspentOutputHash = async (hexEncodedBytes) => {
 };
 
 const setCollateral = async (txBuilder, utxos) => {
-  const instance = await CardanoInstance;
-  const inputs = instance.TransactionInputs.new();
+  await Cardano.load();
+
+  const inputs = Cardano.Instance.TransactionInputs.new();
 
   utxos.forEach((utxo) => {
     inputs.add(utxo.input());
