@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 
 import { connectWallet, get_wallet_assets } from "../../store/wallet/api";
 import { WALLET_STATE } from "../../store/wallet/walletTypes";
@@ -10,42 +11,23 @@ const ButtonConnect = ({state_wallet, connectWallet, get_wallet_assets}) => {
   const [showNotification, setShowNotification] = useState(false);
 
   function connect_wallet(){
-    connectWallet((res) => {
-
-      // if(state_wallet.connected && !state_wallet.loading && !state_wallet.loaded_assets){
-        console.log("wallet connected")
-      get_wallet_assets((res) => {
-        // console.log(res)
-      });
-      // }
-
-      // if (res.success){
-      //   setShowNotification("connected");
-      //   setTimeout(function(){ setShowNotification(false); }, 3000);
-      // }else{
-      //   if(res.error){
-      //     if(res.error.code === -3){
-      //       setShowNotification("no-accept");
-      //     }
-      //     else{
-      //       setShowNotification("no-nami");
-      //     }
-      //   }
-      // }
-    });
+    connectWallet((res) => {});
   }
 
   useEffect(() => {
-    console.log(888, state_wallet.loading);
+
     if(state_wallet.loading){
-      let tmp = {...state_wallet}
-      setShowNotification(tmp.loading);
+      setShowNotification(state_wallet.loading);
     }else{
       setShowNotification(false);
     }
+
+    if(state_wallet.connected && !state_wallet.loading && !state_wallet.loaded_assets){
+      get_wallet_assets((res) => {});
+    }
+
   }, [state_wallet]);
-  
-  
+
   return (
     <>
       {
@@ -53,11 +35,15 @@ const ButtonConnect = ({state_wallet, connectWallet, get_wallet_assets}) => {
           <button className={"button is-rounded is-info" + (state_wallet.loading ? " is-loading" : "")} disabled={state_wallet.loading} onClick={() => connect_wallet()}>
             <span>Connect</span>
           </button>
-        ) : <></>
+        ) : (
+          <Link className="button is-rounded is-info" to="/account">
+            <span>Account</span>
+          </Link>
+        )
       }
       {
         showNotification ? (
-          <div className="notification-window notification ">
+          <div className="notification-window notification is-info">
             <button className="delete" onClick={() => setShowNotification(false)}></button>
             {
               showNotification === "no-nami" ? (

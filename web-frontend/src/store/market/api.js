@@ -1,5 +1,8 @@
-export const listToken = () => async (dispatch) => {
+export const listToken = (policy_id, asset_id, price, callback) => async (dispatch) => {
   try {
+    console.log("listToken", policy_id, asset_id, price);
+    
+    callback({success: true});
   } catch (error) {
     console.error(`Unexpected error in listToken. [Message: ${error.message}]`);
   }

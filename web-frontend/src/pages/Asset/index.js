@@ -3,13 +3,15 @@ import { compose } from "redux";
 import { connect } from "react-redux";
 
 import { load_collection, get_asset} from "../../store/collection/api";
+import { listToken } from "../../store/market/api";
+
 import ButtonBuy from "../../components/ButtonBuy";
 import CollectionAbout from "../../components/CollectionAbout";
 import CollectionBanner from "../../components/CollectionBanner";
 
 import "./style.css";
 
-const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset}) => {
+const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, listToken}) => {
 
   const [asset, setAsset] = useState(false);
   const [thisCollection, setThisCollection] = useState(false);
@@ -35,9 +37,7 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset})
     }
 
     if(query_asset && !state_collection.loading){
-      get_asset(policy_id, asset_id, (res) => {
-
-      });
+      get_asset(policy_id, asset_id, (res) => {});
     }
   }, [policy_id, asset_id, state_collection]);
 
@@ -57,16 +57,14 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset})
                       <img src={"https://ipfs.blockfrost.dev/ipfs/"+asset.info.onchainMetadata.image} alt={asset.info.onchainMetadata.name}/>
                     </figure>
                   </div>
-
-                  
-
                 </div>
+
                 <div className="column">
                   <div className="content">
 
                     <PriceBuy asset={asset} />
 
-                    { asset_id in state_wallet.assets ? <OwnerList asset={asset} /> : <></> }
+                    { asset_id in state_wallet.assets ? <OwnerList asset={asset} listToken={listToken} /> : <></> }
 
                     <AboutAsset thisCollection={thisCollection} asset={asset} />
                     
@@ -119,26 +117,56 @@ const PriceBuy = ({asset}) => {
   )
 }
 
-const OwnerList = ({asset}) => {
+const OwnerList = ({asset, listToken}) => {
+
+  const [userBidAmount, setUserBidAmount] = useState("");
+  const [sendingBid, setSendingBid] = useState(false);
+
+  function list_this_token(price){
+    setSendingBid(true);
+    let policy_id = asset.info.policyId;
+    let assetName = asset.info.assetName;
+    listToken(policy_id, assetName, price, (res) => {
+      setSendingBid(false);
+    });
+  }
+
+  function input_price_changed(event){
+    let v = event.target.value;
+    if(v){
+      v = parseInt(v)
+      if(v){
+        setUserBidAmount(v);
+      }
+    }else{
+      setUserBidAmount("");
+    }
+  }
+
   return (
     <div className="block">
       <div className="card">
         <header className="card-header">
           <p className="card-header-title">
-            Sell
+            Listing asset for sale in the Marketplace
           </p>
         </header>
         <div className="card-content">
           
           <div className="field has-addons">
             <div className="control has-icons-left is-expanded">
-              <input className="input" type="number" placeholder="Price" />
+              <input className="input" type="number" placeholder="Price"
+              value={userBidAmount} onChange={(event) => input_price_changed(event)} 
+              disabled={sendingBid}
+              />
               <span className="icon is-medium is-left">₳</span>
             </div>
             <div className="control">
-              <a className="button is-info">
+              <button className="button is-info" onClick={() => list_this_token(userBidAmount)}
+              disabled={sendingBid || userBidAmount < 5}
+              >
                 List this!
-              </a>
+              </button>
             </div>
           </div>
 
@@ -196,6 +224,7 @@ function mapDispatchToProps(dispatch) {
   return {
     load_collection: (callback) => dispatch(load_collection(callback)),
     get_asset: (policy_id, asset_id, callback) => dispatch(get_asset(policy_id, asset_id, callback)),
+    listToken: (policy_id, asset_id, price, callback) => dispatch(listToken(policy_id, asset_id, price, callback)),
   };
 }
 

@@ -58,7 +58,6 @@ const Navbar = ({state_wallet}) => {
             </div>
           </div>
         </div> */}
-        
 
         <div className="navbar-end">
 
@@ -72,27 +71,14 @@ const Navbar = ({state_wallet}) => {
             </div>
           </div>
           
-          {
-            state_wallet.connected ? (
-              <div className="navbar-item">
-                <div className="field is-grouped">
-                  <div className="control">
-                    <Link className="button is-rounded is-info" to="/account">
-                      <span>Account</span>
-                    </Link>
-                  </div>
-                </div>
+          <div className="navbar-item">
+            <div className="field is-grouped">
+              <div className="control">
+                <ButtonConnect/>
               </div>
-            ) : (
-              <div className="navbar-item">
-                <div className="field is-grouped">
-                  <div className="control">
-                    <ButtonConnect/>
-                  </div>
-                </div>
-              </div>
-            )
-          }
+            </div>
+          </div>
+
         </div>
       </div>
     </nav>
