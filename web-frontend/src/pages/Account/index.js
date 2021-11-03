@@ -63,41 +63,106 @@ const ListingSection = ({state_wallet, state_collection}) => {
   const filtered_listing = matchedtokens
   .map((asset, i) => {
     return(
-      <>
-      {
-        asset.info.onchainMetadata ? (
-          <div className="column is-one-full-mobile is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd" key={i}>
-            <AssetCard asset={asset} />
-          </div>
-        ) : <></>
-      }
-      </>
+      <AssetCard asset={asset} column_className="column is-one-full-mobile is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd" key={i}/>
     )
   });
 
 return (
-  <div className="block">
-    <div className="field is-grouped">
-      <div className="control has-icons-left is-expanded">
-        <input
-          className="input"
-          type="text"
-          placeholder={"Search"}
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-        />
-        <span className="icon is-small is-left">
-          <i className="fa fa-search"></i>
-        </span>
+  <>
+  {
+    listings.length>0?(
+      <div className="block">
+        <div className="field is-grouped">
+          <div className="control has-icons-left is-expanded">
+            <input
+              className="input"
+              type="text"
+              placeholder={"Search"}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
+            <span className="icon is-small is-left">
+              <i className="fa fa-search"></i>
+            </span>
+          </div>
+        </div>
+
+        <div className="columns is-multiline">
+          {filtered_listing}
+        </div>
+
       </div>
-    </div>
-
-    <div className="columns is-multiline">
-      {filtered_listing}
-    </div>
-
-  </div>
+    ) : (
+      <NoAssetFound state_wallet={state_wallet}/>
+    )
+  }
+  </>
   );
+}
+
+const NoAssetFound = ({state_wallet}) => {
+  return (
+    <section className="hero is-large">
+      <div className="hero-body">
+        <div className="container has-text-centered">
+          
+          {
+            !state_wallet.connected ? (
+              <>
+                <h1>
+                  <span className="icon" style={{fontSize:"100px", marginBottom:"50px"}}>
+                    <i className="fas fa-plug"></i>
+                  </span>
+                </h1>
+                <p className="title">
+                  Connect your wallet
+                </p>
+                <p className="subtitle">
+                  Do not have Nami Wallet? <a href="https://namiwallet.io/" target="_blank">Download</a> now!
+                </p>
+              </>
+            ) : <></>
+          }
+
+          {
+            state_wallet.connected && state_wallet.loading ? (
+              <>
+                <h1>
+                  <span className="icon" style={{fontSize:"100px", marginBottom:"50px"}}>
+                    <i class="fas fa-truck-loading"></i>
+                  </span>
+                </h1>
+                <p className="title">
+                  Fetching your assets
+                </p>
+                <p className="subtitle">
+                  This may take awhile...
+                </p>
+              </>
+            ) : <></>
+          }
+
+          {
+            state_wallet.connected && !state_wallet.loading && state_wallet.loaded_assets ? (
+              <>
+                <h1>
+                  <span className="icon" style={{fontSize:"100px", marginBottom:"50px"}}>
+                    <i class="fas fa-truck-loading"></i>
+                  </span>
+                </h1>
+                <p className="title">
+                  No assets
+                </p>
+                <p className="subtitle">
+                  Looks like your wallet is empty, <a href="/">start browsing</a>!
+                </p>
+              </>
+            ) : <></>
+          }
+        </div>
+      </div>
+    </section>
+  )
 }
 
 

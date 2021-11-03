@@ -156,9 +156,7 @@ const ListingSection = ({state_collection, policyId}) => {
   })
   .map((this_nft, i) => {
     return(
-      <div className="column is-one-full-mobile is-half-tablet one-quarter-desktop is-one-quarter-widescreen is-one-quarter-fullhd" key={i}>
-        <AssetCard asset={this_nft} />
-      </div>
+      <AssetCard asset={this_nft} key={i} />
     )
   });
 

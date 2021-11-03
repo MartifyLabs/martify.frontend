@@ -52,11 +52,11 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
             <section className="section">
               <div className="columns">
                 <div className="column is-two-fifths">
-                  <div className="block">
-                    <figure className="image is-square">
-                      <img src={"https://ipfs.blockfrost.dev/ipfs/"+asset.info.onchainMetadata.image} alt={asset.info.onchainMetadata.name}/>
-                    </figure>
-                  </div>
+                  
+                  <AssetImage asset={asset}/>
+
+                  { thisCollection ? <CollectionAbout thisCollection={thisCollection} /> : <></> }
+
                 </div>
 
                 <div className="column">
@@ -68,7 +68,7 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
 
                     <AboutAsset thisCollection={thisCollection} asset={asset} />
                     
-                    { thisCollection ? <CollectionAbout thisCollection={thisCollection} /> : <></> }
+                    <AssetRawMetaData asset={asset} />
                     
                   </div>
                 </div>
@@ -77,9 +77,7 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
             </section>
           </div>
         ) : (
-          <div>
-            no asset
-          </div>
+          <NoAssetFound />
         )
       }
     </>
@@ -201,13 +199,118 @@ const AboutAsset = ({thisCollection, asset}) => {
                     }) : ""
                   }
                 </>
-              ) : ""
+              ) : (
+                <>
+                  {
+                    Object.keys(asset.info.onchainMetadata).map((attr, i) => {
+                      return(
+                        <React.Fragment key={i}>
+                          {
+                            !["files","image","name","mediatype"].includes(attr.toLowerCase()) ? (
+                              <tr key={i}>
+                                <th className="attr">{attr}</th>
+                                <td>
+                                  {
+                                    typeof(asset.info.onchainMetadata[attr])=="object" ? asset.info.onchainMetadata[attr].join(" ") : asset.info.onchainMetadata[attr]
+                                  }
+                                </td>
+                              </tr>
+                            ) : <></>
+                          }
+                        </React.Fragment>
+                      )
+                    })
+                  }
+                </>
+              )
             }
             </tbody>
           </table>
         </div>
       </div>
     </div>
+  )
+}
+
+const AssetRawMetaData = ({asset}) => {
+  const [show, setShow] = useState(false);
+
+  return (
+    <div className="card">
+      <header className="card-header" onClick={() => setShow(!show)} style={{cursor:"pointer"}}>
+        <p className="card-header-title">
+          Raw Metadata
+        </p>
+        <button className="card-header-icon" aria-label="more options">
+          <span className="icon">
+            <i className={show ? "fas fa-angle-down" : "fas fa-angle-up"} aria-hidden="true"></i>
+          </span>
+        </button>
+      </header>
+      {
+        show ? (
+          <div className="card-content">
+            <div className="content" style={{display:"grid"}}>
+              <pre>
+                {JSON.stringify(asset.info, null, 1) }
+              </pre>
+            </div>
+          </div>
+        ) : <></>
+      }
+    </div>
+  )
+}
+
+const AssetImage = ({asset}) => {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="block">
+      <figure className="image is-square" onClick={() => setShow(true)} style={{cursor:"pointer"}}>
+        <img src={"https://ipfs.blockfrost.dev/ipfs/"+asset.info.onchainMetadata.image} alt={asset.info.onchainMetadata.name}/>
+      </figure>
+
+      <div className={"modal "+(show?"is-active":"") }>
+        <div className="modal-background" onClick={() => setShow(false)}></div>
+        <div className="modal-content">
+          {
+            asset.info.onchainMetadata.files ? (
+              <iframe src={asset.info.onchainMetadata.files[0].src.join("")} style={{width:"600px",height:"600px"}}>
+                The “iframe” tag is not supported by your browser.
+              </iframe>
+            ) : (
+              <figure className="image is-square" onClick={() => setShow(true)} style={{cursor:"pointer"}}>
+                <img src={"https://ipfs.blockfrost.dev/ipfs/"+asset.info.onchainMetadata.image} alt={asset.info.onchainMetadata.name}/>
+              </figure>
+            )
+          }
+        </div>
+        <button className="modal-close is-large" aria-label="close" onClick={() => setShow(false)}></button>
+      </div>
+       
+    </div>
+  )
+}
+
+const NoAssetFound = () => {
+  return (
+    <section className="hero is-large">
+      <div className="hero-body">
+        <div className="container has-text-centered">
+          <h1>
+            <span className="icon" style={{fontSize:"100px", marginBottom:"50px"}}>
+              <i className="far fa-question-circle"></i>
+            </span>
+          </h1>
+          <p className="title">
+            This asset does not exist.
+          </p>
+          <p className="subtitle">
+            If you believe this is a mistake, please report this error to our support team.
+          </p>
+        </div>
+      </div>
+    </section>
   )
 }
 
