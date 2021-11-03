@@ -12,11 +12,11 @@ import {WALLET_STATE} from "./walletTypes";
 
 import {
   walletConnected,
-  setWalletNetwork,
-  setWalletUsedAddr,
+  // setWalletNetwork,
+  // setWalletUsedAddr,
   // setWalletRewardAddr,
-  setWalletBalance,
-  setWalletUtxos,
+  // setWalletBalance,
+  // setWalletUtxos,
   setWalletLoading,
   setWalletAssets,
 } from "./walletActions";

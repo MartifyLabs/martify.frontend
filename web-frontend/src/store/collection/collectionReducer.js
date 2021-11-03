@@ -67,11 +67,13 @@ export default function collectionReducer(state = collectionobj, { type, payload
       for(var asset_id in new_tokens){
         new_tokens[asset_id] = update_tokens(new_tokens[asset_id], asset_id, payload.policy_id, state.policies_collections);
       }
+
       if(!(payload.policy_id in tmp)){
         tmp[payload.policy_id] = {};
       }
       
       tmp[payload.policy_id] = {
+        ...tmp[payload.policy_id],
         ...new_tokens
       };
 
