@@ -1,6 +1,7 @@
 import React, { useEffect, useState} from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 
 import { load_collection, get_asset} from "../../store/collection/api";
 import { listToken } from "../../store/market/api";
@@ -12,23 +13,21 @@ import CollectionBanner from "../../components/CollectionBanner";
 import "./style.css";
 
 const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, listToken}) => {
-
   const [asset, setAsset] = useState(false);
   const [thisCollection, setThisCollection] = useState(false);
   
   useEffect(() => {
     let query_asset = false;
 
+    if(policy_id in state_collection.policies_collections){
+      var tmp = {...state_collection.policies_collections[policy_id]}
+      tmp.style.logo_path = `/collections/${tmp.id}/${tmp.style.logo}`;
+      setThisCollection(tmp);
+    }
+
     if(policy_id in state_collection.policies_assets){
       if(asset_id in state_collection.policies_assets[policy_id]){
         setAsset(state_collection.policies_assets[policy_id][asset_id]);
-
-        if(policy_id in state_collection.policies_collections){
-          var tmp = {...state_collection.policies_collections[policy_id]}
-          tmp.style.logo_path = `/collections/${tmp.id}/${tmp.style.logo}`;
-          setThisCollection(tmp);
-        }
-
       }else{
         query_asset = true;
       }
@@ -39,6 +38,7 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
     if(query_asset && !state_collection.loading){
       get_asset(policy_id, asset_id, (res) => {});
     }
+
   }, [policy_id, asset_id, state_collection]);
 
   return (
@@ -55,18 +55,18 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
                   
                   <AssetImage asset={asset}/>
 
-                  { thisCollection ? <CollectionAbout thisCollection={thisCollection} /> : <></> }
-
                 </div>
 
                 <div className="column">
                   <div className="content">
 
-                    <PriceBuy asset={asset} />
+                    <PriceBuy asset={asset} thisCollection={thisCollection} />
 
                     { asset_id in state_wallet.assets ? <OwnerList asset={asset} listToken={listToken} /> : <></> }
 
                     <AboutAsset thisCollection={thisCollection} asset={asset} />
+                    
+                    { thisCollection ? <CollectionAbout thisCollection={thisCollection} /> : <></> }
                     
                     <AssetRawMetaData asset={asset} />
                     
@@ -77,7 +77,7 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
             </section>
           </div>
         ) : (
-          <NoAssetFound />
+          <NoAssetFound state_collection={state_collection} policy_id={policy_id} asset_id={asset_id} />
         )
       }
     </>
@@ -85,14 +85,25 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
   )
 };
 
-const PriceBuy = ({asset}) => {
+const PriceBuy = ({asset, thisCollection}) => {
   return (
     <div className="block">
       <nav className="level">
 
         <div className="level-left">
-          <div className="level-item">
+          <div className="level-item asset_name_block">
             <h1>{asset.info.onchainMetadata.name}</h1>
+            {
+              thisCollection ? (
+                <Link to={`/collection/${thisCollection.id}`}>
+                  {thisCollection.meta.name}
+                </Link>
+              ) : (
+                <Link to={`/collection/${asset.info.policyId}`}>
+                  {asset.info.policyId}
+                </Link>
+              )
+            }
           </div>
         </div>
 
@@ -110,6 +121,7 @@ const PriceBuy = ({asset}) => {
             </div>
           ) : <></>
         }
+
       </nav>
     </div>
   )
@@ -175,6 +187,11 @@ const OwnerList = ({asset, listToken}) => {
 }
 
 const AboutAsset = ({thisCollection, asset}) => {
+  
+  function getArraysIntersection(a1,a2){
+    return  a1.filter(function(n) { return a2.indexOf(n) !== -1;});
+  }
+
   return (
     <div className="block">
       <div className="card">
@@ -185,43 +202,17 @@ const AboutAsset = ({thisCollection, asset}) => {
               thisCollection ? (
                 <>
                   {
-                    thisCollection.asset_attributes ? thisCollection.asset_attributes.map((attr, i) => {
-                      return(
-                        <tr key={i}>
-                          <th className="attr">{attr}</th>
-                          <td>
-                            {
-                              typeof(asset.info.onchainMetadata[attr])=="object" ? asset.info.onchainMetadata[attr].join(" ") : asset.info.onchainMetadata[attr]
-                            }
-                          </td>
-                        </tr>
-                      )
-                    }) : ""
+                    thisCollection.asset_attributes ? 
+                      getArraysIntersection(thisCollection.asset_attributes,Object.keys(asset.info.onchainMetadata)).length > 0 ? 
+                        thisCollection.asset_attributes.map((attr, i) => {
+                          return(
+                            <ListAttributes asset={asset} attr={attr} key={i}/>
+                          )
+                        }) : <ListAllAttributes asset={asset}/> : <ListAllAttributes asset={asset}/>
                   }
                 </>
               ) : (
-                <>
-                  {
-                    Object.keys(asset.info.onchainMetadata).map((attr, i) => {
-                      return(
-                        <React.Fragment key={i}>
-                          {
-                            !["files","image","name","mediatype"].includes(attr.toLowerCase()) ? (
-                              <tr key={i}>
-                                <th className="attr">{attr}</th>
-                                <td>
-                                  {
-                                    typeof(asset.info.onchainMetadata[attr])=="object" ? asset.info.onchainMetadata[attr].join(" ") : asset.info.onchainMetadata[attr]
-                                  }
-                                </td>
-                              </tr>
-                            ) : <></>
-                          }
-                        </React.Fragment>
-                      )
-                    })
-                  }
-                </>
+                <ListAllAttributes asset={asset}/>
               )
             }
             </tbody>
@@ -231,6 +222,40 @@ const AboutAsset = ({thisCollection, asset}) => {
     </div>
   )
 }
+
+const ListAttributes = ({asset, attr}) => {
+  return (
+    <tr>
+      <th className="attr">{attr}</th>
+      <td>
+        {
+          typeof(asset.info.onchainMetadata[attr])=="object" ? asset.info.onchainMetadata[attr].join(" ") : asset.info.onchainMetadata[attr]
+        }
+      </td>
+    </tr>
+  )
+};
+
+const ListAllAttributes = ({asset}) => {
+  return (
+    <>
+      {
+        Object.keys(asset.info.onchainMetadata)
+        .filter((attr)=>{
+          return !["files","image","name","mediatype"].includes(attr.toLowerCase())
+        })
+        .map((attr, i) => {
+          return(
+            <React.Fragment key={i}>
+              <ListAttributes asset={asset} attr={attr} key={i}/>
+            </React.Fragment>
+          )
+        })
+      }
+    </>
+  )
+};
+
 
 const AssetRawMetaData = ({asset}) => {
   const [show, setShow] = useState(false);
@@ -292,25 +317,64 @@ const AssetImage = ({asset}) => {
   )
 }
 
-const NoAssetFound = () => {
+const NoAssetFound = ({state_collection, policy_id, asset_id}) => {
   return (
     <section className="hero is-large">
       <div className="hero-body">
         <div className="container has-text-centered">
-          <h1>
-            <span className="icon" style={{fontSize:"100px", marginBottom:"50px"}}>
-              <i className="far fa-question-circle"></i>
-            </span>
-          </h1>
-          <p className="title">
-            This asset does not exist.
-          </p>
-          <p className="subtitle">
-            If you believe this is a mistake, please report this error to our support team.
-          </p>
+          {
+            !state_collection.loading ? (
+              <>
+              {
+                policy_id in state_collection.policies_assets ? (
+                  <>
+                  {
+                    state_collection.policies_assets[policy_id][asset_id]===false ? <ShowNoAssetFound/> : ""
+                  }
+                  </>
+                ) : <ShowNoAssetFound/>
+              }
+              </>
+            ) : <></>
+          }
+          {
+            state_collection.loading ? (
+              <>
+                <h1>
+                  <span className="icon" style={{fontSize:"100px", marginBottom:"50px"}}>
+                    <i className="fas fa-search"></i>
+                  </span>
+                </h1>
+                <p className="title">
+                  Getting asset meta
+                </p>
+                <p className="subtitle">
+                  Fetching from da blockchain yea
+                </p>
+              </>
+            ) : <></>
+          }
         </div>
       </div>
     </section>
+  )
+}
+
+const ShowNoAssetFound = () => {
+  return (
+    <>
+      <h1>
+        <span className="icon" style={{fontSize:"100px", marginBottom:"50px"}}>
+          <i className="far fa-question-circle"></i>
+        </span>
+      </h1>
+      <p className="title">
+        This asset does not exist.
+      </p>
+      <p className="subtitle">
+        If you believe this is a mistake, please report this error to our support team.
+      </p>
+    </>
   )
 }
 

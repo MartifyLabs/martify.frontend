@@ -37,6 +37,7 @@ export default function collectionReducer(state = collectionobj, { type, payload
       return {
         ...state,
         loaded: true,
+        loading: false,
         collections: tmp_collections,
         policies_collections: tmp_policies_collections
       };

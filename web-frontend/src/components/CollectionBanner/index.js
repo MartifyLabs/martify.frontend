@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 import CollectionLinks from "../CollectionLinks";
 
 const CollectionBanner = ({thisCollection, size}) => {
+  console.log(thisCollection)
   return (
     <section className={"hero collection_name " + (size!=undefined ? size : "is-medium")} style={{backgroundImage: `url(${thisCollection.style.banner_path})`}}>
         <div className="hero-body">
         
           <nav className="level">
-            <Link to={`/collection/${thisCollection.id}`}>
+            <Link to={`/collection/${thisCollection.id?thisCollection.id:thisCollection.meta.name}`}>
               <div className="level-left">
                 {
                   thisCollection.style.logo_path ? (

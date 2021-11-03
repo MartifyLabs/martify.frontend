@@ -11,10 +11,7 @@ import "./style.css";
 
 const Collection = ({state_collection, collection_id, get_listings}) => {
   
-  // const [collectionId, setCollectionId] = useState(false);
   const [policyId, setPolicyId] = useState(false);
-  // const [listingPolicyId, setListingPolicyId] = useState(false);
-  // const [listings, setListings] = useState([]);
 
   const default_meta = {
     is_verified: false,
@@ -30,12 +27,20 @@ const Collection = ({state_collection, collection_id, get_listings}) => {
   const [thisCollection, setThisCollection] = useState(default_meta);
 
   useEffect(() => {
-    if(collection_id in state_collection.collections){
-      let policy_id = state_collection.collections[collection_id];
-      setPolicyId(policy_id);
+    if(collection_id in state_collection.collections || collection_id in state_collection.policies_collections){
+      let policy_id = collection_id;
+
+      if(collection_id in state_collection.collections){
+        policy_id = state_collection.collections[collection_id];
+        setPolicyId(policy_id);
+      }else{
+        setPolicyId(collection_id);
+      }
+
       var tmp = {...state_collection.policies_collections[policy_id]};
       setThisCollection(tmp);
-    }else{
+    }
+    else{
       var tmp = {...default_meta};
       tmp.meta.name = collection_id;
       setPolicyId(collection_id);
@@ -43,35 +48,11 @@ const Collection = ({state_collection, collection_id, get_listings}) => {
     }
   }, [state_collection, collection_id]);
 
-  // useEffect(() => {
-  //   if(collectionId!=collection_id){
-  //     setCollectionId(collection_id);
-  //   }
-  // }, [collection_id]);
-
   useEffect(() => {
-    // if(collectionId in state_collection.collections){
-    //   if(!("listing"in state_collection.collections[collectionId])){
-    //     get_listings(policy_id, (res) => {
-    //       console.log(res)
-    //       setListingPolicyId(res.policy_id);
-    //       console.log(res.listing)
-    //       setListings(res.listing);
-    //     });
-    //   }
-    // }
-
     if(policyId){
-      get_listings(policyId, (res) => {
-        // console.log(res)
-        // setListingPolicyId(res.policy_id);
-        // console.log(res.listing)
-        // setListings(res.listing);
-      });
+      get_listings(policyId, (res) => {});
     }
-    
   }, [policyId]);
-
   
   return (
     <div className="collection">
@@ -102,12 +83,6 @@ const Collection = ({state_collection, collection_id, get_listings}) => {
 const ListingSection = ({state_collection, policyId}) => {
 
   const [listings, setListings] = useState([]);
-  const [searchText, setSearchText] = useState("");
-  const [sortby, setSortby] = useState("");
-  const sort_options = [
-    {"value": 1, "label": "Price: Low to High"},
-    {"value": 2, "label": "Price: High to Low"},
-  ]
 
   function load(){
     if(policyId in state_collection.policies_assets){
@@ -124,6 +99,26 @@ const ListingSection = ({state_collection, policyId}) => {
     load()
   }, []);
 
+return (
+  <>
+  {
+    listings.length > 0 ? <DisplayListing listings={listings} /> : <></>
+  }
+  {
+    listings.length == 0 ? <NoAssetFound state_collection={state_collection} policyId={policyId} /> : <></>
+  }
+  </>
+  );
+}
+
+const DisplayListing = ({listings}) => {
+
+  const [searchText, setSearchText] = useState("");
+  const [sortby, setSortby] = useState("");
+  const sort_options = [
+    {"value": 1, "label": "Price: Low to High"},
+    {"value": 2, "label": "Price: High to Low"},
+  ]
 
   const searchingFor = searchText => {
     return x => {
@@ -197,6 +192,51 @@ return (
 
   </div>
   );
+}
+
+const NoAssetFound = ({state_collection, policyId}) => {
+  return (
+    <section className="hero is-medium">
+      <div className="hero-body">
+        <div className="container has-text-centered">
+          {
+            state_collection.loading ? (
+              <>
+                <h1>
+                  <span className="icon" style={{fontSize:"100px", marginBottom:"50px"}}>
+                    <i className="fas fa-truck-loading"></i>
+                  </span>
+                </h1>
+                <p className="title">
+                  Fetching assets
+                </p>
+                <p className="subtitle">
+                  This may take awhile...
+                </p>
+              </>
+            ) : <></>
+          }
+          {
+            !state_collection.loading && policyId in state_collection.policies_assets ? (
+              <>
+                <h1>
+                  <span className="icon" style={{fontSize:"100px", marginBottom:"50px"}}>
+                    <i className="far fa-times-circle"></i>
+                  </span>
+                </h1>
+                <p className="title">
+                  No assets
+                </p>
+                <p className="subtitle">
+                  This policy ID does not exist or does not contain any assets.
+                </p>
+              </>
+            ) : <></>
+          }
+        </div>
+      </div>
+    </section>
+  )
 }
 
 function mapStateToProps(state, props) {

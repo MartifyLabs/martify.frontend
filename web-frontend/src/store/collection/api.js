@@ -7,6 +7,11 @@ import {
 import data_collections from "../../data/collections.json";
 import data_assets from "../../data/assets.json";
 
+import {
+  getAssets,
+  getAsset,
+} from "../../database";
+
 export const load_collection = (callback) => async (dispatch) => {
 
   for(var collection_id in data_collections){
@@ -23,13 +28,24 @@ export const load_collection = (callback) => async (dispatch) => {
 
 export const get_listings = (policy_id, callback) => async (dispatch) => {
 
-  // query policy ID, get data
   dispatch(collections_loading(true));
-  
+
   let output = {
     "policy_id": policy_id,
-    "listing": data_assets[policy_id]
+    "listing": {}
   };
+
+  let assets = await getAssets(policy_id);
+  for(var i in assets){
+    let asset = assets[i];
+    output.listing[asset.info.asset] = asset;
+  }
+  
+  // let output = {
+  //   "policy_id": policy_id,
+  //   "listing": data_assets[policy_id]
+  // };
+  // console.log(22, data_assets[policy_id])
   
   if(output.policy_id && output.listing){
     dispatch(collections_add_tokens(output));
@@ -41,7 +57,6 @@ export const get_listings = (policy_id, callback) => async (dispatch) => {
 
 export const get_asset = (policy_id, asset_id, callback) => async (dispatch) => {
 
-  // query, get data
   dispatch(collections_loading(true));
   
   let output = {
@@ -49,12 +64,14 @@ export const get_asset = (policy_id, asset_id, callback) => async (dispatch) => 
     "listing": {}
   };
 
-  output.listing[asset_id] = data_assets[policy_id][asset_id] ? data_assets[policy_id][asset_id] : false;
-  
+  let asset = await getAsset(policy_id, asset_id);
+
+  // output.listing[asset_id] = data_assets[policy_id][asset_id] ? data_assets[policy_id][asset_id] : false;
+  if(asset) output.listing[asset_id] = asset;
+  else output.listing[asset_id] = false;
   
   if(output.policy_id && output.listing){
     dispatch(collections_add_tokens(output));
   }
   callback(true);
-  
 }
