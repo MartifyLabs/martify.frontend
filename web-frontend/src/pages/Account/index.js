@@ -17,19 +17,35 @@ const ListingSection = ({state_wallet, state_collection}) => {
 
   const [listings, setListings] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const default_list_projects = [{"value": "all", "label": "All Projects"}];
+  const [listProjectsFilter, setListProjectsFilter] = useState([...default_list_projects]);
+  const [filterProject, setFilterProject] = useState("all");
 
   function load(){
-
     if(state_wallet.loaded_assets){
       let list_nfts = [];
+      let list_projects = [...default_list_projects];
+      let dict_projects = {};
 
       for(var asset_id in state_wallet.assets){
         let this_asset_ids = state_wallet.assets[asset_id];
         let this_asset = state_collection.policies_assets[this_asset_ids.policy_id][this_asset_ids.asset_id];
         list_nfts.push(this_asset);
+
+        if(this_asset_ids.policy_id in state_collection.policies_collections){
+          dict_projects[this_asset_ids.policy_id] = state_collection.policies_collections[this_asset_ids.policy_id].meta.name;
+        }else{
+          dict_projects[this_asset_ids.policy_id] = this_asset_ids.policy_id;
+        }
       }
 
       setListings(list_nfts);
+
+      for(var policy_id in dict_projects){
+        list_projects.push({"value": policy_id, "label": dict_projects[policy_id]})
+      }
+      setListProjectsFilter(list_projects);
+
     }
   }
 
@@ -61,6 +77,10 @@ const ListingSection = ({state_wallet, state_collection}) => {
   let matchedtokens = listings.filter(searchingFor(searchText));
 
   const filtered_listing = matchedtokens
+  .filter((asset) => {
+    if(filterProject=="all") return true;
+    else return asset.info.policyId;
+  })
   .map((asset, i) => {
     return(
       <AssetCard asset={asset} column_className="column is-one-full-mobile is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd" key={i}/>
@@ -83,6 +103,19 @@ return (
             />
             <span className="icon is-small is-left">
               <i className="fa fa-search"></i>
+            </span>
+          </div>
+          <div className="control">
+            <span className="select">
+              <select value={filterProject} onChange={(event) => setFilterProject(event.target.value)}>
+                {
+                  listProjectsFilter.map((option, i) => {
+                    return(
+                      <option value={option.value} key={i}>{option.label}</option>
+                    )
+                  })
+                }
+              </select>
             </span>
           </div>
         </div>
@@ -129,7 +162,7 @@ const NoAssetFound = ({state_wallet}) => {
               <>
                 <h1>
                   <span className="icon" style={{fontSize:"100px", marginBottom:"50px"}}>
-                    <i class="fas fa-truck-loading"></i>
+                    <i className="fas fa-truck-loading"></i>
                   </span>
                 </h1>
                 <p className="title">
@@ -147,7 +180,7 @@ const NoAssetFound = ({state_wallet}) => {
               <>
                 <h1>
                   <span className="icon" style={{fontSize:"100px", marginBottom:"50px"}}>
-                    <i class="fas fa-truck-loading"></i>
+                    <i className="fas fa-truck-loading"></i>
                   </span>
                 </h1>
                 <p className="title">

@@ -6,6 +6,8 @@ import {
   getFirestore,
   query,
   where,
+  setDoc,
+  doc,
 } from "firebase/firestore";
 import { firebaseOptions } from "../config";
 
@@ -60,7 +62,11 @@ export const saveAssets = async (assets) => {
   try {
     await Promise.all(
       assets.map(async (asset) => {
-        await addDoc(collection(db, "assets"), asset);
+        if(asset){
+          await setDoc(doc(db, "assets", asset.asset), {
+            info: asset
+          });
+        }
       })
     );
   } catch (error) {
