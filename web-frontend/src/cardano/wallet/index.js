@@ -1,5 +1,7 @@
+import Cardano from "../serialization-lib";
 import { getAssetInfo, getTxDetails } from "../blockfrost-api";
 import { getTxUnspentOutputHash } from "../transaction";
+import { fromHex, toHex } from "../../utils";
 
 export const getBalance = async () => {
   return await window.cardano.getBalance();
@@ -15,7 +17,13 @@ export const getNetworkId = async () => {
 
 export const getOwnedAssets = async () => {
   // TODO: refactor using map, filter and reduce.
+  await Cardano.load();
   let assets = {};
+
+  const usedAddresse = Cardano.Instance.Address.from_bytes(
+    fromHex((await getUsedAddresses())[0])
+  ).to_bech32();
+
   const utxos = await getUtxos();
 
   for (var u_i in utxos) {
@@ -24,8 +32,12 @@ export const getOwnedAssets = async () => {
 
     let utxo = await getTxDetails(utxo_hash);
 
-    for (var o_i in utxo.outputs) {
-      let this_tx_out = utxo.outputs[o_i];
+    const ownedOutputs = utxo.outputs.filter((o) => {
+      return o.address === usedAddresse;
+    });
+
+    for (var o_i in ownedOutputs) {
+      let this_tx_out = ownedOutputs[o_i];
       for (var a_i in this_tx_out.amount) {
         let this_unit = this_tx_out.amount[a_i].unit;
         if (!(this_unit in assets)) assets[this_unit] = { quantity: 0 };
