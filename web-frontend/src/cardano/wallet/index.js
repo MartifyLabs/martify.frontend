@@ -1,5 +1,6 @@
 import Cardano from "../serialization-lib";
-import { getAssetInfo, getTxDetails } from "../blockfrost-api";
+import { getTxDetails } from "../blockfrost-api";
+import { getAsset } from "../../database";
 import { getTxUnspentOutputHash } from "../transaction";
 import { fromHex } from "../../utils";
 
@@ -50,8 +51,8 @@ export const getOwnedAssets = async () => {
 
   for (var asset_id in assets) {
     if (asset_id !== "lovelace") {
-      let asset_info = await getAssetInfo(asset_id);
-      assets[asset_id].info = asset_info;
+      let asset_info = await getAsset(asset_id);
+      assets[asset_id].info = asset_info.info;
     }
   }
 

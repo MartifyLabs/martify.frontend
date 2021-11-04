@@ -64,7 +64,7 @@ export const get_asset = (policy_id, asset_id, callback) => async (dispatch) => 
     "listing": {}
   };
 
-  let asset = await getAsset(policy_id, asset_id);
+  let asset = await getAsset(asset_id);
 
   // output.listing[asset_id] = data_assets[policy_id][asset_id] ? data_assets[policy_id][asset_id] : false;
   if(asset) output.listing[asset_id] = asset;
