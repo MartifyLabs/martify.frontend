@@ -1,4 +1,5 @@
 import { apiKey, cardanoUrl } from "../../config";
+import { fromHex, toString } from "../../utils";
 
 /**
  * @param {string} asset - asset is a Concatenation of the policy_id and hex-encoded asset_name.
@@ -11,6 +12,7 @@ export const getAssetInfo = async (asset) => {
       asset: response.asset,
       policyId: response.policy_id,
       assetName: response.asset_name,
+      readableAssetName: toString(fromHex(response.asset_name)),
       fingerprint: response.fingerprint,
       quantity: parseInt(response.quantity),
       initialMintTxHash: response.initial_mint_tx_hash,
