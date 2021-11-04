@@ -42,24 +42,21 @@ export const getAssets = async (policyId) => {
   }
 };
 
-export const getAsset = async (policyId, assetId) => {
+export const getAsset = async (assetId) => {
   try {
     const result = await query(
       collection(db, "assets"),
-      where("info.policyId", "==", policyId),
       where("info.asset", "==", assetId)
     );
 
     const snapshot = await getDocs(result);
 
     if (snapshot.empty) {
-      const assetIds = await getMintedAssets(policyId);
-      const asset = await assetIds
-        .filter((id) => assetId === id)
-        .map(async (assetId) => await getAssetInfo(assetId));
+      const asset = await getAssetInfo(assetId)
 
-      await saveAssets(asset);
-      return { info: asset[0] };
+      await saveAssets([asset]);
+
+      return { info: asset };
     } else {
       return snapshot.docs[0].data();
     }
