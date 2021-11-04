@@ -1,14 +1,14 @@
 import { initializeApp } from "firebase/app";
 import {
-  addDoc,
   collection,
+  doc,
   getDocs,
   getFirestore,
   query,
-  where,
   setDoc,
-  doc,
+  where,
 } from "firebase/firestore";
+import { getAssetInfo, getMintedAssets } from "../cardano/blockfrost-api";
 import { firebaseOptions } from "../config";
 
 const app = initializeApp(firebaseOptions);
@@ -25,9 +25,15 @@ export const getAssets = async (policyId) => {
     const snapshot = await getDocs(result);
 
     if (snapshot.empty) {
-      console.log(
-        `No Assets found for policyId: ${policyId} in firebase, will be querying blockfrost instead... Work In Progress...`
+      const assetIds = await getMintedAssets(policyId);
+      const assets = await Promise.all(
+        assetIds.map(async (assetId) => await getAssetInfo(assetId))
       );
+
+      await saveAssets(assets);
+      return assets.map((asset) => {
+        return { info: asset };
+      });
     } else {
       return snapshot.docs.map((doc) => doc.data());
     }
@@ -47,9 +53,13 @@ export const getAsset = async (policyId, assetId) => {
     const snapshot = await getDocs(result);
 
     if (snapshot.empty) {
-      console.log(
-        `No Asset found with id: ${assetId} in firebase, will be querying blockfrost instead... Work In Progress...`
-      );
+      const assetIds = await getMintedAssets(policyId);
+      const asset = await assetIds
+        .filter((id) => assetId === id)
+        .map(async (assetId) => await getAssetInfo(assetId));
+
+      await saveAssets(asset);
+      return { info: asset[0] };
     } else {
       return snapshot.docs[0].data();
     }
@@ -62,9 +72,9 @@ export const saveAssets = async (assets) => {
   try {
     await Promise.all(
       assets.map(async (asset) => {
-        if(asset){
+        if (asset) {
           await setDoc(doc(db, "assets", asset.asset), {
-            info: asset
+            info: asset,
           });
         }
       })

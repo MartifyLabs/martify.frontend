@@ -1,7 +1,7 @@
 import Cardano from "../serialization-lib";
 import { getAssetInfo, getTxDetails } from "../blockfrost-api";
 import { getTxUnspentOutputHash } from "../transaction";
-import { fromHex, toHex } from "../../utils";
+import { fromHex } from "../../utils";
 
 export const getBalance = async () => {
   return await window.cardano.getBalance();
@@ -20,7 +20,7 @@ export const getOwnedAssets = async () => {
   await Cardano.load();
   let assets = {};
 
-  const usedAddresse = Cardano.Instance.Address.from_bytes(
+  const usedAddress = Cardano.Instance.Address.from_bytes(
     fromHex((await getUsedAddresses())[0])
   ).to_bech32();
 
@@ -33,7 +33,7 @@ export const getOwnedAssets = async () => {
     let utxo = await getTxDetails(utxo_hash);
 
     const ownedOutputs = utxo.outputs.filter((o) => {
-      return o.address === usedAddresse;
+      return o.address === usedAddress;
     });
 
     for (var o_i in ownedOutputs) {
