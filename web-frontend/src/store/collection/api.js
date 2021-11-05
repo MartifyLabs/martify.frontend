@@ -5,12 +5,14 @@ import {
 } from "./collectionActions";
 
 import data_collections from "../../data/collections.json";
-import data_assets from "../../data/assets.json";
 
 import {
   getAssets,
   getAsset,
+  saveAsset,
 } from "../../database";
+
+import { getWalletAddresses } from "../../cardano/wallet";
 
 export const load_collection = (callback) => async (dispatch) => {
 
@@ -41,18 +43,11 @@ export const get_listings = (policy_id, callback) => async (dispatch) => {
     output.listing[asset.info.asset] = asset;
   }
   
-  // let output = {
-  //   "policy_id": policy_id,
-  //   "listing": data_assets[policy_id]
-  // };
-  // console.log(22, data_assets[policy_id])
-  
   if(output.policy_id && output.listing){
     dispatch(collections_add_tokens(output));
   }
 
   callback(true);
-  
 }
 
 export const get_asset = (policy_id, asset_id, callback) => async (dispatch) => {
@@ -73,5 +68,28 @@ export const get_asset = (policy_id, asset_id, callback) => async (dispatch) => 
   if(output.policy_id && output.listing){
     dispatch(collections_add_tokens(output));
   }
+  callback(true);
+}
+
+
+export const asset_add_offer = (asset_id, price, callback) => async (dispatch) => {
+  let asset = await getAsset(asset_id);
+
+  let wallet_address = await getWalletAddresses();
+
+  if(!("offers" in asset)){
+    asset.offers = [];
+  }
+
+  let offer = {
+    t: new Date().getTime(),
+    a: wallet_address,
+    p: price,
+  }
+
+  asset.offers.push(offer);
+  
+  await saveAsset(asset);
+
   callback(true);
 }

@@ -232,7 +232,6 @@ export const get_wallet_assets = (callback) => async (dispatch) => {
 
   await saveAssets(list_assets)
 
-
   dispatch(setWalletAssets(wallet_assets));
   callback({ success: true, assets: wallet_assets });
   
