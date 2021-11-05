@@ -4,7 +4,6 @@
 
 /* development */
 export const api_host = "http://localhost:4000";
-export const cardanoscan_url = "https://testnet.cardanoscan.io/transaction/";
 // Blockfrost
 export const apiKey = "testnetAWfuCqaLZ5KtOSslc8ZTZyEWj36We8h7";
 export const cardanoUrl = "https://cardano-testnet.blockfrost.io/api/v0/";
@@ -26,3 +25,8 @@ export const firebaseOptions = {
   appId: "1:21247675598:web:1de31399a345fd5bb2549f",
   measurementId: "G-227RMXJ8P1"
 };
+
+export const urls = {
+  root: "http://localhost:3000/",
+  cardanoscan_url: "https://testnet.cardanoscan.io/",
+}

@@ -3,6 +3,7 @@ import { compose } from "redux";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
+import { urls } from "../../config";
 import { load_collection, get_asset} from "../../store/collection/api";
 import { listToken } from "../../store/market/api";
 
@@ -13,6 +14,7 @@ import CollectionBanner from "../../components/CollectionBanner";
 import "./style.css";
 
 const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, listToken}) => {
+
   const [asset, setAsset] = useState(false);
   const [thisCollection, setThisCollection] = useState(false);
   
@@ -21,7 +23,6 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
 
     if(policy_id in state_collection.policies_collections){
       var tmp = {...state_collection.policies_collections[policy_id]}
-      tmp.style.logo_path = `/collections/${tmp.id}/${tmp.style.logo}`;
       setThisCollection(tmp);
     }
 
@@ -52,20 +53,17 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
             <section className="section">
               <div className="columns">
                 <div className="column is-two-fifths">
-                  
                   <AssetImage asset={asset}/>
-
+                  <Listing asset={asset} state_wallet={state_wallet} listToken={listToken} />
                 </div>
 
                 <div className="column">
                   <div className="content">
 
-                    <PriceBuy asset={asset} thisCollection={thisCollection} />
-
-                    { asset_id in state_wallet.assets ? <OwnerList asset={asset} listToken={listToken} /> : <></> }
+                    <AssetHeader asset={asset} thisCollection={thisCollection} />
 
                     <AboutAsset thisCollection={thisCollection} asset={asset} />
-                    
+
                     { thisCollection ? <CollectionAbout thisCollection={thisCollection} /> : <></> }
                     
                     <AssetRawMetaData asset={asset} />
@@ -85,7 +83,7 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
   )
 };
 
-const PriceBuy = ({asset, thisCollection}) => {
+const AssetHeader = ({asset, thisCollection}) => {
   return (
     <div className="block">
       <nav className="level">
@@ -107,29 +105,135 @@ const PriceBuy = ({asset, thisCollection}) => {
           </div>
         </div>
 
-        {
-          asset.listing.is_listed ? (
-            <div className="level-right">
-              <div className="level-item">
-                <div className="media-content">
-                  <p className="title is-4">{asset.listing.price}<span className="ada_symbol">₳</span></p>
-                </div>
-              </div>
-              <div className="level-item">
-                <ButtonBuy />
-              </div>
-            </div>
-          ) : <></>
-        }
+        <div className="level-right">
+          <div className="level-item">
+            <SocialLinks asset={asset}/>
+          </div>
+        </div>
 
       </nav>
     </div>
   )
 }
 
-const OwnerList = ({asset, listToken}) => {
+const SocialLinks = ({asset}) => {
+  return (
+    <div className="field has-addons social-links">
+      <p className="control">
+        <a className="button is-small social-icon" href={`https://twitter.com/share?url=${urls.root}assets/${asset.info.policyId}/${asset.info.asset}`} rel="noreferrer" target="_blank" data-tooltip="Share on Twitter">
+          <span className="icon">
+            <img src="/images/icons/twitter.svg"/>
+          </span>
+        </a>
+      </p>
+      <p className="control">
+        <a className="button is-small social-icon" href={`https://www.facebook.com/sharer/sharer.php?u=${urls.root}assets/${asset.info.policyId}/${asset.info.asset}`} rel="noreferrer" target="_blank"  data-tooltip="Share on Facebook">
+          <span className="icon">
+            <img src="/images/icons/facebook.svg"/>
+          </span>
+        </a>
+      </p>
+      <p className="control">
+        <a className="button is-small social-icon" href={`${urls.cardanoscan_url}token/${asset.info.asset}`} rel="noreferrer" target="_blank"  data-tooltip="Check Cardanoscan">
+          <span className="icon">
+            <img src="/images/icons/cardanoscan.png"/>
+          </span>
+        </a>
+      </p>
+      <p className="control">
+        <a className="button is-small social-icon" href={`https://pool.pm/${asset.info.policyId}.${asset.info.readableAssetName}`} rel="noreferrer" target="_blank" data-tooltip="View it on pool.pm">
+          <span className="icon">
+            <img src="/images/icons/poolpm.png"/>
+          </span>
+        </a>
+      </p>
+    </div>
+  );
+};
 
-  const [userBidAmount, setUserBidAmount] = useState("");
+const Listing = ({asset, state_wallet, listToken}) => {
+  return (
+    <div className="block">
+      { asset.info.asset in state_wallet.assets ? 
+        <OwnerListAsset asset={asset} listToken={listToken} /> : 
+        <PurchaseAsset asset={asset} /> 
+      }
+    </div>
+  )
+}
+
+const PurchaseAsset = ({asset}) => {
+
+  const [userInputAmount, setUserInputAmount] = useState("");
+  const [sendingBid, setSendingBid] = useState(false);
+
+  function list_this_token(price){
+    setSendingBid(true);
+    // let policy_id = asset.info.policyId;
+    // let assetName = asset.info.assetName;
+    // listToken(policy_id, assetName, price, (res) => {
+    //   setSendingBid(false);
+    // });
+  }
+
+  function input_price_changed(event){
+    let v = event.target.value;
+    if(v){
+      v = parseInt(v)
+      if(v){
+        setUserInputAmount(v);
+      }
+    }else{
+      setUserInputAmount("");
+    }
+  }
+
+  return (
+    <div className="card">
+      <header className="card-header">
+        <p className="card-header-title">
+          Buy {asset.info.onchainMetadata.name}
+        </p>
+      </header>
+      <div className="card-content">
+        {
+          asset.listing.is_listed ? (
+            <>
+              <p className="title is-4">{asset.listing.price}<span className="ada_symbol">₳</span></p>
+              <div className="level-item">
+                <ButtonBuy />
+              </div>
+            </>
+          ) : <></>
+        }
+
+        <div className="field has-addons">
+          <div className="control has-icons-left is-expanded">
+            <input className="input" type="number" placeholder="Offer price"
+            value={userInputAmount} onChange={(event) => input_price_changed(event)} 
+            disabled={sendingBid}
+            />
+            <span className="icon is-medium is-left">₳</span>
+          </div>
+          <div className="control">
+            <button className="button is-info" onClick={() => list_this_token(userInputAmount)}
+            disabled={sendingBid || userInputAmount < 5}
+            >
+              {
+                userInputAmount ? `Offer for ₳${userInputAmount}` : "Offer a price"
+              }
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
+const OwnerListAsset = ({asset, listToken}) => {
+
+  const [userInputAmount, setUserInputAmount] = useState("");
   const [sendingBid, setSendingBid] = useState(false);
 
   function list_this_token(price){
@@ -146,41 +250,41 @@ const OwnerList = ({asset, listToken}) => {
     if(v){
       v = parseInt(v)
       if(v){
-        setUserBidAmount(v);
+        setUserInputAmount(v);
       }
     }else{
-      setUserBidAmount("");
+      setUserInputAmount("");
     }
   }
 
   return (
-    <div className="block">
-      <div className="card">
-        <header className="card-header">
-          <p className="card-header-title">
-            Listing asset for sale in the Marketplace
-          </p>
-        </header>
-        <div className="card-content">
-          
-          <div className="field has-addons">
-            <div className="control has-icons-left is-expanded">
-              <input className="input" type="number" placeholder="Price"
-              value={userBidAmount} onChange={(event) => input_price_changed(event)} 
-              disabled={sendingBid}
-              />
-              <span className="icon is-medium is-left">₳</span>
-            </div>
-            <div className="control">
-              <button className="button is-info" onClick={() => list_this_token(userBidAmount)}
-              disabled={sendingBid || userBidAmount < 5}
-              >
-                List this!
-              </button>
-            </div>
+    <div className="card">
+      <header className="card-header">
+        <p className="card-header-title">
+          List {asset.info.onchainMetadata.name} for sale in the Marketplace
+        </p>
+      </header>
+      <div className="card-content">
+        
+        <div className="field has-addons">
+          <div className="control has-icons-left is-expanded">
+            <input className="input" type="number" placeholder="Price"
+            value={userInputAmount} onChange={(event) => input_price_changed(event)} 
+            disabled={sendingBid}
+            />
+            <span className="icon is-medium is-left">₳</span>
           </div>
-
+          <div className="control">
+            <button className="button is-info" onClick={() => list_this_token(userInputAmount)}
+            disabled={sendingBid || userInputAmount < 5}
+            >
+              {
+                userInputAmount ? `List for ₳${userInputAmount}!` : "List this!"
+              }
+            </button>
+          </div>
         </div>
+
       </div>
     </div>
   )
@@ -225,14 +329,20 @@ const AboutAsset = ({thisCollection, asset}) => {
 
 const ListAttributes = ({asset, attr}) => {
   return (
-    <tr>
-      <th className="attr">{attr}</th>
-      <td>
-        {
-          typeof(asset.info.onchainMetadata[attr])=="object" ? asset.info.onchainMetadata[attr].join(" ") : asset.info.onchainMetadata[attr]
-        }
-      </td>
-    </tr>
+    <>
+    {
+      attr in asset.info.onchainMetadata ? (
+        <tr>
+          <th className="attr">{attr}</th>
+          <td>
+            {
+              typeof(asset.info.onchainMetadata[attr])=="object" ? asset.info.onchainMetadata[attr].join(" ") : asset.info.onchainMetadata[attr]
+            }
+          </td>
+        </tr>
+      ) : <></>
+    }
+    </>
   )
 };
 
@@ -291,29 +401,53 @@ const AssetImage = ({asset}) => {
   const [show, setShow] = useState(false);
   return (
     <div className="block">
-      <figure className="image is-square" onClick={() => setShow(true)} style={{cursor:"pointer"}}>
-        <img src={"https://ipfs.blockfrost.dev/ipfs/"+asset.info.onchainMetadata.image} alt={asset.info.onchainMetadata.name}/>
-      </figure>
+      <AssetImageFigure asset={asset} setShow={setShow} show_trigger={true}/>
 
       <div className={"modal "+(show?"is-active":"") }>
         <div className="modal-background" onClick={() => setShow(false)}></div>
         <div className="modal-content">
           {
             asset.info.onchainMetadata.files ? (
-              <iframe src={asset.info.onchainMetadata.files[0].src.join("")} style={{width:"600px",height:"600px"}}>
-                The “iframe” tag is not supported by your browser.
-              </iframe>
+              <>
+              {
+                asset.info.onchainMetadata.files[0].mediaType=="text/html" ? (
+                  <iframe src={asset.info.onchainMetadata.files[0].src.join("")} style={{width:"600px",height:"600px"}}>
+                    <AssetImageFigure asset={asset} setShow={setShow}/>
+                  </iframe>
+                ) : (
+                  <AssetImageFigure asset={asset} setShow={setShow}/>
+                )
+              }
+              </>
             ) : (
-              <figure className="image is-square" onClick={() => setShow(true)} style={{cursor:"pointer"}}>
-                <img src={"https://ipfs.blockfrost.dev/ipfs/"+asset.info.onchainMetadata.image} alt={asset.info.onchainMetadata.name}/>
-              </figure>
+              <AssetImageFigure asset={asset} setShow={setShow}/>
             )
           }
         </div>
         <button className="modal-close is-large" aria-label="close" onClick={() => setShow(false)}></button>
       </div>
-       
     </div>
+  )
+}
+
+const AssetImageFigure = ({asset, setShow, show_trigger}) => {
+
+  function get_src(image){
+    if(image.includes("ipfs://")){
+      return "https://ipfs.blockfrost.dev/ipfs/" + image.split("ipfs://")[0];
+    }
+    else if(image.length==46){
+      return "https://ipfs.blockfrost.dev/ipfs/" + image;
+    }
+    else{
+      return image;
+    }
+  }
+
+  return (
+    <figure className="image is-square" onClick={() => setShow(show_trigger?show_trigger:false)} style={{cursor:"pointer"}}>
+      <img src={get_src(asset.info.onchainMetadata.image)} alt={asset.info.onchainMetadata.name}/>
+    </figure>
   )
 }
 

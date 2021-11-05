@@ -1,3 +1,7 @@
+body{
+  cursor: default;
+}
+
 .notification-window{
   border-radius: .375em;
   bottom: 1em;
@@ -16,4 +20,9 @@
 
 .ada_symbol{
   font-size: 12px;
+}
+.social-icon img{
+  /* padding: 0px; */
+  width: 16px;
+  height: 16px;
 }

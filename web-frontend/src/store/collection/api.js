@@ -16,8 +16,8 @@ export const load_collection = (callback) => async (dispatch) => {
 
   for(var collection_id in data_collections){
     var tmp = data_collections[collection_id];
-    tmp.style.banner_path = `/collections/${tmp.id}/${tmp.style.banner}`;
-    tmp.style.logo_path = `/collections/${tmp.id}/${tmp.style.logo}`;
+    tmp.style.banner_path = `/images/collections/${tmp.id}/${tmp.style.banner}`;
+    tmp.style.logo_path = `/images/collections/${tmp.id}/${tmp.style.logo}`;
     tmp.is_verified = true;
     data_collections[collection_id] = tmp;
   }

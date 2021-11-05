@@ -16,7 +16,7 @@
       "twitter": "https://twitter.com/PixelHeadSquad",
       "website": "https://pixelhead.io/"
     },
-    "asset_attributes": ["creature name", "narrative"]
+    "asset_attributes": ["creature name", "narrative", "description"]
   },
   "cardanotrees": {
     "id": "cardanotrees",
