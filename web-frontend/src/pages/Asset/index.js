@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
 import { urls } from "../../config";
-import { load_collection, get_asset} from "../../store/collection/api";
+import { load_collection, get_asset, asset_add_offer } from "../../store/collection/api";
 import { listToken } from "../../store/market/api";
 
 import ButtonBuy from "../../components/ButtonBuy";
@@ -13,7 +13,7 @@ import CollectionBanner from "../../components/CollectionBanner";
 
 import "./style.css";
 
-const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, listToken}) => {
+const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, listToken, asset_add_offer}) => {
 
   const [asset, setAsset] = useState(false);
   const [thisCollection, setThisCollection] = useState(false);
@@ -54,7 +54,7 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
               <div className="columns">
                 <div className="column is-two-fifths">
                   <AssetImage asset={asset}/>
-                  <Listing asset={asset} state_wallet={state_wallet} listToken={listToken} />
+                  <Listing asset={asset} state_wallet={state_wallet} listToken={listToken} asset_add_offer={asset_add_offer} />
                 </div>
 
                 <div className="column">
@@ -134,7 +134,7 @@ const SocialLinks = ({asset}) => {
         </a>
       </p>
       <p className="control">
-        <a className="button is-small social-icon" href={`${urls.cardanoscan_url}token/${asset.info.asset}`} rel="noreferrer" target="_blank"  data-tooltip="Check Cardanoscan">
+        <a className="button is-small social-icon" href={`${urls.cardanoscan}token/${asset.info.asset}`} rel="noreferrer" target="_blank"  data-tooltip="Check Cardanoscan">
           <span className="icon">
             <img src="/images/icons/cardanoscan.png"/>
           </span>
@@ -151,29 +151,28 @@ const SocialLinks = ({asset}) => {
   );
 };
 
-const Listing = ({asset, state_wallet, listToken}) => {
+const Listing = ({asset, state_wallet, listToken, asset_add_offer}) => {
   return (
     <div className="block">
       { asset.info.asset in state_wallet.assets ? 
         <OwnerListAsset asset={asset} listToken={listToken} /> : 
-        <PurchaseAsset asset={asset} /> 
+        <PurchaseAsset asset={asset} asset_add_offer={asset_add_offer} /> 
       }
     </div>
   )
 }
 
-const PurchaseAsset = ({asset}) => {
+const PurchaseAsset = ({asset, asset_add_offer}) => {
 
   const [userInputAmount, setUserInputAmount] = useState("");
   const [sendingBid, setSendingBid] = useState(false);
 
   function list_this_token(price){
     setSendingBid(true);
-    // let policy_id = asset.info.policyId;
-    // let assetName = asset.info.assetName;
-    // listToken(policy_id, assetName, price, (res) => {
-    //   setSendingBid(false);
-    // });
+    asset_add_offer(asset.info.asset, price, (res) => {
+      setSendingBid(false);
+      setUserInputAmount("");
+    });
   }
 
   function input_price_changed(event){
@@ -206,6 +205,10 @@ const PurchaseAsset = ({asset}) => {
             </>
           ) : <></>
         }
+
+        {/* {
+          asset.offer ? asset.offer.length > 0 ? 
+        } */}
 
         <div className="field has-addons">
           <div className="control has-icons-left is-expanded">
@@ -526,6 +529,7 @@ function mapDispatchToProps(dispatch) {
     load_collection: (callback) => dispatch(load_collection(callback)),
     get_asset: (policy_id, asset_id, callback) => dispatch(get_asset(policy_id, asset_id, callback)),
     listToken: (policy_id, asset_id, price, callback) => dispatch(listToken(policy_id, asset_id, price, callback)),
+    asset_add_offer: (asset_id, price, callback) => dispatch(asset_add_offer(asset_id, price, callback)),
   };
 }
 

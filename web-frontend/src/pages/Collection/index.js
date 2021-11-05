@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
 
@@ -28,24 +28,26 @@ const Collection = ({state_collection, collection_id, get_listings}) => {
   const [thisCollection, setThisCollection] = useState(default_meta);
 
   useEffect(() => {
-    if(collection_id in state_collection.collections || collection_id in state_collection.policies_collections){
-      let policy_id = collection_id;
-
-      if(collection_id in state_collection.collections){
-        policy_id = state_collection.collections[collection_id];
-        setPolicyId(policy_id);
-      }else{
-        setPolicyId(collection_id);
+    if(state_collection.loaded){
+      if(collection_id in state_collection.collections || collection_id in state_collection.policies_collections){
+        let policy_id = collection_id;
+  
+        if(collection_id in state_collection.collections){
+          policy_id = state_collection.collections[collection_id];
+          setPolicyId(policy_id);
+        }else{
+          setPolicyId(collection_id);
+        }
+  
+        var tmp = {...state_collection.policies_collections[policy_id]};
+        setThisCollection(tmp);
       }
-
-      var tmp = {...state_collection.policies_collections[policy_id]};
-      setThisCollection(tmp);
-    }
-    else{
-      var tmp = {...default_meta};
-      tmp.policy_id = collection_id;
-      setPolicyId(collection_id);
-      setThisCollection(tmp);
+      else{
+        var tmp = {...default_meta};
+        tmp.policy_id = collection_id;
+        setPolicyId(collection_id);
+        setThisCollection(tmp);
+      }
     }
   }, [state_collection, collection_id]);
 
@@ -113,8 +115,15 @@ return (
   );
 }
 
+
+
 const DisplayListing = ({listings}) => {
 
+  //pagination
+  const pageSize = 8;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // search and filter
   const [searchText, setSearchText] = useState("");
   const [sortby, setSortby] = useState("");
   const sort_options = [
@@ -150,6 +159,19 @@ const DisplayListing = ({listings}) => {
     if(sortby===2){
       return a.price > b.price ? -1 : 1
     }
+  })
+  .map((this_nft, i) => {
+    return this_nft
+  });
+
+  const display_listing = filtered_listing
+  .filter((this_nft, i) => {
+    let current_index_min = ((currentPage-1)*pageSize)
+    let current_index_max = (currentPage*pageSize)
+    if(i>=current_index_min && i<current_index_max){
+      return true;
+    }
+    return false;
   })
   .map((this_nft, i) => {
     return(
@@ -189,8 +211,52 @@ return (
     </div>
 
     <div className="columns is-multiline">
-      {filtered_listing}
+      {display_listing}
     </div>
+    
+    {
+      (filtered_listing.length/pageSize) > 1 ? (
+        <nav className="pagination is-rounded" role="navigation" aria-label="pagination">
+          <button className="pagination-previous" onClick={() => setCurrentPage(currentPage-1)} disabled={currentPage==1}>Previous</button>
+          <button className="pagination-next" onClick={() => setCurrentPage(currentPage+1)} disabled={currentPage==(filtered_listing.length/pageSize)}>Next page</button>
+          <ul className="pagination-list">
+            {
+              currentPage!=1?(
+                <li><a className="pagination-link" aria-label="Goto page 1" onClick={() => setCurrentPage(1)}>1</a></li>
+              ) : <></>
+            }
+            {
+              currentPage > 3 ? (
+                <li><span className="pagination-ellipsis">&hellip;</span></li>
+              ) : <></>
+            }
+            { 
+              currentPage > 2 ? 
+                <li><a className="pagination-link" aria-label="Goto page 45" onClick={() => setCurrentPage(currentPage-1)}>{currentPage-1}</a></li>
+              : <></>
+            }
+            <li><a className="pagination-link is-current" aria-label="Page 46" aria-current="page">{currentPage}</a></li>
+            {
+              currentPage < (filtered_listing.length/pageSize) ? (
+                <li><a className="pagination-link" aria-label="Goto page 47" onClick={() => setCurrentPage(currentPage+1)}>{currentPage+1}</a></li>
+              ) : <></>
+            }
+            {
+              currentPage < (filtered_listing.length/pageSize)-2 ? (
+                <>
+                  <li><span className="pagination-ellipsis">&hellip;</span></li>
+                </>
+              ) : <></>
+            }
+            {
+              currentPage < (filtered_listing.length/pageSize)-1 ? (
+                <li><a className="pagination-link" aria-label="Goto page 86">{(filtered_listing.length/pageSize)}</a></li>
+              ) : <></>
+            }
+          </ul>
+        </nav>
+      ) : <></>
+    }
 
   </div>
   );

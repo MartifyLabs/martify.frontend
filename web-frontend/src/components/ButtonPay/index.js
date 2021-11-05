@@ -47,7 +47,7 @@ const ButtonPay = ({wallet, create_txn, buyer_pay}) => {
                   showNotification.type === "payment-success" ? (
                     <p>
                       Payment successful.<br/>
-                      <a href={urls.cardanoscan_url+showNotification.data} target="_blank" rel="noreferrer">{showNotification.data}</a>.
+                      <a href={urls.cardanoscan+showNotification.data} target="_blank" rel="noreferrer">{showNotification.data}</a>.
                     </p>
                   ) : <></>
                 }

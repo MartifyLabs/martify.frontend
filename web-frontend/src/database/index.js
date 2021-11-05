@@ -82,3 +82,17 @@ export const saveAssets = async (assets) => {
     );
   }
 };
+
+export const saveAsset = async (asset) => {
+  try {
+    if (asset) {
+      await setDoc(doc(db, "assets", asset.info.asset), {
+        ...asset
+      });
+    }
+  } catch (error) {
+    console.error(
+      `Unexpected error in saveAsset. [Message: ${error.message}]`
+    );
+  }
+};
