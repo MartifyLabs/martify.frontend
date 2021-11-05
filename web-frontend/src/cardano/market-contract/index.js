@@ -30,9 +30,10 @@ export const offer = async (tn, cs, price) => {
       await contractAddress(),
       await assetsToValue([
         {
-          unit: cs,
+          unit: `${cs}${tn}`,
           quantity: "1",
         },
+        { unit: "lovelace", quantity: "1640000" },
       ]),
       {
         datum: offerDatum,
@@ -130,7 +131,9 @@ const assetsToValue = async (assets) => {
     const assetsValue = Cardano.Instance.Assets.new();
     policyAssets.forEach((asset) => {
       assetsValue.insert(
-        Cardano.Instance.AssetName.new(Buffer.from(asset.unit.slice(56), "hex")),
+        Cardano.Instance.AssetName.new(
+          Buffer.from(asset.unit.slice(56), "hex")
+        ),
         Cardano.Instance.BigNum.from_str(asset.quantity)
       );
     });

@@ -222,10 +222,10 @@ export const createTxOutput = async (
 
   const output = Cardano.Instance.TransactionOutput.new(address, v);
 
-  if (datum) {
+  /*if (datum) {
     output.set_data_hash(Cardano.Instance.hash_plutus_data(datum));
     metadata[DATUM_LABEL][index] = "0x" + toHex(datum.to_bytes());
-  }
+  }*/
 
   if (tradeOwnerAddress) {
     metadata[ADDRESS_LABEL].address =
