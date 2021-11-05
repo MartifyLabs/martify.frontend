@@ -1,15 +1,15 @@
 import React from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import CollectionLinks from "../CollectionLinks";
 
 const CollectionBanner = ({thisCollection, size}) => {
-  console.log(thisCollection)
+
   return (
     <section className={"hero collection_name " + (size!=undefined ? size : "is-medium")} style={{backgroundImage: `url(${thisCollection.style.banner_path})`}}>
         <div className="hero-body">
         
           <nav className="level">
-            <Link to={`/collection/${thisCollection.id?thisCollection.id:thisCollection.meta.name}`}>
+            {/* <Link to={`/collection/${thisCollection.id?thisCollection.id:thisCollection.policy_id}`}> */}
               <div className="level-left">
                 {
                   thisCollection.style.logo_path ? (
@@ -22,13 +22,27 @@ const CollectionBanner = ({thisCollection, size}) => {
                 }
                 <div className="level-item">
                   <div className="collection_title">
-                    <p className="title is-size-1" style={{color: thisCollection.style.font_color_title}}>
-                      {thisCollection.meta.name}
-                    </p>
+                    {
+                      thisCollection.meta.name ? (
+                        <p className="title is-size-1" style={{color: thisCollection.style.font_color_title}}>
+                          {thisCollection.meta.name}
+                        </p>
+                      ) : (
+                        <>
+                        <p className="title is-size-2" style={{color: thisCollection.style.font_color_title}}>
+                        Browsing results for
+                        </p>
+                        <p className="title is-size-4" style={{color: thisCollection.style.font_color_title}}>
+                          {thisCollection.policy_id}
+                        </p>
+                        </>
+                      )
+                    }
+                    
                   </div>
                 </div>
               </div>
-            </Link>
+            {/* </Link> */}
 
             <div className="level-right">
               <div className="level-item">

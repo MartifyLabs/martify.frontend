@@ -3,7 +3,7 @@ import { compose } from "redux";
 import { connect } from "react-redux";
 
 import { create_txn, buyer_pay } from "../../store/wallet/api";
-import {cardanoscan_url} from "../../config";
+import {urls} from "../../config";
 
 const ButtonPay = ({wallet, create_txn, buyer_pay}) => {
 
@@ -47,7 +47,7 @@ const ButtonPay = ({wallet, create_txn, buyer_pay}) => {
                   showNotification.type === "payment-success" ? (
                     <p>
                       Payment successful.<br/>
-                      <a href={cardanoscan_url+showNotification.data} target="_blank" rel="noreferrer">{showNotification.data}</a>.
+                      <a href={urls.cardanoscan_url+showNotification.data} target="_blank" rel="noreferrer">{showNotification.data}</a>.
                     </p>
                   ) : <></>
                 }

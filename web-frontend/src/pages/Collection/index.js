@@ -15,6 +15,7 @@ const Collection = ({state_collection, collection_id, get_listings}) => {
 
   const default_meta = {
     is_verified: false,
+    policy_id: false,
     meta: {
 
     },
@@ -42,7 +43,7 @@ const Collection = ({state_collection, collection_id, get_listings}) => {
     }
     else{
       var tmp = {...default_meta};
-      tmp.meta.name = collection_id;
+      tmp.policy_id = collection_id;
       setPolicyId(collection_id);
       setThisCollection(tmp);
     }
@@ -63,7 +64,7 @@ const Collection = ({state_collection, collection_id, get_listings}) => {
         <div className="columns">
           {
             thisCollection.is_verified ? (
-              <div className="column is-three-quarters-mobile is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
+              <div className="column is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
                 <div className="block">
                   { thisCollection ? <CollectionAbout thisCollection={thisCollection} /> : <></> }
                 </div>
@@ -85,6 +86,7 @@ const ListingSection = ({state_collection, policyId}) => {
   const [listings, setListings] = useState([]);
 
   function load(){
+    setListings([]);
     if(policyId in state_collection.policies_assets){
       let tmp = Object.values(state_collection.policies_assets[policyId]);
       setListings(tmp);

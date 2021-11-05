@@ -22,21 +22,34 @@ const Search = ({state_collection}) => {
     })
   }
 
-  function selected(){
-
-  }
-
   function handleKeyPress(event) {
     switch (event.which) {
       case 13: // Enter key
         if (state.matches.length) {
-          setState({
-            activeIndex: 0,
-            matches: [],
-            query: state.matches[state.activeIndex].label,
-            selected: true
-          });
-          history.push("/collection/"+state.matches[0].value);
+          // have selected from the suggestion
+          if(state.activeIndex!=undefined){
+            setState({
+              activeIndex: 0,
+              matches: [],
+              query: state.matches[state.activeIndex].label,
+              selected: true
+            });
+            history.push("/collection/"+state.matches[0].value);
+          }
+          // will try to fuzzy match, exact match names or policy ID from verifed collections first
+          else{
+            for(var policy_id in state_collection.policies_collections){
+              let this_is_the_one = false;
+              if(state.query==policy_id){
+                this_is_the_one = true;
+              }else if(state.query.toLowerCase()==state_collection.policies_collections[policy_id].meta.name){
+                this_is_the_one = true;
+              }
+              history.push("/collection/"+state_collection.policies_collections[policy_id].id);
+              break;
+            }
+          }
+          
         }else{
           history.push("/collection/"+state.query);
         }

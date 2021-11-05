@@ -15,7 +15,11 @@ const CollectionAbout = ({thisCollection}) => {
             </header>
             <div className="card-content">
               <div className="content">
-                {thisCollection.meta.description}
+                <p>{thisCollection.meta.description}</p>
+                Policy ID:
+                <pre>
+                  {thisCollection.policy_id}
+                </pre>
               </div>
               <CollectionLinks collection={thisCollection} />
             </div>
