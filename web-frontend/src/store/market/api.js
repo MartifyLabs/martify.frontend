@@ -14,9 +14,9 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
     let asset_updated = await getAsset(asset.info.asset);
     
     // call market, list on market
-    // console.log("listToken on market", asset.info.assetName, asset.info.policyId, price);
-    // let txHash = await offer(asset.info.assetName, asset.info.policyId, price.toString());
-    // console.log("txHash", txHash);
+    console.log("listToken on market", asset.info.assetName, asset.info.policyId, price);
+    let txHash = await offer(asset.info.assetName, asset.info.policyId, price.toString());
+    console.log("txHash", txHash);
 
     if(price>0){
       let wallet_address = await getWalletAddresses();

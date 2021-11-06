@@ -102,7 +102,7 @@ export const finalizeTx = async ({
 
   let aux_data;
 
-  if (metadata) {
+  /*if (metadata) {
     aux_data = Cardano.Instance.AuxiliaryData.new();
     const generalMetadata = Cardano.Instance.GeneralTransactionMetadata.new();
     Object.keys(metadata).forEach((label) => {
@@ -117,7 +117,7 @@ export const finalizeTx = async ({
     });
     aux_data.set_metadata(generalMetadata);
     txBuilder.set_auxiliary_data(aux_data);
-  }
+  }*/
 
   const changeMultiAssets = change.multiasset();
 
@@ -222,10 +222,10 @@ export const createTxOutput = async (
 
   const output = Cardano.Instance.TransactionOutput.new(address, v);
 
-  /*if (datum) {
+  if (datum) {
     output.set_data_hash(Cardano.Instance.hash_plutus_data(datum));
     metadata[DATUM_LABEL][index] = "0x" + toHex(datum.to_bytes());
-  }*/
+  }
 
   if (tradeOwnerAddress) {
     metadata[ADDRESS_LABEL].address =
