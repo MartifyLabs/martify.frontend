@@ -156,14 +156,15 @@ const Listing = ({asset, state_wallet, listToken, asset_add_offer}) => {
     <div className="block">
       { asset.info.asset in state_wallet.assets ? 
         <OwnerListAsset asset={asset} listToken={listToken} /> : 
-        <PurchaseAsset asset={asset} asset_add_offer={asset_add_offer} /> 
+        <PurchaseAsset asset={asset} asset_add_offer={asset_add_offer} state_wallet={state_wallet} /> 
       }
     </div>
   )
 }
 
-const PurchaseAsset = ({asset, asset_add_offer}) => {
+const PurchaseAsset = ({asset, asset_add_offer, state_wallet}) => {
 
+  const [showTab, setShowTab] = useState( asset.listing ? asset.listing.is_listed ? "buy" : "offer" : "offer");
   const [userInputAmount, setUserInputAmount] = useState("");
   const [sendingBid, setSendingBid] = useState(false);
 
@@ -195,39 +196,99 @@ const PurchaseAsset = ({asset, asset_add_offer}) => {
         </p>
       </header>
       <div className="card-content">
+        
         {
-          asset.listing.is_listed ? (
-            <>
-              <p className="title is-4">{asset.listing.price}<span className="ada_symbol">₳</span></p>
-              <div className="level-item">
-                <ButtonBuy />
+          asset.listing ? asset.listing.is_listed ? (
+            <div className="tabs is-centered">
+              <ul>
+                <li className={showTab=="buy"?"is-active":""} onClick={() => setShowTab("buy")}><a>Buy Now</a></li>
+                <li className={showTab=="offer"?"is-active":""} onClick={() => setShowTab("offer")}><a>Offer</a></li>
+              </ul>
+            </div>
+          )
+          : <></> : <></>
+        }
+        
+        {
+          showTab=="buy" ? asset.listing ? asset.listing.is_listed ? (
+            <nav className="level is-mobile">
+              <div className="level-item has-text-centered">
+                <div>
+                  <p className="heading">Buy now</p>
+                  <p className="title">
+                    {asset.listing.price}
+                    <span className="ada_symbol">₳</span>
+                  </p>
+                </div>
               </div>
-            </>
-          ) : <></>
+                <div className="level-item has-text-centered">
+                  <ButtonBuy />
+                </div>
+            </nav>
+          )
+          : <></> : <></> : <></>
         }
 
-        {/* {
-          asset.offer ? asset.offer.length > 0 ? 
-        } */}
-
-        <div className="field has-addons">
-          <div className="control has-icons-left is-expanded">
-            <input className="input" type="number" placeholder="Offer price"
-            value={userInputAmount} onChange={(event) => input_price_changed(event)} 
-            disabled={sendingBid}
-            />
-            <span className="icon is-medium is-left">₳</span>
-          </div>
-          <div className="control">
-            <button className="button is-info" onClick={() => list_this_token(userInputAmount)}
-            disabled={sendingBid || userInputAmount < 5}
-            >
+        {
+          showTab=="offer" ? asset.offers ? Object.keys(asset.offers).length ? 
+          (
+            <nav className="level is-mobile">
+              <div className="level-item has-text-centered">
+                <div>
+                  <p className="heading">Current offer</p>
+                  <p className="title">
+                    {
+                      Math.max.apply(Math, Object.keys(asset.offers).map(function(key){
+                        return asset.offers[key];
+                      }).map(function(o) { return o.p; }))
+                    }
+                    <span className="ada_symbol">₳</span>
+                  </p>
+                </div>
+              </div>
               {
-                userInputAmount ? `Offer for ₳${userInputAmount}` : "Offer a price"
+                state_wallet.connected ? state_wallet.data.wallet_address in asset.offers ? (
+                  <div className="level-item has-text-centered">
+                    <div>
+                      <p className="heading">Your offer</p>
+                      <p className="title">
+                        {asset.offers[state_wallet.data.wallet_address].p}
+                        <span className="ada_symbol">₳</span>
+                      </p>
+                    </div>
+                  </div>
+                ) : <></> : <></>
               }
-            </button>
-          </div>
-        </div>
+            </nav>
+          )
+          : <></> : <></> : <></>
+        }
+
+        {
+          showTab=="offer" ? (
+            <div className="field has-addons">
+              <div className="control has-icons-left is-expanded">
+                <input className="input" type="number" placeholder="Offer price"
+                value={userInputAmount} onChange={(event) => input_price_changed(event)} 
+                disabled={sendingBid || !state_wallet.connected}
+                />
+                <span className="icon is-medium is-left">₳</span>
+                { !state_wallet.connected ? 
+                  <p className="help">Connect your wallet to offer</p> : <></>
+                }
+              </div>
+              <div className="control">
+                <button className="button is-info" onClick={() => list_this_token(userInputAmount)}
+                disabled={sendingBid || userInputAmount < 5 || !state_wallet.connected}
+                >
+                  {
+                    userInputAmount ? `Offer for ₳${userInputAmount}` : "Offer a price"
+                  }
+                </button>
+              </div>
+            </div>
+          ) : <></>
+        }
 
       </div>
     </div>
@@ -241,10 +302,9 @@ const OwnerListAsset = ({asset, listToken}) => {
 
   function list_this_token(price){
     setSendingBid(true);
-    let policy_id = asset.info.policyId;
-    let assetName = asset.info.assetName;
-    listToken(policy_id, assetName, price, (res) => {
+    listToken(asset, price, (res) => {
       setSendingBid(false);
+      setUserInputAmount("");
     });
   }
 
@@ -268,10 +328,32 @@ const OwnerListAsset = ({asset, listToken}) => {
         </p>
       </header>
       <div className="card-content">
+
+        {
+          asset.listing ? asset.listing.is_listed ? (
+            <nav className="level is-mobile">
+              <div className="level-item has-text-centered">
+                <div>
+                  <p className="heading">Currently listed for</p>
+                  <p className="title">
+                    {asset.listing.price}
+                    <span className="ada_symbol">₳</span>
+                  </p>
+                </div>
+              </div>
+                <div className="level-item has-text-centered">
+                <button className={"button is-rounded is-info" + (sendingBid ? " is-loading" : "")} disabled={sendingBid} onClick={() => list_this_token(0)}>
+                  <span>Cancel listing</span>
+                </button>
+                </div>
+            </nav>
+          )
+          : <></> : <></>
+        }
         
         <div className="field has-addons">
           <div className="control has-icons-left is-expanded">
-            <input className="input" type="number" placeholder="Price"
+            <input className="input" type="number" placeholder={asset.listing.is_listed ? "Update listing price" : "Input listing price"}
             value={userInputAmount} onChange={(event) => input_price_changed(event)} 
             disabled={sendingBid}
             />
@@ -528,7 +610,7 @@ function mapDispatchToProps(dispatch) {
   return {
     load_collection: (callback) => dispatch(load_collection(callback)),
     get_asset: (policy_id, asset_id, callback) => dispatch(get_asset(policy_id, asset_id, callback)),
-    listToken: (policy_id, asset_id, price, callback) => dispatch(listToken(policy_id, asset_id, price, callback)),
+    listToken: (asset, price, callback) => dispatch(listToken(asset, price, callback)),
     asset_add_offer: (asset_id, price, callback) => dispatch(asset_add_offer(asset_id, price, callback)),
   };
 }

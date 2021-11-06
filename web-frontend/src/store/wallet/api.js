@@ -6,6 +6,7 @@ import {
   getUsedAddresses,
   getUtxos,
   signTx,
+  getWalletAddresses,
 } from "../../cardano/wallet";
 
 import {
@@ -98,30 +99,34 @@ export const connectWallet = (callback) => async (dispatch) => {
               // dispatch(setWalletUsedAddr(used_address));
               connected_wallet.used_addr = used_address;
 
-              getBalance().then((res) => {
-                const balance = cbor.decode(res);
-                // console.log("balance", balance);
+              getWalletAddresses().then((res_walletaddr) => {
+                connected_wallet.wallet_address = res_walletaddr;
 
-                let wallet_balance = 0;
-                if (Number.isInteger(balance)) {
-                  wallet_balance = balance;
-                } else {
-                  for (let i in balance) {
-                    if (Number.isInteger(balance[i])) {
-                      wallet_balance = balance[i];
-                      break;
+                getBalance().then((res) => {
+                  const balance = cbor.decode(res);
+                  // console.log("balance", balance);
+
+                  let wallet_balance = 0;
+                  if (Number.isInteger(balance)) {
+                    wallet_balance = balance;
+                  } else {
+                    for (let i in balance) {
+                      if (Number.isInteger(balance[i])) {
+                        wallet_balance = balance[i];
+                        break;
+                      }
                     }
                   }
-                }
-                
-                connected_wallet.wallet_balance = wallet_balance;
-                // dispatch(setWalletBalance(wallet_balance));
+                  
+                  connected_wallet.wallet_balance = wallet_balance;
+                  // dispatch(setWalletBalance(wallet_balance));
 
-                dispatch(walletConnected(connected_wallet));
+                  dispatch(walletConnected(connected_wallet));
 
-                callback({
-                  success: true,
-                  data: connected_wallet,
+                  callback({
+                    success: true,
+                    data: connected_wallet,
+                  });
                 });
               });
             });

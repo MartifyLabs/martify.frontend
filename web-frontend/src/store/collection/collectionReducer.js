@@ -17,7 +17,9 @@ function update_tokens(token, asset_id, policy_id, state_policies_collections){
     }else{
       token.collection = {policy_id: policy_id};
     }
-    token.listing = {};
+    token.listing = 
+      token.listing ? {...token.listing} : {}
+    ;
   }
   
   return token;
