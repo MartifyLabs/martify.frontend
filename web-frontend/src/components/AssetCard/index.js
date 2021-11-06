@@ -19,19 +19,24 @@ const AssetCard = ({asset, column_className}) => {
                     </figure>
                   </div>
                   <div className="card-content">
+                    {
+                      asset.listing.is_listed ? 
+                      <span className="tag is-white is-medium is-rounded price_tag">
+                        <p className="">₳{asset.listing.price}</p>
+                      </span> : <></>
+                    }
+
                     <div className="media is-clipped">
                       <div className="media-content clipped">
-                        <p className="title is-4 clipped">{asset.info.onchainMetadata.name}</p>
-                        <p className="subtitle is-6 clipped">
-                          {
-                            asset.collection.is_verified ? asset.collection.meta.name : asset.info.policyId
-                          }
+                        <p className="subtitle is-size-7 clipped">
+                          {asset.collection.is_verified ? asset.collection.meta.name : asset.info.policyId}
                         </p>
-                        {
-                          asset.listing.is_listed ? <p className="subtitle is-6">₳{asset.listing.price}</p> : <></>
-                        }
+                        <p className="title is-size-5 clipped">
+                          {asset.info.onchainMetadata.name}
+                        </p>
                       </div>
                     </div>
+                    
                   </div>
                 </div>
               </Link>

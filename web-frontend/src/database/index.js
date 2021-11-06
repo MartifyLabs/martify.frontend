@@ -72,7 +72,7 @@ export const saveAssets = async (assets) => {
         if (asset) {
           await setDoc(doc(db, "assets", asset.asset), {
             info: asset,
-          });
+          }, { merge: true });
         }
       })
     );

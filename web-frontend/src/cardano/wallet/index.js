@@ -52,7 +52,7 @@ export const getOwnedAssets = async () => {
   for (var asset_id in assets) {
     if (asset_id !== "lovelace") {
       let asset_info = await getAsset(asset_id);
-      assets[asset_id].info = asset_info.info;
+      assets[asset_id] = asset_info;
     }
   }
 
@@ -76,6 +76,7 @@ export const submitTx = async (tx) => {
 };
 
 export const getWalletAddresses = async () => {
+  await Cardano.load();
   return Cardano.Instance.Address.from_bytes(
     fromHex((await getUsedAddresses())[0])
   ).to_bech32();

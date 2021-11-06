@@ -50,24 +50,23 @@ export const get_listings = (policy_id, callback) => async (dispatch) => {
   callback(true);
 }
 
+function add_token(asset, dispatch){
+  let output = {
+    "policy_id": asset.info.policyId,
+    "listing": {
+      [asset.info.asset]: asset
+    }
+  };
+  dispatch(collections_add_tokens(output));
+}
+
 export const get_asset = (policy_id, asset_id, callback) => async (dispatch) => {
 
   dispatch(collections_loading(true));
   
-  let output = {
-    "policy_id": policy_id,
-    "listing": {}
-  };
-
   let asset = await getAsset(asset_id);
 
-  // output.listing[asset_id] = data_assets[policy_id][asset_id] ? data_assets[policy_id][asset_id] : false;
-  if(asset) output.listing[asset_id] = asset;
-  else output.listing[asset_id] = false;
-  
-  if(output.policy_id && output.listing){
-    dispatch(collections_add_tokens(output));
-  }
+  if(asset) add_token(asset, dispatch);
   callback(true);
 }
 
@@ -78,18 +77,19 @@ export const asset_add_offer = (asset_id, price, callback) => async (dispatch) =
   let wallet_address = await getWalletAddresses();
 
   if(!("offers" in asset)){
-    asset.offers = [];
+    asset.offers = {};
   }
 
   let offer = {
     t: new Date().getTime(),
-    a: wallet_address,
     p: price,
   }
 
-  asset.offers.push(offer);
+  asset.offers[wallet_address] = offer;
   
   await saveAsset(asset);
+
+  add_token(asset, dispatch)
 
   callback(true);
 }
