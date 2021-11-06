@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./style.css";
 
-const AssetCard = ({asset, column_className}) => {
+const AssetCard = ({asset, column_className, show_offer}) => {
   return (
     <>
     {
@@ -21,9 +21,23 @@ const AssetCard = ({asset, column_className}) => {
                   <div className="card-content">
                     {
                       asset.listing.is_listed ? 
-                      <span className="tag is-white is-medium is-rounded price_tag">
-                        <p className="">₳{asset.listing.price}</p>
+                      <span className="tag is-link is-medium is-rounded price_tag">
+                        <p className="" data-tooltip={`Buy now for ₳${asset.listing.price}`}><span className="ada_symbol">₳</span>{asset.listing.price}</p>
                       </span> : <></>
+                    }
+                    {
+                      show_offer ? asset.offers ? Object.keys(asset.offers).length ? (
+                        <span className="tag is-warning is-medium is-rounded price_tag" style={{top:"50px"}}>
+                          <p className="" data-tooltip={`Highest offer`}>
+                            <span className="ada_symbol">₳</span>
+                            {
+                              Math.max.apply(Math, Object.keys(asset.offers).map(function(key){
+                                return asset.offers[key];
+                              }).map(function(o) { return o.p; }))
+                            }
+                          </p>
+                        </span>
+                      ) : <></> : <></> : <></>
                     }
 
                     <div className="media is-clipped">

@@ -329,27 +329,52 @@ const OwnerListAsset = ({asset, listToken}) => {
       </header>
       <div className="card-content">
 
-        {
-          asset.listing ? asset.listing.is_listed ? (
-            <nav className="level is-mobile">
-              <div className="level-item has-text-centered">
-                <div>
-                  <p className="heading">Currently listed for</p>
-                  <p className="title">
-                    {asset.listing.price}
-                    <span className="ada_symbol">₳</span>
-                  </p>
-                </div>
-              </div>
+        <nav className="level is-mobile">
+          {
+            asset.offers ? Object.keys(asset.offers).length ? 
+            (
+              <>
                 <div className="level-item has-text-centered">
-                <button className={"button is-rounded is-info" + (sendingBid ? " is-loading" : "")} disabled={sendingBid} onClick={() => list_this_token(0)}>
-                  <span>Cancel listing</span>
-                </button>
+                  <div>
+                    <p className="heading">Highest offer</p>
+                    <p className="title">
+                      {
+                        Math.max.apply(Math, Object.keys(asset.offers).map(function(key){
+                          return asset.offers[key];
+                        }).map(function(o) { return o.p; }))
+                      }
+                      <span className="ada_symbol">₳</span>
+                    </p>
+                  </div>
                 </div>
-            </nav>
-          )
-          : <></> : <></>
-        }
+              </>
+            )
+            : <></> : <></>
+          }
+
+          {
+            asset.listing ? asset.listing.is_listed ? (
+              <>
+                <div className="level-item has-text-centered">
+                  <div>
+                    <p className="heading">Currently listed for</p>
+                    <p className="title">
+                      {asset.listing.price}
+                      <span className="ada_symbol">₳</span>
+                    </p>
+                  </div>
+                </div>
+                <div className="level-item has-text-centered">
+                  <button className={"button is-rounded is-info" + (sendingBid ? " is-loading" : "")} disabled={sendingBid} onClick={() => list_this_token(0)}>
+                    <span>Cancel listing</span>
+                  </button>
+                </div>
+              </>
+            )
+            : <></> : <></>
+          }
+
+        </nav>
         
         <div className="field has-addons">
           <div className="control has-icons-left is-expanded">

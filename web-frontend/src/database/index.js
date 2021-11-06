@@ -69,7 +69,7 @@ export const saveAssets = async (assets) => {
   try {
     await Promise.all(
       assets.map(async (asset) => {
-        if (asset) {
+        if (asset && asset.onchainMetadata) {
           await setDoc(doc(db, "assets", asset.asset), {
             info: asset,
           }, { merge: true });
