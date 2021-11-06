@@ -11,6 +11,12 @@ const Listings = ({state_wallet, state_collection}) => {
   const default_list_projects = [{"value": "all", "label": "All Projects"}];
   const [listProjectsFilter, setListProjectsFilter] = useState([...default_list_projects]);
   const [filterProject, setFilterProject] = useState("all");
+  const filters_assets = [
+    {"value": "all", "label": "Show all assets"},
+    {"value": "listed", "label": "Show listed"},
+    {"value": "offered", "label": "Show has offers"},
+  ];
+  const [filterAsset, setFilterAsset] = useState("all");
 
   function load(){
     if(state_wallet.loaded_assets){
@@ -69,12 +75,37 @@ const Listings = ({state_wallet, state_collection}) => {
 
   const filtered_listing = matchedtokens
   .filter((asset) => {
-    if(filterProject=="all") return true;
-    else return asset.info.policyId;
+    let allow_project = false;
+
+    if(filterProject=="all") allow_project = true;
+    else allow_project = filterProject == asset.info.policyId;
+
+    if(allow_project){
+      if(filterAsset=="all"){
+        return true;
+      }else if(filterAsset=="listed" && asset.listing.is_listed){
+        return true;
+      }else if(filterAsset=="offered"){
+        if(asset.offers){
+          if(Object.keys(asset.offers).length){
+            return true;
+          }else{
+            return false;
+          }
+        }else{
+          return false;
+        }
+      }else{
+        return false;
+      }
+    }
+    else{
+      return false;
+    }
   })
   .map((asset, i) => {
     return(
-      <AssetCard asset={asset} column_className="column is-one-full-mobile is-one-quarter-tablet is-2-desktop is-2-widescreen is-2-fullhd" key={i}/>
+      <AssetCard asset={asset} show_offer={true} column_className="column is-one-full-mobile is-one-quarter-tablet is-2-desktop is-2-widescreen is-2-fullhd" key={i}/>
     )
   });
 
@@ -96,6 +127,21 @@ return (
               <i className="fa fa-search"></i>
             </span>
           </div>
+
+          <div className="control">
+            <span className="select">
+              <select value={filterAsset} onChange={(event) => setFilterAsset(event.target.value)}>
+                {
+                  filters_assets.map((option, i) => {
+                    return(
+                      <option value={option.value} key={i}>{option.label}</option>
+                    )
+                  })
+                }
+              </select>
+            </span>
+          </div>
+
           <div className="control">
             <span className="select">
               <select value={filterProject} onChange={(event) => setFilterProject(event.target.value)}>
@@ -109,6 +155,7 @@ return (
               </select>
             </span>
           </div>
+          
         </div>
 
         <div className="columns is-multiline">

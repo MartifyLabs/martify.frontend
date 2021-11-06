@@ -125,7 +125,7 @@ const DisplayListing = ({listings}) => {
 
   // search and filter
   const [searchText, setSearchText] = useState("");
-  const [sortby, setSortby] = useState("");
+  const [sortby, setSortby] = useState(1);
   const sort_options = [
     {"value": 1, "label": "Price: Low to High"},
     {"value": 2, "label": "Price: High to Low"},
@@ -153,12 +153,17 @@ const DisplayListing = ({listings}) => {
 
   const filtered_listing = matchedtokens
   .sort((a, b) => {
+    let a_price = a.listing.price ? a.listing.price : 999999;
+    let b_price = b.listing.price ? b.listing.price : 999999;
+
     if(sortby===1){
-      return a.price > b.price ? 1 : -1
+      // console.log(a_price, b_price, a_price > b_price)
+      return a_price > b_price ? 1 : -1;
     }
     if(sortby===2){
-      return a.price > b.price ? -1 : 1
+      return a_price > b_price ? -1 : 1;
     }
+    
   })
   .map((this_nft, i) => {
     return this_nft
