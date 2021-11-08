@@ -27,6 +27,16 @@ export const getAssetInfo = async (asset) => {
   }
 };
 
+export const getLockedAssetUtxos = async (contractAddress, asset) => {
+  try {
+    return await cardano(`addresses/${contractAddress.to_bech32()}/utxos/${asset}`);
+  } catch (error) {
+    console.error(
+      `Unexpected error in getLockedAssets. [Message: ${error.message}]`
+    );
+  }
+}
+
 export const getMintedAssets = async (policyId) => {
   try {
     const response = await cardano(`assets/policy/${policyId}`);
@@ -39,7 +49,17 @@ export const getMintedAssets = async (policyId) => {
   }
 };
 
-export const getTxDetails = async (hash) => {
+export const getTxMetadata = async (hash) => {
+  try {
+    return await cardano(`txs/${hash}/metadata`);
+  } catch (error) {
+    console.error(
+      `Unexpected error in getTxMetadata. [Message: ${error.message}]`
+    );
+  }
+};
+
+export const getTxUtxos = async (hash) => {
   try {
     const response = await cardano(`txs/${hash}/utxos`);
 
@@ -50,7 +70,7 @@ export const getTxDetails = async (hash) => {
     };
   } catch (error) {
     console.error(
-      `Unexpected error in getTxDetails. [Message: ${error.message}]`
+      `Unexpected error in getTxUtxos. [Message: ${error.message}]`
     );
   }
 };
