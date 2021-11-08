@@ -2,7 +2,12 @@ import Cardano from "../serialization-lib";
 import { serialize } from "./datums";
 import { BUY } from "./redeemers";
 import { cborHex } from "./script";
-import { assetsToValue, createTxOutput, finalizeTx, initializeTx } from "../transaction";
+import {
+  assetsToValue,
+  createTxOutput,
+  finalizeTx,
+  initializeTx,
+} from "../transaction";
 import { getUsedAddresses, getUtxos } from "../wallet";
 import { fromHex, toHex } from "../../utils";
 
@@ -70,18 +75,16 @@ export const purchase = async (tn, cs, price, sellerAddress, scriptUtxo) => {
   const utxos = (await getUtxos()).map((utxo) =>
     Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
   );
+
+  const sa = Cardano.Instance.BaseAddress.from_address(
+    Cardano.Instance.Address.from_bech32(sellerAddress)
+  );
+
   const offerDatum = await serialize({
     tn,
     cs,
     price,
-    sellerAddress: toHex(
-      Cardano.Instance.BaseAddress.from_address(
-        Cardano.Instance.Address.from_bech32(sellerAddress)
-      )
-        .payment_cred()
-        .to_keyhash()
-        .to_bytes()
-    ),
+    sellerAddress: toHex(sa.payment_cred().to_keyhash().to_bytes()),
   });
 
   datums.add(offerDatum);
@@ -89,11 +92,18 @@ export const purchase = async (tn, cs, price, sellerAddress, scriptUtxo) => {
   outputs.add(
     await createTxOutput(
       walletAddress.to_address(),
+      scriptUtxo.output().amount(),
+      {
+        datum: offerDatum,
+        index: 0
+      }
+    )
+  );
+  outputs.add(
+    await createTxOutput(
+      sa.to_address(),
       await assetsToValue([
-        {
-          unit: `${cs}${tn}`,
-          quantity: "1",
-        },
+        { unit: "lovelace", quantity: `${price * 1000000}` },
       ])
     )
   );

@@ -269,13 +269,13 @@ export const createTxOutput = async (
 
   if (datum) {
     output.set_data_hash(Cardano.Instance.hash_plutus_data(datum));
-    metadata[DATUM_LABEL][index] = "0x" + toHex(datum.to_bytes());
+    //metadata[DATUM_LABEL][index] = "0x" + toHex(datum.to_bytes());
   }
 
-  if (tradeOwnerAddress) {
+  /*if (tradeOwnerAddress) {
     metadata[ADDRESS_LABEL].address =
       "0x" + toHex(tradeOwnerAddress.to_address().to_bytes());
-  }
+  }*/
 
   return output;
 };
