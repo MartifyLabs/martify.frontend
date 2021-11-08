@@ -15,7 +15,7 @@ const AssetCard = ({asset, column_className, show_offer}) => {
                 <div className="card asset_card">
                   <div className="card-image">
                     <figure className="image is-square">
-                      <img src={"https://ipfs.blockfrost.dev/ipfs/"+asset.info.onchainMetadata.image} alt={asset.info.onchainMetadata.assetName}/>
+                      <img src={"https://infura-ipfs.io/ipfs/"+asset.info.onchainMetadata.image} alt={asset.info.onchainMetadata.assetName}/>
                     </figure>
                   </div>
                   <div className="card-content">

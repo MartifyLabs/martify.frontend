@@ -29,5 +29,5 @@ export const firebaseOptions = {
 export const urls = {
   root: "http://localhost:3000/",
   cardanoscan: "https://testnet.cardanoscan.io/",
-  ipfs: "https://ipfs.blockfrost.dev/ipfs/"
+  ipfs: "https://infura-ipfs.io/ipfs/"
 }
