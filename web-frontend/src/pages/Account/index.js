@@ -3,6 +3,7 @@ import { compose } from "redux";
 import { connect } from "react-redux";
 
 import Listings from "./Listings";
+import Events from "./Events";
 
 const Account = ({state_wallet, state_collection}) => {
   return (
@@ -28,8 +29,8 @@ const Connected = ({state_wallet, state_collection}) => {
       label: "Your Assets",
       icon: "far fa-images",
     },
-    NOTIFICATIONS: {
-      label: "Notifications",
+    EVENTS: {
+      label: "Events",
       icon: "far fa-envelope",
     },
   }
@@ -55,7 +56,7 @@ const Connected = ({state_wallet, state_collection}) => {
       </div>
 
       { displayTab == "LISTINGS" ? <Listings state_wallet={state_wallet} state_collection={state_collection} /> : <></> }
-      { displayTab == "NOTIFICATIONS" ? <>a</> : <></> }
+      { displayTab == "EVENTS" ? <Events state_wallet={state_wallet} state_collection={state_collection} /> : <></> }
 
     </section>
   )

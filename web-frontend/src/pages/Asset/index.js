@@ -544,10 +544,10 @@ const AssetImageFigure = ({asset, setShow, show_trigger}) => {
 
   function get_src(image){
     if(image.includes("ipfs://")){
-      return "https://ipfs.blockfrost.dev/ipfs/" + image.split("ipfs://")[0];
+      return "https://infura-ipfs.io/ipfs/" + image.split("ipfs://")[0];
     }
     else if(image.length==46){
-      return "https://ipfs.blockfrost.dev/ipfs/" + image;
+      return "https://infura-ipfs.io/ipfs/" + image;
     }
     else{
       return image;

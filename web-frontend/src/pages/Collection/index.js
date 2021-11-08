@@ -115,8 +115,6 @@ return (
   );
 }
 
-
-
 const DisplayListing = ({listings}) => {
 
   //pagination
@@ -125,15 +123,20 @@ const DisplayListing = ({listings}) => {
 
   // search and filter
   const [searchText, setSearchText] = useState("");
-  const [sortby, setSortby] = useState(1);
+  const [sortby, setSortby] = useState('lowtohigh');
   const sort_options = [
-    {"value": 1, "label": "Price: Low to High"},
-    {"value": 2, "label": "Price: High to Low"},
-  ]
+    {"value": 'lowtohigh', "label": "Price: Low to High"},
+    {"value": 'hightolow', "label": "Price: High to Low"},
+  ];
 
   const searchingFor = searchText => {
     return x => {
       let return_this = false;
+
+      if(x.info.onchainMetadata==null){
+        return false
+      }
+
       if (searchText === "") {
         return_this = true;
       }
@@ -152,24 +155,6 @@ const DisplayListing = ({listings}) => {
   let matchedtokens = listings.filter(searchingFor(searchText));
 
   const filtered_listing = matchedtokens
-  .sort((a, b) => {
-    let a_price = a.listing.price ? a.listing.price : 999999;
-    let b_price = b.listing.price ? b.listing.price : 999999;
-
-    if(sortby===1){
-      // console.log(a_price, b_price, a_price > b_price)
-      return a_price > b_price ? 1 : -1;
-    }
-    if(sortby===2){
-      return a_price > b_price ? -1 : 1;
-    }
-    
-  })
-  .map((this_nft, i) => {
-    return this_nft
-  });
-
-  const display_listing = filtered_listing
   .filter((this_nft, i) => {
     let current_index_min = ((currentPage-1)*pageSize)
     let current_index_max = (currentPage*pageSize)
@@ -177,6 +162,18 @@ const DisplayListing = ({listings}) => {
       return true;
     }
     return false;
+  })
+  .sort((a, b) => {
+    let a_price = a.listing.price!=undefined ? a.listing.price : 999999;
+    let b_price = b.listing.price!=undefined ? b.listing.price : 999999;
+
+    if(sortby==='lowtohigh'){
+      return a_price - b_price;
+    }
+    if(sortby==='hightolow'){
+      return b_price - a_price;
+    }
+    
   })
   .map((this_nft, i) => {
     return(
@@ -216,14 +213,14 @@ return (
     </div>
 
     <div className="columns is-multiline">
-      {display_listing}
+      {filtered_listing}
     </div>
     
     {
-      (filtered_listing.length/pageSize) > 1 ? (
+      (matchedtokens.length/pageSize) > 1 ? (
         <nav className="pagination is-rounded" role="navigation" aria-label="pagination">
           <button className="pagination-previous" onClick={() => setCurrentPage(currentPage-1)} disabled={currentPage==1}>Previous</button>
-          <button className="pagination-next" onClick={() => setCurrentPage(currentPage+1)} disabled={currentPage==(filtered_listing.length/pageSize)}>Next page</button>
+          <button className="pagination-next" onClick={() => setCurrentPage(currentPage+1)} disabled={currentPage==(matchedtokens.length/pageSize)}>Next page</button>
           <ul className="pagination-list">
             {
               currentPage!=1?(
@@ -242,20 +239,20 @@ return (
             }
             <li><a className="pagination-link is-current" aria-label="Page 46" aria-current="page">{currentPage}</a></li>
             {
-              currentPage < (filtered_listing.length/pageSize) ? (
+              currentPage < (matchedtokens.length/pageSize) ? (
                 <li><a className="pagination-link" aria-label="Goto page 47" onClick={() => setCurrentPage(currentPage+1)}>{currentPage+1}</a></li>
               ) : <></>
             }
             {
-              currentPage < (filtered_listing.length/pageSize)-2 ? (
+              currentPage < (matchedtokens.length/pageSize)-2 ? (
                 <>
                   <li><span className="pagination-ellipsis">&hellip;</span></li>
                 </>
               ) : <></>
             }
             {
-              currentPage < (filtered_listing.length/pageSize)-1 ? (
-                <li><a className="pagination-link" aria-label="Goto page 86">{(filtered_listing.length/pageSize)}</a></li>
+              currentPage < (matchedtokens.length/pageSize)-1 ? (
+                <li><a className="pagination-link" aria-label="Goto page 86">{(matchedtokens.length/pageSize)}</a></li>
               ) : <></>
             }
           </ul>
