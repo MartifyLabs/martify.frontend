@@ -4,9 +4,48 @@ import { getProtocolParameters } from "../blockfrost-api";
 import CoinSelection from "./coinSelection";
 import { languageViews } from "./languageViews";
 import { fromHex, toHex } from "../../utils";
+import { contractAddress } from "../market-contract";
 
 const DATUM_LABEL = 405;
 const ADDRESS_LABEL = 406;
+
+
+
+export const assetsToValue = async (assets) => {
+  await Cardano.load();
+  const multiAsset = Cardano.Instance.MultiAsset.new();
+  const lovelace = assets.find((asset) => asset.unit === "lovelace");
+  const policies = [
+    ...new Set(
+      assets
+        .filter((asset) => asset.unit !== "lovelace")
+        .map((asset) => asset.unit.slice(0, 56))
+    ),
+  ];
+  policies.forEach((policy) => {
+    const policyAssets = assets.filter(
+      (asset) => asset.unit.slice(0, 56) === policy
+    );
+    const assetsValue = Cardano.Instance.Assets.new();
+    policyAssets.forEach((asset) => {
+      assetsValue.insert(
+        Cardano.Instance.AssetName.new(
+          Buffer.from(asset.unit.slice(56), "hex")
+        ),
+        Cardano.Instance.BigNum.from_str(asset.quantity)
+      );
+    });
+    multiAsset.insert(
+      Cardano.Instance.ScriptHash.from_bytes(Buffer.from(policy, "hex")),
+      assetsValue
+    );
+  });
+  const value = Cardano.Instance.Value.new(
+    Cardano.Instance.BigNum.from_str(lovelace ? lovelace.quantity : "0")
+  );
+  if (assets.length > 1 || !lovelace) value.set_multiasset(multiAsset);
+  return value;
+};
 
 export const initializeTx = async () => {
   await Cardano.load();
@@ -81,7 +120,7 @@ export const finalizeTx = async ({
     const redeemerIndex = txBuilder
       .index_of_input(scriptUtxo.input())
       .toString();
-    redeemers.add(action(redeemerIndex));
+    redeemers.add(await action(redeemerIndex));
     txBuilder.set_redeemers(
       Cardano.Instance.Redeemers.from_bytes(redeemers.to_bytes())
     );
@@ -126,7 +165,9 @@ export const finalizeTx = async ({
     changeMultiAssets &&
     change.to_bytes().length * 2 > Parameters.maxValSize
   ) {
-    const partialChange = Cardano.Instance.Value.new(Cardano.Instance.BigNum.from_str("0"));
+    const partialChange = Cardano.Instance.Value.new(
+      Cardano.Instance.BigNum.from_str("0")
+    );
 
     const partialMultiAssets = Cardano.Instance.MultiAsset.new();
     const policies = changeMultiAssets.keys();
@@ -145,12 +186,11 @@ export const finalizeTx = async ({
             partialMultiAssets.to_bytes()
           );
           checkMultiAssets.insert(policy, assets);
-          const checkValue = Cardano.Instance.Value.new(Cardano.Instance.BigNum.from_str("0"));
+          const checkValue = Cardano.Instance.Value.new(
+            Cardano.Instance.BigNum.from_str("0")
+          );
           checkValue.set_multiasset(checkMultiAssets);
-          if (
-            checkValue.to_bytes().length * 2 >=
-            Parameters.maxValSize
-          ) {
+          if (checkValue.to_bytes().length * 2 >= Parameters.maxValSize) {
             partialMultiAssets.insert(policy, assets);
             return;
           }
@@ -167,7 +207,10 @@ export const finalizeTx = async ({
     partialChange.set_coin(minAda);
 
     txBuilder.add_output(
-      Cardano.Instance.TransactionOutput.new(changeAddress.to_address(), partialChange)
+      Cardano.Instance.TransactionOutput.new(
+        changeAddress.to_address(),
+        partialChange
+      )
     );
   }
 
@@ -177,7 +220,9 @@ export const finalizeTx = async ({
 
   const tx = Cardano.Instance.Transaction.new(
     txBody,
-    Cardano.Instance.TransactionWitnessSet.from_bytes(transactionWitnessSet.to_bytes()),
+    Cardano.Instance.TransactionWitnessSet.from_bytes(
+      transactionWitnessSet.to_bytes()
+    ),
     aux_data
   );
 
@@ -235,12 +280,35 @@ export const createTxOutput = async (
   return output;
 };
 
+export const createTxUnspentOutput = async (utxo) => {
+  await Cardano.load();
+
+  try {
+    return Cardano.Instance.TransactionUnspentOutput.new(
+      Cardano.Instance.TransactionInput.new(
+        Cardano.Instance.TransactionHash.from_bytes(fromHex(utxo.tx_hash)),
+        utxo.output_index
+      ),
+      Cardano.Instance.TransactionOutput.new(
+        await contractAddress(),
+        await assetsToValue(utxo.amount)
+      )
+    );
+  } catch (error) {
+    console.error(
+      `Unexpected error in getTxUnspentOutput. [Message: ${error.message}]`
+    );
+  }
+};
+
 export const getTxUnspentOutputHash = async (hexEncodedBytes) => {
   await Cardano.load();
 
   try {
     return toHex(
-      Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(hexEncodedBytes))
+      Cardano.Instance.TransactionUnspentOutput.from_bytes(
+        fromHex(hexEncodedBytes)
+      )
         .input()
         .transaction_id()
         .to_bytes()

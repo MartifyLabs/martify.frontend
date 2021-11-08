@@ -1,8 +1,8 @@
 import Cardano from "../serialization-lib";
 import { serialize } from "./datums";
 import { BUY } from "./redeemers";
-import { cbor } from "./script";
-import { createTxOutput, finalizeTx, initializeTx } from "../transaction";
+import { cborHex } from "./script";
+import { assetsToValue, createTxOutput, finalizeTx, initializeTx } from "../transaction";
 import { getUsedAddresses, getUtxos } from "../wallet";
 import { fromHex, toHex } from "../../utils";
 
@@ -33,7 +33,7 @@ export const offer = async (tn, cs, price) => {
           unit: `${cs}${tn}`,
           quantity: "1",
         },
-        { unit: "lovelace", quantity: "1600000" },
+        { unit: "lovelace", quantity: "1742000" },
       ]),
       {
         datum: offerDatum,
@@ -59,7 +59,7 @@ export const offer = async (tn, cs, price) => {
 
 export const cancel = async () => {};
 
-export const purchase = async (tokenUtxo) => {
+export const purchase = async (tn, cs, price, sellerAddress, scriptUtxo) => {
   await Cardano.load();
   const { txBuilder, datums, outputs } = await initializeTx();
 
@@ -70,12 +70,33 @@ export const purchase = async (tokenUtxo) => {
   const utxos = (await getUtxos()).map((utxo) =>
     Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
   );
+  const offerDatum = await serialize({
+    tn,
+    cs,
+    price,
+    sellerAddress: toHex(
+      Cardano.Instance.BaseAddress.from_address(
+        Cardano.Instance.Address.from_bech32(sellerAddress)
+      )
+        .payment_cred()
+        .to_keyhash()
+        .to_bytes()
+    ),
+  });
 
-  datums.add(tokenUtxo.datum);
+  datums.add(offerDatum);
 
-  const token = tokenUtxo.utxo.output().amount();
-
-  outputs.add(createTxOutput(walletAddress.to_address(), token));
+  outputs.add(
+    await createTxOutput(
+      walletAddress.to_address(),
+      await assetsToValue([
+        {
+          unit: `${cs}${tn}`,
+          quantity: "1",
+        },
+      ])
+    )
+  );
 
   const requiredSigners = Cardano.Instance.Ed25519KeyHashes.new();
   requiredSigners.add(walletAddress.payment_cred().to_keyhash());
@@ -86,7 +107,7 @@ export const purchase = async (tokenUtxo) => {
     utxos,
     outputs,
     datums,
-    scriptUtxo: tokenUtxo.utxo,
+    scriptUtxo,
     changeAddress: walletAddress,
     plutusScripts: await contractScripts(),
     action: BUY,
@@ -108,43 +129,48 @@ export const contractScripts = async () => {
 
   const scripts = Cardano.Instance.PlutusScripts.new();
 
-  scripts.add(Cardano.Instance.PlutusScript.new(fromHex(cbor)));
+  scripts.add(Cardano.Instance.PlutusScript.new(fromHex(cborHex)));
 
   return scripts;
 };
 
-const assetsToValue = async (assets) => {
-  await Cardano.load();
-  const multiAsset = Cardano.Instance.MultiAsset.new();
-  const lovelace = assets.find((asset) => asset.unit === "lovelace");
-  const policies = [
-    ...new Set(
-      assets
-        .filter((asset) => asset.unit !== "lovelace")
-        .map((asset) => asset.unit.slice(0, 56))
+/*const utxoToDatum = async (utxo) => {
+  const metadata = await blockfrostRequest(`/txs/${utxo.tx_hash}/metadata`);
+  let datum;
+  let tradeOwnerAddress;
+  try {
+    datum = metadata
+      .find((m) => m.label == DATUM_LABEL)
+      .json_metadata[utxo.output_index].slice(2);
+    if (datum != toHex(START_BID().to_bytes()))
+      //STARTBID doesn't have a tradeOwner
+      tradeOwnerAddress = metadata
+        .find((m) => m.label == ADDRESS_LABEL)
+        .json_metadata.address.slice(2);
+  } catch (e) {
+    throw new Error("Some required metadata entries were not found");
+  }
+  datum = Loader.Cardano.PlutusData.from_bytes(fromHex(datum));
+  if (
+    toHex(Loader.Cardano.hash_plutus_data(datum).to_bytes()) !== utxo.data_hash
+  )
+    throw new Error("Datum hash doesn't match");
+
+  return {
+    datum,
+    tradeOwnerAddress:
+      tradeOwnerAddress &&
+      Loader.Cardano.Address.from_bytes(fromHex(tradeOwnerAddress)),
+    utxo: Loader.Cardano.TransactionUnspentOutput.new(
+      Loader.Cardano.TransactionInput.new(
+        Loader.Cardano.TransactionHash.from_bytes(fromHex(utxo.tx_hash)),
+        utxo.output_index
+      ),
+      Loader.Cardano.TransactionOutput.new(
+        CONTRACT_ADDRESS(),
+        assetsToValue(utxo.amount)
+      )
     ),
-  ];
-  policies.forEach((policy) => {
-    const policyAssets = assets.filter(
-      (asset) => asset.unit.slice(0, 56) === policy
-    );
-    const assetsValue = Cardano.Instance.Assets.new();
-    policyAssets.forEach((asset) => {
-      assetsValue.insert(
-        Cardano.Instance.AssetName.new(
-          Buffer.from(asset.unit.slice(56), "hex")
-        ),
-        Cardano.Instance.BigNum.from_str(asset.quantity)
-      );
-    });
-    multiAsset.insert(
-      Cardano.Instance.ScriptHash.from_bytes(Buffer.from(policy, "hex")),
-      assetsValue
-    );
-  });
-  const value = Cardano.Instance.Value.new(
-    Cardano.Instance.BigNum.from_str(lovelace ? lovelace.quantity : "0")
-  );
-  if (assets.length > 1 || !lovelace) value.set_multiasset(multiAsset);
-  return value;
-};
+    budId,
+  };
+};*/

@@ -1,5 +1,5 @@
 import Cardano from "../serialization-lib";
-import { getTxDetails } from "../blockfrost-api";
+import { getTxUtxos } from "../blockfrost-api";
 import { getAsset } from "../../database";
 import { getTxUnspentOutputHash } from "../transaction";
 import { fromHex } from "../../utils";
@@ -31,9 +31,9 @@ export const getOwnedAssets = async () => {
     let utxo_hex_byte_string = utxos[u_i];
     let utxo_hash = await getTxUnspentOutputHash(utxo_hex_byte_string);
 
-    let utxo = await getTxDetails(utxo_hash);
+    let txUtxos = await getTxUtxos(utxo_hash);
 
-    const ownedOutputs = utxo.outputs.filter((o) => {
+    const ownedOutputs = txUtxos.outputs.filter((o) => {
       return o.address === usedAddress;
     });
 
