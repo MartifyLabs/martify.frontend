@@ -10,16 +10,36 @@ const CollectionAbout = ({thisCollection}) => {
           <div className="card">
             <header className="card-header">
               <p className="card-header-title">
-                About {thisCollection.meta.name}
+                About {thisCollection.meta.name} 
+                {
+                  thisCollection.is_martify_verified ? (
+                    <span className="icon" data-tooltip="Martify Verified">
+                      <i className="fas fa-check-circle" style={{color:"gold"}}></i>
+                    </span>
+                  ) : <></>
+                }
+                {
+                  thisCollection.is_cnft_verified ? (
+                    <span className="icon" data-tooltip="CNFT Verified">
+                      <i className="fas fa-check-circle" style={{color:"green"}}></i>
+                    </span>
+                  ) : <></>
+                }
               </p>
             </header>
             <div className="card-content">
               <div className="content">
                 <p>{thisCollection.meta.description}</p>
-                Policy ID:
-                <pre>
-                  {thisCollection.policy_id}
-                </pre>
+                {
+                  thisCollection.policy_id ? (
+                    <>
+                      Policy ID:
+                      <pre>
+                        {thisCollection.policy_id.join("\n")}
+                      </pre>
+                    </>
+                  ) : <></>
+                }
               </div>
               <CollectionLinks collection={thisCollection} />
             </div>

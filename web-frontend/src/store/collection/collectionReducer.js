@@ -33,8 +33,11 @@ export default function collectionReducer(state = collectionobj, { type, payload
       var tmp_collections = {...state.collections};
 
       for(var collection_id in payload){
-        tmp_collections[collection_id] = payload[collection_id].policy_id
-        tmp_policies_collections[payload[collection_id].policy_id] = payload[collection_id];
+        tmp_collections[collection_id] = payload[collection_id]
+        for(var i in payload[collection_id].policy_id){
+          var policy_id = payload[collection_id].policy_id[i];
+          tmp_policies_collections[policy_id] = payload[collection_id];
+        }
       }
       return {
         ...state,

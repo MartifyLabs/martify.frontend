@@ -13,38 +13,110 @@
   top: 0px;
   // background-color: black;
   margin: 0 auto;
-  padding: 0;
+  padding: 0 1rem;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  // animation: spin var(--duration) var(--delay) linear infinite;
   transform-style: preserve-3d;
   perspective: 25rem;
 }
 
-.homepage_gallery .overlay{
-  height: 100%;
-  width: 100%;
+@mixin setImage($a, $x) {
+  --name: float-up-#{$a};
+  --duration: calc(20s * #{$a});
+  left: #{$x}vw;
+  z-index: -1 * $a;
+}
+
+.homepage_images {
+  --duration: 40s;
+  --name: float-up-1;
   position: absolute;
-  z-index: 99;
-}
-.homepage_gallery .overlay_dark{
-  background: rgba(0, 0, 0, .3);
+  top: 0;
+  left: 0;
+  width: 33vw;
+  transform: translateY(200vh);
+  animation: var(--name) var(--duration) linear infinite;
+  box-shadow: 1px 3px 15px rgba(0,0,0,0.5);
+  z-index: 1;
+
+  @for $i from 1 through 10 {
+    &:nth-child(#{$i}) {
+      animation-delay: ($i - 1) * -3s;
+    }
+  }
+  
+  &:nth-child(1)  { @include setImage(1,  0) }
+  &:nth-child(2)  { @include setImage(3, 10) }
+  &:nth-child(3)  { @include setImage(2, 90) }
+  &:nth-child(4)  { @include setImage(1, 36) }
+  &:nth-child(5)  { @include setImage(3, 62) }
+  &:nth-child(6)  { @include setImage(2, 15) }
+  &:nth-child(7)  { @include setImage(2, 55) }
+  &:nth-child(8)  { @include setImage(3,-20) }
+  &:nth-child(9)  { @include setImage(1, 68) }
+  &:nth-child(10) { @include setImage(2,  0) }
+  &:nth-child(11) { @include setImage(2,  10) }
+  &:nth-child(12) { @include setImage(2,  20) }
+  &:nth-child(13) { @include setImage(2,  30) }
+  &:nth-child(14) { @include setImage(2,  40) }
+  &:nth-child(15) { @include setImage(2,  50) }
 }
 
-.homepage .slogan{
-  font-family: JosefinSansMediumItalic;
-  text-shadow: 1px 1px 2px grey, 0 0 1em grey, 0 0 0.2em grey;
+@keyframes float-up-3 {
+  from {
+    transform: translateY(200vh) translateZ(-50vh);
+  }
+  to {
+    transform: translateY(-200vh) translateZ(-50vh);
+  }
 }
 
-.homepage .top-project-image{
-  height: 100%;
+@keyframes float-up-2 {
+  from {
+    transform: translateY(150vh) translateZ(-25vh);
+  }
+  to {
+    transform: translateY(-150vh) translateZ(-25vh);
+  }
 }
 
-.homepage .top-project-name{
-  font-size: 1rem;
+@keyframes float-up-1 {
+  from {
+    transform: translateY(100vh);
+  }
+  to {
+    transform: translateY(-100vh);
+  }
 }
 
-.homepage .rdt_TableRow{
-  padding: 10px;
+@keyframes spin {
+  10%,
+  100% {
+    transform: rotateY(360deg);
+  }
 }
 
+@keyframes shrink {
+  0% {
+    transform: scale(1) translateX(0);
+  }
+  2.5% {
+    transform: scale(0.75) translateX(5%);
+  }
+  7.5% {
+    transform: scale(0.75) translateX(-5%);
+  }
+  10%,
+  100% {
+    transform: scale(1);
+  }
+}
+
+
+.homepage .hero-foot a{
+  color: #000;
+  text-shadow: 1px 1px 2px white, 1px 1px 2px white, 1px 1px 2px white;
+  font-size: 1.25rem;
+}

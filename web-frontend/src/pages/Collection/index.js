@@ -11,71 +11,70 @@ import "./style.css";
 
 const Collection = ({state_collection, collection_id, get_listings}) => {
   
-  const [policyId, setPolicyId] = useState(false);
+  const [policyIds, setPolicyIds] = useState(false);
 
   const default_meta = {
-    is_verified: false,
     policy_id: false,
     meta: {
 
     },
     style: {
-      font_color_title: "#fff",
-      banner_path: "/images/collection/banner.jpg"
+      font_color_title: "#333",
+      banner_path: false
     },
     links: {}
   };
   const [thisCollection, setThisCollection] = useState(default_meta);
-
+  
   useEffect(() => {
     if(state_collection.loaded){
       if(collection_id in state_collection.collections || collection_id in state_collection.policies_collections){
-        let policy_id = collection_id;
   
         if(collection_id in state_collection.collections){
-          policy_id = state_collection.collections[collection_id];
-          setPolicyId(policy_id);
+          var policy_id = state_collection.collections[collection_id].policy_id;
+          setPolicyIds(policy_id);
         }else{
-          setPolicyId(collection_id);
+          setPolicyIds(collection_id);
         }
-  
-        var tmp = {...state_collection.policies_collections[policy_id]};
+        
+        var tmp = {...default_meta, ...state_collection.collections[collection_id]};
         setThisCollection(tmp);
       }
       else{
         var tmp = {...default_meta};
         tmp.policy_id = collection_id;
-        setPolicyId(collection_id);
+        setPolicyIds(collection_id);
         setThisCollection(tmp);
       }
     }
   }, [state_collection, collection_id]);
 
   useEffect(() => {
-    if(policyId){
-      get_listings(policyId, (res) => {});
+    if(policyIds){
+      for(var i in policyIds){
+        get_listings(policyIds[i], (res) => {});
+      }
     }
-  }, [policyId]);
+  }, [policyIds]);
   
   return (
     <div className="collection">
 
-      <CollectionBanner thisCollection={thisCollection} />
+      <CollectionBanner thisCollection={thisCollection} size={thisCollection.style.banner_path?"is-medium":"is-small"} />
       
       <section className="section">
         <div className="columns">
-          {
-            thisCollection.is_verified ? (
-              <div className="column is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
-                <div className="block">
-                  { thisCollection ? <CollectionAbout thisCollection={thisCollection} /> : <></> }
-                </div>
-              </div>
-            ) : <></>
-          }
-          <div className="column">
-            <ListingSection state_collection={state_collection} policyId={policyId} />
+          
+          <div className="column is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
+            <div className="block">
+              { thisCollection ? <CollectionAbout thisCollection={thisCollection} /> : <></> }
+            </div>
           </div>
+      
+          <div className="column">
+            <ListingSection state_collection={state_collection} policyIds={policyIds} />
+          </div>
+
         </div>
       </section>
 
@@ -83,21 +82,26 @@ const Collection = ({state_collection, collection_id, get_listings}) => {
   );
 };
 
-const ListingSection = ({state_collection, policyId}) => {
+const ListingSection = ({state_collection, policyIds}) => {
 
   const [listings, setListings] = useState([]);
 
   function load(){
     setListings([]);
-    if(policyId in state_collection.policies_assets){
-      let tmp = Object.values(state_collection.policies_assets[policyId]);
-      setListings(tmp);
+    let tmp_list = [];
+    for(var i in policyIds){
+      var policy_id = policyIds[i]
+      if(policy_id in state_collection.policies_assets){
+        let tmp = Object.values(state_collection.policies_assets[policy_id]);
+        tmp_list.push(...tmp);
+      }
     }
+    setListings(tmp_list);
   }
 
   useEffect(() => {
     load()
-  }, [policyId, state_collection]);
+  }, [policyIds, state_collection]);
 
   useEffect(() => {
     load()
@@ -109,7 +113,7 @@ return (
     listings.length > 0 ? <DisplayListing listings={listings} /> : <></>
   }
   {
-    listings.length == 0 ? <NoAssetFound state_collection={state_collection} policyId={policyId} /> : <></>
+    listings.length == 0 ? <NoAssetFound state_collection={state_collection} policyIds={policyIds} /> : <></>
   }
   </>
   );
@@ -264,7 +268,7 @@ return (
   );
 }
 
-const NoAssetFound = ({state_collection, policyId}) => {
+const NoAssetFound = ({state_collection, policyIds}) => {
   return (
     <section className="hero is-medium">
       <div className="hero-body">
@@ -287,7 +291,7 @@ const NoAssetFound = ({state_collection, policyId}) => {
             ) : <></>
           }
           {
-            !state_collection.loading && policyId in state_collection.policies_assets ? (
+            !state_collection.loading && policyIds ? policyIds.some(r=> Object.keys(state_collection.policies_assets).indexOf(r) >= 0) ? (
               <>
                 <h1>
                   <span className="icon" style={{fontSize:"100px", marginBottom:"50px"}}>
@@ -301,7 +305,7 @@ const NoAssetFound = ({state_collection, policyId}) => {
                   This policy ID does not exist or does not contain any assets.
                 </p>
               </>
-            ) : <></>
+            ) : <></> : <></>
           }
         </div>
       </div>

@@ -31,3 +31,7 @@ body{
   background-color: #fff;
   cursor: pointer;
 }
+
+.search .dropdown-menu{
+  width: 100%;
+}

@@ -102,6 +102,20 @@ const AssetHeader = ({asset, thisCollection}) => {
                 </Link>
               )
             }
+            {
+              thisCollection.is_martify_verified ? (
+                <span className="icon" data-tooltip="Martify Verified">
+                  <i className="fas fa-check-circle" style={{color:"gold"}}></i>
+                </span>
+              ) : <></>
+            }
+            {
+              thisCollection.is_cnft_verified ? (
+                <span className="icon" data-tooltip="CNFT Verified">
+                  <i className="fas fa-check-circle" style={{color:"green"}}></i>
+                </span>
+              ) : <></>
+            }
           </div>
         </div>
 
@@ -155,7 +169,7 @@ const Listing = ({asset, state_wallet, listToken, asset_add_offer}) => {
   return (
     <div className="block">
       { asset.info.asset in state_wallet.assets ? 
-        <OwnerListAsset asset={asset} listToken={listToken} /> : 
+        <OwnerListAsset state_wallet={state_wallet} asset={asset} listToken={listToken} /> : 
         <PurchaseAsset asset={asset} asset_add_offer={asset_add_offer} state_wallet={state_wallet} /> 
       }
     </div>
@@ -295,7 +309,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet}) => {
   )
 }
 
-const OwnerListAsset = ({asset, listToken}) => {
+const OwnerListAsset = ({state_wallet, asset, listToken}) => {
 
   const [userInputAmount, setUserInputAmount] = useState("");
   const [sendingBid, setSendingBid] = useState(false);
@@ -373,7 +387,6 @@ const OwnerListAsset = ({asset, listToken}) => {
             )
             : <></> : <></>
           }
-
         </nav>
         
         <div className="field has-addons">
@@ -383,6 +396,9 @@ const OwnerListAsset = ({asset, listToken}) => {
             disabled={sendingBid}
             />
             <span className="icon is-medium is-left">₳</span>
+            { state_wallet.data.collateral.length==0 ? 
+              <p className="help">Fund the wallet and add collateral (option in Nami).</p> : <></>
+            }
           </div>
           <div className="control">
             <button className="button is-info" onClick={() => list_this_token(userInputAmount)}
@@ -412,23 +428,47 @@ const AboutAsset = ({thisCollection, asset}) => {
         <div className="card-content">
           <table className="table">
             <tbody>
-            {
-              thisCollection ? (
-                <>
+              {
+                thisCollection ? (
+                  <>
+                    {
+                      thisCollection.asset_attributes ? 
+                        getArraysIntersection(thisCollection.asset_attributes,Object.keys(asset.info.onchainMetadata)).length > 0 ? 
+                          thisCollection.asset_attributes.map((attr, i) => {
+                            return(
+                              <ListAttributes asset={asset} attr={attr} key={i}/>
+                            )
+                          }) : <ListAllAttributes asset={asset}/> : <ListAllAttributes asset={asset}/>
+                    }
+                  </>
+                ) : (
+                  <ListAllAttributes asset={asset}/>
+                )
+              }
+              <tr>
+                <th className="attr">Policy ID</th>
+                <td>
+                  <nav className="level" style={{"marginBottom":"0px"}}>
+                    <div className="level-left">
+                      <div className="level-item">
+                        <pre>{asset.info.policyId}</pre>
+                      </div>
+                    </div>
+                    <div className="level-right">
+                      <div className="level-item">
+                        <a className="button social-icon" href={`${urls.cardanoscan}tokenPolicy/${asset.info.policyId}`} rel="noreferrer" target="_blank" data-tooltip="Check Cardanoscan" style={{marginLeft:"10px"}}>
+                          <span className="icon">
+                            <img src="/images/icons/cardanoscan.png"/>
+                          </span>
+                        </a>
+                      </div>
+                    </div>
+                  </nav>
                   {
-                    thisCollection.asset_attributes ? 
-                      getArraysIntersection(thisCollection.asset_attributes,Object.keys(asset.info.onchainMetadata)).length > 0 ? 
-                        thisCollection.asset_attributes.map((attr, i) => {
-                          return(
-                            <ListAttributes asset={asset} attr={attr} key={i}/>
-                          )
-                        }) : <ListAllAttributes asset={asset}/> : <ListAllAttributes asset={asset}/>
+                    thisCollection.is_martify_verified ? <span>This policy ID is verified by Martify.</span> : <></>
                   }
-                </>
-              ) : (
-                <ListAllAttributes asset={asset}/>
-              )
-            }
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
