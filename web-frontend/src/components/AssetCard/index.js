@@ -43,7 +43,7 @@ const AssetCard = ({asset, column_className, show_offer}) => {
                     <div className="media is-clipped">
                       <div className="media-content clipped">
                         <p className="subtitle is-size-7 clipped">
-                          {asset.collection.is_verified ? asset.collection.meta.name : asset.info.policyId}
+                          {asset.collection.is_martify_verified ? asset.collection.meta.name : asset.info.policyId}
                         </p>
                         <p className="title is-size-5 clipped">
                           {asset.info.onchainMetadata.name}

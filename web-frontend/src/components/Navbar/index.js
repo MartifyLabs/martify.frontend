@@ -1,7 +1,7 @@
 import React from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 // import "./style.css";
 
@@ -62,13 +62,11 @@ const Navbar = ({state_wallet}) => {
         <div className="navbar-end">
 
           <div className="navbar-item is-expanded">
-            <div className="control has-icons-left is-expanded">
+            
               {/* <input className="input" type="search" placeholder="Search..."/> */}
               <Search />
-              <span className="icon is-small is-left">
-                <i className="fa fa-search"></i>
-              </span>
-            </div>
+              
+            
           </div>
           
           <div className="navbar-item">

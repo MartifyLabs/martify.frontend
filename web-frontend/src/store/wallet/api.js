@@ -7,6 +7,7 @@ import {
   getUtxos,
   signTx,
   getWalletAddresses,
+  getCollateral,
 } from "../../cardano/wallet";
 
 import {
@@ -99,33 +100,37 @@ export const connectWallet = (callback) => async (dispatch) => {
               // dispatch(setWalletUsedAddr(used_address));
               connected_wallet.used_addr = used_address;
 
-              getWalletAddresses().then((res_walletaddr) => {
-                connected_wallet.wallet_address = res_walletaddr;
+              getCollateral().then((resCollateral) => {
+                connected_wallet.collateral = resCollateral;
 
-                getBalance().then((res) => {
-                  const balance = cbor.decode(res);
-                  // console.log("balance", balance);
+                getWalletAddresses().then((res_walletaddr) => {
+                  connected_wallet.wallet_address = res_walletaddr;
 
-                  let wallet_balance = 0;
-                  if (Number.isInteger(balance)) {
-                    wallet_balance = balance;
-                  } else {
-                    for (let i in balance) {
-                      if (Number.isInteger(balance[i])) {
-                        wallet_balance = balance[i];
-                        break;
+                  getBalance().then((res) => {
+                    const balance = cbor.decode(res);
+                    // console.log("balance", balance);
+
+                    let wallet_balance = 0;
+                    if (Number.isInteger(balance)) {
+                      wallet_balance = balance;
+                    } else {
+                      for (let i in balance) {
+                        if (Number.isInteger(balance[i])) {
+                          wallet_balance = balance[i];
+                          break;
+                        }
                       }
                     }
-                  }
-                  
-                  connected_wallet.wallet_balance = wallet_balance;
-                  // dispatch(setWalletBalance(wallet_balance));
+                    
+                    connected_wallet.wallet_balance = wallet_balance;
+                    // dispatch(setWalletBalance(wallet_balance));
 
-                  dispatch(walletConnected(connected_wallet));
+                    dispatch(walletConnected(connected_wallet));
 
-                  callback({
-                    success: true,
-                    data: connected_wallet,
+                    callback({
+                      success: true,
+                      data: connected_wallet,
+                    });
                   });
                 });
               });
@@ -221,8 +226,6 @@ export const get_wallet_assets = (callback) => async (dispatch) => {
 
   const wallet_assets = await getOwnedAssets();
   console.log("gotten wallet_assets", wallet_assets);
-
-
   
   // need to save `wallet_assets` into database. if this asset does not exist, store it. if it exist, just update it. in firebase, both store and update is the same concept. note, do not store `lovelace` in database
 
@@ -233,7 +236,6 @@ export const get_wallet_assets = (callback) => async (dispatch) => {
   var list_assets = Object.keys(wallet_assets).map(function(key){
     return wallet_assets[key].info ? wallet_assets[key].info : false;
   });
-  console.log(list_assets)
 
   await saveAssets(list_assets)
 

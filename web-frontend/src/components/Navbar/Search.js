@@ -3,7 +3,7 @@ import { compose } from "redux";
 import { connect } from "react-redux";
 import { useHistory } from 'react-router-dom';
 
-const Search = ({state_collection}) => {
+const Search = ({state_collection, size}) => {
 
   const history = useHistory();
   const [state, setState] = useState({
@@ -16,9 +16,8 @@ const Search = ({state_collection}) => {
   let data = [];
 
   for(var collection_id in state_collection.collections){
-    let policy_id = state_collection.collections[collection_id];
     data.push({
-      label: state_collection.policies_collections[policy_id].meta.name, value: collection_id
+      label: state_collection.collections[collection_id].meta.name, value: collection_id
     })
   }
 
@@ -93,9 +92,17 @@ const Search = ({state_collection}) => {
       setState({
         matches:
           query.length >= 2
-            ? data.filter(
-                item => item.label.toUpperCase().indexOf(query.toUpperCase()) >= 0
-              )
+            ? 
+            data.filter(function(item) {
+              if (this.count < 10 && item.label.toUpperCase().indexOf(query.toUpperCase()) >= 0) {
+                this.count++;
+                return true;
+              }
+              return false;
+            }, {count: 0})
+            // data.filter(
+            //     item => item.label.toUpperCase().indexOf(query.toUpperCase()) >= 0
+            //   )
             : [],
         query
       });
@@ -111,12 +118,12 @@ const Search = ({state_collection}) => {
   }
 
   return (
-    <div className="control">
-      <div className={`dropdown ${state.matches.length > 0 ? "is-active" : ""}`}>
-        <div className="dropdown-trigger">
+    <div className={"search control has-icons-left is-expanded " +(size?size:"")}>
+      <div className={`dropdown ${state.matches.length > 0 ? "is-active" : ""}`} style={{width:"100%"}}>
+        <div className="dropdown-trigger" style={{width:"100%"}}>
           <input
             type="text"
-            className="input"
+            className={"input is-rounded " +(size?size:"")}
             value={state.query}
             onChange={updateQuery}
             onKeyDown={handleKeyPress}
@@ -143,6 +150,9 @@ const Search = ({state_collection}) => {
           )}
         </div>
       </div>
+      <span className={"icon is-left"} style={size ? size=="is-large" ? {height:"60px",width:"60px"} : {} : {}}>
+        <i className="fa fa-search" style={size ? size=="is-large" ? {fontSize:"25px"} : {} : {}}></i>
+      </span>
     </div>
   );
 };

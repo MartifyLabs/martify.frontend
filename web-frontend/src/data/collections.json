@@ -1,7 +1,9 @@
 {
-  "pixelhead": {
-    "id": "pixelhead",
-    "policy_id": "9236a326ec65243627d89f60921a42314d0cd407c002280499e1f88b",
+  "thepixelheadsquad": {
+    "id": "thepixelheadsquad",
+    "policy_id": [
+      "9236a326ec65243627d89f60921a42314d0cd407c002280499e1f88b"
+    ],
     "meta": {
       "name": "The Pixel Head Squad",
       "description": "The Pixel Head Squad was created by a team of Cardano NFT enthusiasts. After many months in the space, we were spurred to explore new ways to bring an exciting twist to collectable NFT pieces, both in the form of art and tech."
@@ -17,18 +19,5 @@
       "website": "https://pixelhead.io/"
     },
     "asset_attributes": ["creature name", "narrative", "description"]
-  },
-  "cardanotrees": {
-    "id": "cardanotrees",
-    "policy_id": "abcxyz",
-    "meta": {
-      "name": "Cardano Trees"
-    },
-    "style":{
-      "banner": "banner.gif"
-    },
-    "links": {
-      "website": "https://cardanotrees.io/"
-    }
   }
 }

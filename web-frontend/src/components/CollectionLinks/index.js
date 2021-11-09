@@ -34,13 +34,13 @@ const CollectionLinks = ({collection}) => {
         })
       }
       
-      <p className="control">
+      {/* <p className="control">
         <a className="button social-icon" href={`${urls.cardanoscan}tokenPolicy/${collection.policy_id}`} rel="noreferrer" target="_blank" data-tooltip="Check Cardanoscan">
           <span className="icon">
             <img src="/images/icons/cardanoscan.png"/>
           </span>
         </a>
-      </p>
+      </p> */}
     </div>
   );
 };
