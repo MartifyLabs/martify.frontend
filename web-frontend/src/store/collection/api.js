@@ -2,6 +2,7 @@ import {
   collections_loaded,
   collections_add_tokens,
   collections_loading,
+  collections_top_projects,
 } from "./collectionActions";
 
 import data_collections from "../../data/collections.json";
@@ -11,9 +12,11 @@ import {
   getAssets,
   getAsset,
   saveAsset,
+  getRandomAssets,
 } from "../../database";
 
 import { getWalletAddresses } from "../../cardano/wallet";
+import { getAssetsPolicy , getAssetTransactions } from "../../cardano/blockfrost-api";
 
 export const load_collection = (callback) => async (dispatch) => {
 
@@ -58,7 +61,11 @@ export const get_listings = (policy_id, callback) => async (dispatch) => {
   let assets = await getAssets(policy_id);
   for(var i in assets){
     let asset = assets[i];
-    output.listing[asset.info.asset] = asset;
+    if(asset){
+      if(asset.info){
+        output.listing[asset.info.asset] = asset;
+      }
+    }
   }
   
   if(output.policy_id && output.listing){
@@ -110,4 +117,77 @@ export const asset_add_offer = (asset_id, price, callback) => async (dispatch) =
   add_token(asset, dispatch)
 
   callback(true);
+}
+
+export const get_random_assets = (callback) => async (dispatch) => {
+  let assets = await getRandomAssets(10);
+  callback(assets);
+}
+
+
+export const get_assets_in_policy = (policies, callback) => async (dispatch) => {
+  // console.log(policies)
+
+  // for(var i in policies){
+  //   var policy_id = policies[i];
+  //   console.log("policy_id", i, policy_id)
+  //   var res = await getAssetsPolicy(policy_id);
+  //   console.log(res)
+  // }
+  callback(true);
+}
+
+export const get_asset_transactions = (asset, callback) => async (dispatch) => {
+
+  // let asset_id = asset.info.asset;
+  // console.log(asset_id)
+
+  // var res = await getAssetTransactions(asset_id);
+  // console.log(res)
+
+  
+
+
+  // console.log(policies)
+
+  // for(var i in policies){
+  //   var policy_id = policies[i];
+  //   console.log("policy_id", i, policy_id)
+  //   var res = await getAssetsPolicy(policy_id);
+  //   console.log(res)
+  // }
+
+  callback(true);
+}
+
+
+
+
+export const get_top_projects = (time, callback) => async (dispatch) => {
+  fetch('https://api.opencnft.io/1/rank?window='+time, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(res => res.json())
+  .then((res) => {
+    dispatch(collections_top_projects(res.ranking));
+    callback({success: true, data: res.ranking});
+  });
+}
+
+export const opencnft_get_policy = (policy_id, callback) => async (dispatch) => {
+  fetch(`https://api.opencnft.io/1/policy/${policy_id}`, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(res => res.json())
+  .then((res) => {
+    callback({success: true, data: res});
+  });
 }

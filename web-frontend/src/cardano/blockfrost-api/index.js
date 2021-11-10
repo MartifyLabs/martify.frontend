@@ -113,3 +113,36 @@ const request = async (base, endpoint, headers, body) => {
     body,
   }).then((res) => res.json());
 };
+
+
+/**
+ * Assets
+ */
+
+export const getAssetsPolicy = async (policy_id) => {
+  try {
+    const response = await cardano(`assets/policy/${policy_id}`);
+    return response;
+  } catch (error) {
+    console.error(
+      `Unexpected error in getTxUtxos. [Message: ${error.message}]`
+    );
+  }
+};
+
+export const getAssetTransactions = async (asset) => {
+  try {
+    const response = await cardano(`assets/${asset}/transactions?order=desc`);
+    for(var i in response){
+      console.log(response[i].tx_hash)
+      var tx = await getTxUtxos(response[i].tx_hash);
+      console.log(tx)
+      break
+    }
+    return response;
+  } catch (error) {
+    console.error(
+      `Unexpected error in getTxUtxos. [Message: ${error.message}]`
+    );
+  }
+};

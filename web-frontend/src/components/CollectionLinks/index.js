@@ -21,6 +21,7 @@ const CollectionLinks = ({collection}) => {
   return (
     <div className="field has-addons social-links">
       {
+        collection ? collection.links ? 
         Object.keys(collection.links).map(function (key) {
           return (
             <p className="control" key={key}>
@@ -31,7 +32,7 @@ const CollectionLinks = ({collection}) => {
               </a>
             </p>
           )
-        })
+        }) : <></> : <></>
       }
       
       {/* <p className="control">

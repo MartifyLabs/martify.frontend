@@ -3,7 +3,7 @@ import { compose } from "redux";
 import { connect } from "react-redux";
 import { useHistory } from 'react-router-dom';
 
-const Search = ({state_collection, size}) => {
+const Search = ({state_collection, size, placeholder}) => {
 
   const history = useHistory();
   const [state, setState] = useState({
@@ -127,7 +127,7 @@ const Search = ({state_collection, size}) => {
             value={state.query}
             onChange={updateQuery}
             onKeyDown={handleKeyPress}
-            placeholder="Search"
+            placeholder={placeholder?placeholder:"Search..."}
             ref={searchTbRef}
           />
         </div>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./style.css";
+import AssetImageFigure from "../AssetImageFigure";
 
 const AssetCard = ({asset, column_className, show_offer}) => {
   return (
@@ -14,9 +15,7 @@ const AssetCard = ({asset, column_className, show_offer}) => {
               <Link to={`/assets/${asset.info.policyId}/${asset.info.asset}`}>
                 <div className="card asset_card">
                   <div className="card-image">
-                    <figure className="image is-square">
-                      <img src={"https://infura-ipfs.io/ipfs/"+asset.info.onchainMetadata.image} alt={asset.info.onchainMetadata.assetName}/>
-                    </figure>
+                    <AssetImageFigure asset={asset}/>
                   </div>
                   <div className="card-content">
                     {
@@ -43,7 +42,10 @@ const AssetCard = ({asset, column_className, show_offer}) => {
                     <div className="media is-clipped">
                       <div className="media-content clipped">
                         <p className="subtitle is-size-7 clipped">
-                          {asset.collection.is_martify_verified ? asset.collection.meta.name : asset.info.policyId}
+                          {asset.collection.is_martify_verified ? asset.collection.meta.name : 
+                          asset.collection.is_cnft_verified ? asset.collection.is_cnft_verified :
+                          asset.info.policyId
+                          }
                         </p>
                         <p className="title is-size-5 clipped">
                           {asset.info.onchainMetadata.name}

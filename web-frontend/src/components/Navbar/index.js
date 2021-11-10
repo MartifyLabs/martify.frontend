@@ -1,7 +1,7 @@
 import React from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
-// import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 // import "./style.css";
 
@@ -13,7 +13,7 @@ const Navbar = ({state_wallet}) => {
     <nav className="navbar is-fixed-top is-transparent has-shadow">
       <div className="navbar-brand">
         <a className="navbar-item" href="/">
-          <img src="https://bulma.io/images/bulma-logo.png" alt="Market place" width="112" height="28"/>
+          <img src="/images/martify-logo-black-yellow.png" alt="Market place" width="112" height="28"/>
         </a>
         {/* <div className="navbar-burger" data-target="navbarExampleTransparentExample">
           <span></span>
@@ -24,8 +24,13 @@ const Navbar = ({state_wallet}) => {
 
       <div className="navbar-menu">
 
-        {/* <div className="navbar-start">
-          <a className="navbar-item" href="https://bulma.io/">
+        <div className="navbar-start">
+
+          <Link className="navbar-item" to="about">About</Link>
+          <Link className="navbar-item" to="faq">FAQ</Link>
+          <Link className="navbar-item" to="howitworks">How It Works</Link>
+
+          {/* <a className="navbar-item" href="https://bulma.io/">
             Home
           </a>
           <div className="navbar-item has-dropdown is-hoverable">
@@ -56,17 +61,13 @@ const Navbar = ({state_wallet}) => {
                 Components
               </a>
             </div>
-          </div>
-        </div> */}
+          </div> */}
+        </div>
 
         <div className="navbar-end">
 
           <div className="navbar-item is-expanded">
-            
-              {/* <input className="input" type="search" placeholder="Search..."/> */}
-              <Search />
-              
-            
+            <Search />
           </div>
           
           <div className="navbar-item">

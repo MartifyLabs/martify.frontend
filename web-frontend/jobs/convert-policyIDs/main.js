@@ -20,7 +20,7 @@ function add_project(output, data){
     if(data.policies[0].length>10){
       let this_project = {
         "id": project_id,
-        "policy_ids": data.policies,
+        "policy_id": data.policies,
         "meta": {
           "name": data.project
         }
