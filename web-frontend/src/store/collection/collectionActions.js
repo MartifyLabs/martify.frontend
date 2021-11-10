@@ -18,3 +18,10 @@ export function collections_loading(payload) {
     payload: payload,
   };
 }
+
+export function collections_top_projects(payload) {
+  return {
+    type: types.COLLECTIONS_TOP_PROJECTS,
+    payload: payload,
+  };
+}

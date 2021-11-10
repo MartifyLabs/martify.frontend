@@ -13,13 +13,21 @@
   top: 0px;
   // background-color: black;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
   // animation: spin var(--duration) var(--delay) linear infinite;
   transform-style: preserve-3d;
   perspective: 25rem;
+}
+
+.homepage_gallery .overlay{
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, .3);
+  position: absolute;
+  z-index: 99;
 }
 
 @mixin setImage($a, $x) {
@@ -30,12 +38,12 @@
 }
 
 .homepage_images {
-  --duration: 40s;
+  --duration: 30s;
   --name: float-up-1;
   position: absolute;
   top: 0;
   left: 0;
-  width: 33vw;
+  width: 23vw;
   transform: translateY(200vh);
   animation: var(--name) var(--duration) linear infinite;
   box-shadow: 1px 3px 15px rgba(0,0,0,0.5);
@@ -43,13 +51,23 @@
 
   @for $i from 1 through 10 {
     &:nth-child(#{$i}) {
-      animation-delay: ($i - 1) * -3s;
+      animation-delay: ($i - 1) * -1s;
     }
   }
   
+  // &:nth-child(1)  { @include setImage(1,  0) }
+  // &:nth-child(2)  { @include setImage(3, 10) }
+  // &:nth-child(3)  { @include setImage(2, 90) }
+  // &:nth-child(4)  { @include setImage(1, 26) }
+  // &:nth-child(5)  { @include setImage(3, 100) }
+  // &:nth-child(6)  { @include setImage(1, 5) }
+  // &:nth-child(7)  { @include setImage(2, 55) }
+  // &:nth-child(8)  { @include setImage(3,-20) }
+  // &:nth-child(9)  { @include setImage(1, 52) }
+  // &:nth-child(10) { @include setImage(2,  30) }
   &:nth-child(1)  { @include setImage(1,  0) }
   &:nth-child(2)  { @include setImage(3, 10) }
-  &:nth-child(3)  { @include setImage(2, 90) }
+  &:nth-child(3)  { @include setImage(2, 100) }
   &:nth-child(4)  { @include setImage(1, 36) }
   &:nth-child(5)  { @include setImage(3, 62) }
   &:nth-child(6)  { @include setImage(2, 15) }
@@ -57,19 +75,15 @@
   &:nth-child(8)  { @include setImage(3,-20) }
   &:nth-child(9)  { @include setImage(1, 68) }
   &:nth-child(10) { @include setImage(2,  0) }
-  &:nth-child(11) { @include setImage(2,  10) }
-  &:nth-child(12) { @include setImage(2,  20) }
-  &:nth-child(13) { @include setImage(2,  30) }
-  &:nth-child(14) { @include setImage(2,  40) }
-  &:nth-child(15) { @include setImage(2,  50) }
 }
 
 @keyframes float-up-3 {
   from {
-    transform: translateY(200vh) translateZ(-50vh);
+    transform: translateY(200vh) translateZ(-30vh);
+    z-index: -12;
   }
   to {
-    transform: translateY(-200vh) translateZ(-50vh);
+    transform: translateY(-200vh) translateZ(-30vh);
   }
 }
 
@@ -85,6 +99,7 @@
 @keyframes float-up-1 {
   from {
     transform: translateY(100vh);
+    z-index: -10;
   }
   to {
     transform: translateY(-100vh);
@@ -115,8 +130,14 @@
 }
 
 
+
 .homepage .hero-foot a{
   color: #000;
   text-shadow: 1px 1px 2px white, 1px 1px 2px white, 1px 1px 2px white;
   font-size: 1.25rem;
+}
+
+.homepage .slogan{
+  font-family: JosefinSansMediumItalic;
+  text-shadow: 1px 1px 2px grey, 0 0 1em grey, 0 0 0.2em grey;
 }

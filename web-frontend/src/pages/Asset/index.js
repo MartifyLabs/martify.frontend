@@ -4,16 +4,17 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
 import { urls } from "../../config";
-import { load_collection, get_asset, asset_add_offer } from "../../store/collection/api";
+import { load_collection, get_asset, asset_add_offer, get_asset_transactions } from "../../store/collection/api";
 import { listToken } from "../../store/market/api";
 
 import ButtonBuy from "../../components/ButtonBuy";
 import CollectionAbout from "../../components/CollectionAbout";
 import CollectionBanner from "../../components/CollectionBanner";
+import AssetImageFigure from "../../components/AssetImageFigure";
 
 import "./style.css";
 
-const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, listToken, asset_add_offer}) => {
+const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, listToken, asset_add_offer, get_asset_transactions}) => {
 
   const [asset, setAsset] = useState(false);
   const [thisCollection, setThisCollection] = useState(false);
@@ -45,7 +46,7 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
   return (
     <>
       {
-        thisCollection ? <CollectionBanner thisCollection={thisCollection} size="is-small" /> : <></>
+        thisCollection && asset ? <CollectionBanner thisCollection={thisCollection} size="is-small" asset={asset} /> : <></>
       }
       {
         asset ? (
@@ -65,6 +66,8 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
                     <AboutAsset thisCollection={thisCollection} asset={asset} />
 
                     { thisCollection ? <CollectionAbout thisCollection={thisCollection} /> : <></> }
+
+                    {/* <Transactions asset={asset} get_asset_transactions={get_asset_transactions} /> */}
                     
                     <AssetRawMetaData asset={asset} />
                     
@@ -107,10 +110,7 @@ const AssetHeader = ({asset, thisCollection}) => {
                 <span className="icon" data-tooltip="Martify Verified">
                   <i className="fas fa-check-circle" style={{color:"gold"}}></i>
                 </span>
-              ) : <></>
-            }
-            {
-              thisCollection.is_cnft_verified ? (
+              ) : thisCollection.is_cnft_verified ? (
                 <span className="icon" data-tooltip="CNFT Verified">
                   <i className="fas fa-check-circle" style={{color:"green"}}></i>
                 </span>
@@ -465,7 +465,9 @@ const AboutAsset = ({thisCollection, asset}) => {
                     </div>
                   </nav>
                   {
-                    thisCollection.is_martify_verified ? <span>This policy ID is verified by Martify.</span> : <></>
+                    thisCollection.is_martify_verified ? <span className="is-size-7">This policy ID is verified by Martify.</span> : 
+                    thisCollection.is_cnft_verified ? <span className="is-size-7">This policy ID is verified on CNFT.</span> : 
+                    <></>
                   }
                 </td>
               </tr>
@@ -486,7 +488,20 @@ const ListAttributes = ({asset, attr}) => {
           <th className="attr">{attr}</th>
           <td>
             {
-              typeof(asset.info.onchainMetadata[attr])=="object" ? asset.info.onchainMetadata[attr].join(" ") : asset.info.onchainMetadata[attr]
+              typeof(asset.info.onchainMetadata[attr])=="object" ? (
+                <table className="table is-narrow">
+                  <tbody>
+                  {
+                    asset.info.onchainMetadata[attr]
+                    .map((att, i) => {
+                      return(
+                        <tr key={i}><td>{att}</td></tr>
+                      )
+                    }
+                  )}
+                  </tbody>
+                </table> 
+              ) : asset.info.onchainMetadata[attr]
             }
           </td>
         </tr>
@@ -580,26 +595,7 @@ const AssetImage = ({asset}) => {
   )
 }
 
-const AssetImageFigure = ({asset, setShow, show_trigger}) => {
 
-  function get_src(image){
-    if(image.includes("ipfs://")){
-      return "https://infura-ipfs.io/ipfs/" + image.split("ipfs://")[0];
-    }
-    else if(image.length==46){
-      return "https://infura-ipfs.io/ipfs/" + image;
-    }
-    else{
-      return image;
-    }
-  }
-
-  return (
-    <figure className="image is-square" onClick={() => setShow(show_trigger?show_trigger:false)} style={{cursor:"pointer"}}>
-      <img src={get_src(asset.info.onchainMetadata.image)} alt={asset.info.onchainMetadata.name}/>
-    </figure>
-  )
-}
 
 const NoAssetFound = ({state_collection, policy_id, asset_id}) => {
   return (
@@ -644,6 +640,44 @@ const NoAssetFound = ({state_collection, policy_id, asset_id}) => {
   )
 }
 
+
+// const Transactions = ({asset, get_asset_transactions}) => {
+
+//   const [fetching, setFetching] = useState(false);
+
+//   function feteh_update(){
+//     setFetching(true);
+    
+//     get_asset_transactions(asset, (res) => {
+//       setFetching(false);
+//     });
+//   }
+  
+//   return (
+//     <div className="block">
+//       <div className="card">
+//       <header className="card-header">
+//         <p className="card-header-title">
+//           Transactions
+//         </p>
+//         <button className="card-header-icon" aria-label="more options" onClick={() => feteh_update()}>
+//           <span className="icon">  
+//             <i class={"fas fa-sync " + (fetching?"icn-spinner":"")}></i>
+//           </span>
+//         </button>
+//       </header>
+//         <div className="card-content">
+//           <table className="table">
+//             <tbody>
+              
+//             </tbody>
+//           </table>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
+
 const ShowNoAssetFound = () => {
   return (
     <>
@@ -677,6 +711,7 @@ function mapDispatchToProps(dispatch) {
     get_asset: (policy_id, asset_id, callback) => dispatch(get_asset(policy_id, asset_id, callback)),
     listToken: (asset, price, callback) => dispatch(listToken(asset, price, callback)),
     asset_add_offer: (asset_id, price, callback) => dispatch(asset_add_offer(asset_id, price, callback)),
+    get_asset_transactions: (asset, callback) => dispatch(get_asset_transactions(asset, callback)),
   };
 }
 

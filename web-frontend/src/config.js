@@ -1,13 +1,18 @@
 // TODO: store configuration in firebase
 
 /* production */
+export const apiKey = "mainnet7QfcsX9AVOzWMay1QM1URdTftBp27hQD";
+export const cardanoUrl = "https://cardano-mainnet.blockfrost.io/api/v0/";
 
 /* development */
 export const api_host = "http://localhost:4000";
 // Blockfrost
-export const apiKey = "testnetAWfuCqaLZ5KtOSslc8ZTZyEWj36We8h7";
-export const cardanoUrl = "https://cardano-testnet.blockfrost.io/api/v0/";
+// export const apiKey = "testnetAWfuCqaLZ5KtOSslc8ZTZyEWj36We8h7";
+// export const cardanoUrl = "https://cardano-testnet.blockfrost.io/api/v0/";
 export const ipfsUrl = "https://ipfs.blockfrost.io/api/v0/";
+
+
+
 // Firebase
 // export const firebaseOptions = {
 //   apiKey: "AIza....", // Auth / General Use

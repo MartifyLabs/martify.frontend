@@ -2,6 +2,11 @@ body{
   cursor: default;
 }
 
+@font-face {
+  font-family: JosefinSansMediumItalic;
+  src: url(./assets/fonts/Josefin_Sans/static/JosefinSans-MediumItalic.ttf);
+}
+
 .notification-window{
   border-radius: .375em;
   bottom: 1em;
@@ -34,4 +39,23 @@ body{
 
 .search .dropdown-menu{
   width: 100%;
+}
+
+.icn-spinner {
+  animation: spin-animation 0.5s infinite;
+  display: inline-block;
+}
+
+@keyframes spin-animation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}
+
+.search input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #111111;
+  opacity: 0.7;
 }
