@@ -92,13 +92,10 @@ export const purchase = async (tn, cs, price, sellerAddress, scriptUtxo) => {
   outputs.add(
     await createTxOutput(
       walletAddress.to_address(),
-      scriptUtxo.output().amount(),
-      {
-        datum: offerDatum,
-        index: 0
-      }
+      scriptUtxo.output().amount()
     )
   );
+
   outputs.add(
     await createTxOutput(
       sa.to_address(),
