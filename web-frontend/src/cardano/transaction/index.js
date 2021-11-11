@@ -132,7 +132,14 @@ export const finalizeTx = async ({
       Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
     );
 
-    setCollateral(txBuilder, collateral);
+    //setCollateral(txBuilder, collateral);
+    const inputs = Cardano.Instance.TransactionInputs.new();
+
+    collateral.forEach((utxo) => {
+      inputs.add(utxo.input());
+    });
+
+    txBuilder.set_collateral(inputs);
 
     transactionWitnessSet.set_plutus_scripts(plutusScripts);
     transactionWitnessSet.set_plutus_data(datums);
