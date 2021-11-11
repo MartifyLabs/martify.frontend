@@ -246,20 +246,25 @@ export const get_wallet_assets = (callback) => async (dispatch) => {
   dispatch(setWalletAssets(wallet_assets));
 
   // TEMP
-  const utxos = await getLockedAssetUtxos(
-    await contractAddress(),
-    "9236a326ec65243627d89f60921a42314d0cd407c002280499e1f88b506978656c4865616430303142657461"
-  );
-  console.log("utxos", utxos);
-  const scriptUtxo = await createTxUnspentOutput(utxos[0]);
-  let txHash = await purchase(
-    "506978656c4865616430303142657461",
-    "9236a326ec65243627d89f60921a42314d0cd407c002280499e1f88b",
-    "5",
-    "addr_test1qrsea3gp4svseqz25htcdk3x6jn0xlhpqdtzkq3tx68plnrk6swlz45fv76s89g6ewcennvckqkep36767kwpzchr4nq5yz5ky",
-    scriptUtxo
-  );
-  console.log("txHash", txHash);
+  try {
+    const utxos = await getLockedAssetUtxos(
+      await contractAddress(),
+      "9236a326ec65243627d89f60921a42314d0cd407c002280499e1f88b506978656c4865616430303142657461"
+    );
+    console.log("utxos", utxos);
+    const scriptUtxo = await createTxUnspentOutput(utxos[0]);
+    let txHash = await purchase(
+      "506978656c4865616430303142657461",
+      "9236a326ec65243627d89f60921a42314d0cd407c002280499e1f88b",
+      "5",
+      "addr_test1qrsea3gp4svseqz25htcdk3x6jn0xlhpqdtzkq3tx68plnrk6swlz45fv76s89g6ewcennvckqkep36767kwpzchr4nq5yz5ky",
+      scriptUtxo
+    );
+    console.log("txHash", txHash);
+  } catch (error) {
+    console.error("TESTING BUY ENDPOINT: ", error);
+  }
+  
   // TEMP
 
   callback({ success: true, assets: wallet_assets });
