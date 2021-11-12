@@ -14,8 +14,8 @@ export const BUY = async (index) => {
     Cardano.Instance.BigNum.from_str(index),
     data,
     Cardano.Instance.ExUnits.new(
-      Cardano.Instance.BigNum.from_str("7000000"),
-      Cardano.Instance.BigNum.from_str("3000000000")
+      Cardano.Instance.BigNum.from_str("2500000"),
+      Cardano.Instance.BigNum.from_str("800000000")
     )
   );
 
@@ -36,8 +36,8 @@ export const CANCEL = async (index) => {
     Cardano.Instance.BigNum.from_str(index),
     data,
     Cardano.Instance.ExUnits.new(
-      Cardano.Instance.BigNum.from_str("5000000"),
-      Cardano.Instance.BigNum.from_str("2000000000")
+      Cardano.Instance.BigNum.from_str("2500000"),
+      Cardano.Instance.BigNum.from_str("800000000")
     )
   );
 

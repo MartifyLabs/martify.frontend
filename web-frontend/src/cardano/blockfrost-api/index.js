@@ -59,12 +59,12 @@ export const getLockedUtxos = async (address) => {
  * @param {string} address - address must be in bech_32 format.
  * @param {string} asset - asset is a Concatenation of the policy_id and hex-encoded asset_name.
  */
-export const getLockedUtxosForAsset = async (address, asset) => {
+export const getLockedUtxosByAsset = async (address, asset) => {
   try {
     return await cardano(`addresses/${address}/utxos/${asset}`);
   } catch (error) {
     console.error(
-      `Unexpected error in getLockedUtxosForAsset. [Message: ${error.message}]`
+      `Unexpected error in getLockedUtxosByAsset. [Message: ${error.message}]`
     );
   }
 };

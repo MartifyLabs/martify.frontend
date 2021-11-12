@@ -4,12 +4,7 @@ import { getProtocolParameters } from "../blockfrost-api";
 import CoinSelection from "./coinSelection";
 import { languageViews } from "./languageViews";
 import { fromHex, toHex } from "../../utils";
-import { contractAddress } from "../market-contract";
-
-const DATUM_LABEL = 405;
-const ADDRESS_LABEL = 406;
-
-
+import { contractAddress } from "../market-contract/validator";
 
 export const assetsToValue = async (assets) => {
   await Cardano.load();
@@ -49,8 +44,8 @@ export const assetsToValue = async (assets) => {
 
 export const initializeTx = async () => {
   await Cardano.load();
+  const metadata = {};
   const Parameters = await getProtocolParameters();
-  const metadata = { [DATUM_LABEL]: {}, [ADDRESS_LABEL]: {} };
 
   const txBuilder = Cardano.Instance.TransactionBuilder.new(
     Cardano.Instance.LinearFee.new(
@@ -132,14 +127,7 @@ export const finalizeTx = async ({
       Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
     );
 
-    //setCollateral(txBuilder, collateral);
-    const inputs = Cardano.Instance.TransactionInputs.new();
-
-    collateral.forEach((utxo) => {
-      inputs.add(utxo.input());
-    });
-
-    txBuilder.set_collateral(inputs);
+    await setCollateral(txBuilder, collateral);
 
     transactionWitnessSet.set_plutus_scripts(plutusScripts);
     transactionWitnessSet.set_plutus_data(datums);
