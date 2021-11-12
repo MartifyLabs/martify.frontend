@@ -9,8 +9,7 @@ let collectionobj = {
   policies_assets: {},
 };
 
-function update_tokens(token, asset_id, policy_id, state_policies_collections){
-
+function update_tokens(token, policy_id, state_policies_collections){
   if(token){
     if(policy_id in state_policies_collections){
       token.collection = state_policies_collections[policy_id];
@@ -21,7 +20,6 @@ function update_tokens(token, asset_id, policy_id, state_policies_collections){
       token.listing ? {...token.listing} : {}
     ;
   }
-  
   return token;
 }
 
@@ -34,8 +32,8 @@ export default function collectionReducer(state = collectionobj, { type, payload
 
       for(var collection_id in payload){
         tmp_collections[collection_id] = payload[collection_id]
-        for(var i in payload[collection_id].policy_id){
-          var policy_id = payload[collection_id].policy_id[i];
+        for(var i in payload[collection_id].policy_ids){
+          var policy_id = payload[collection_id].policy_ids[i];
           tmp_policies_collections[policy_id] = payload[collection_id];
         }
       }
@@ -71,7 +69,7 @@ export default function collectionReducer(state = collectionobj, { type, payload
       var new_tokens = {...payload.listing};
 
       for(var asset_id in new_tokens){
-        new_tokens[asset_id] = update_tokens(new_tokens[asset_id], asset_id, payload.policy_id, state.policies_collections);
+        new_tokens[asset_id] = update_tokens(new_tokens[asset_id], payload.policy_id, state.policies_collections);
       }
 
       if(!(payload.policy_id in tmp)){
@@ -103,7 +101,7 @@ export default function collectionReducer(state = collectionobj, { type, payload
             tmp_policies_assets_policy = {...tmp_policies_assets[policy_id]};
           }
 
-          this_asset = update_tokens(this_asset, asset_id, policy_id, state.policies_collections);
+          this_asset = update_tokens(this_asset, policy_id, state.policies_collections);
 
           tmp_policies_assets_policy[asset_id] = this_asset;
 

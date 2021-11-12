@@ -31,11 +31,11 @@ const CollectionAbout = ({thisCollection}) => {
               <div className="content">
                 <p>{thisCollection.meta.description}</p>
                 {
-                  thisCollection.policy_id ? (
+                  thisCollection.policy_ids ? (
                     <>
                       Policy ID:
                       <pre>
-                        {thisCollection.policy_id.join("\n")}
+                        {thisCollection.policy_ids.join("\n")}
                       </pre>
                     </>
                   ) : <></>

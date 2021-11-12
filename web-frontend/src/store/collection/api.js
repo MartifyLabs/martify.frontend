@@ -36,7 +36,7 @@ export const load_collection = (callback) => async (dispatch) => {
   for(var collection_id in data_collections_cnft){
     var tmp = data_collections_cnft[collection_id];
     if(tmp.id in all_collections){
-      all_collections[tmp.id].policy_id = [...all_collections[tmp.id].policy_id, ...tmp.policy_id];
+      all_collections[tmp.id].policy_ids = [...all_collections[tmp.id].policy_ids, ...tmp.policy_ids];
     }else{
       tmp.is_cnft_verified = true;
       all_collections[collection_id] = tmp;
@@ -85,7 +85,7 @@ function add_token(asset, dispatch){
   dispatch(collections_add_tokens(output));
 }
 
-export const get_asset = (policy_id, asset_id, callback) => async (dispatch) => {
+export const get_asset = (asset_id, callback) => async (dispatch) => {
 
   dispatch(collections_loading(true));
   
@@ -125,45 +125,8 @@ export const get_random_assets = (callback) => async (dispatch) => {
 }
 
 
-export const get_assets_in_policy = (policies, callback) => async (dispatch) => {
-  // console.log(policies)
 
-  // for(var i in policies){
-  //   var policy_id = policies[i];
-  //   console.log("policy_id", i, policy_id)
-  //   var res = await getAssetsPolicy(policy_id);
-  //   console.log(res)
-  // }
-  callback(true);
-}
-
-export const get_asset_transactions = (asset, callback) => async (dispatch) => {
-
-  // let asset_id = asset.info.asset;
-  // console.log(asset_id)
-
-  // var res = await getAssetTransactions(asset_id);
-  // console.log(res)
-
-  
-
-
-  // console.log(policies)
-
-  // for(var i in policies){
-  //   var policy_id = policies[i];
-  //   console.log("policy_id", i, policy_id)
-  //   var res = await getAssetsPolicy(policy_id);
-  //   console.log(res)
-  // }
-
-  callback(true);
-}
-
-
-
-
-export const get_top_projects = (time, callback) => async (dispatch) => {
+export const opencnft_get_top_projects = (time, callback) => async (dispatch) => {
   fetch('https://api.opencnft.io/1/rank?window='+time, {
     method: 'GET',
     headers: {
@@ -173,13 +136,26 @@ export const get_top_projects = (time, callback) => async (dispatch) => {
   })
   .then(res => res.json())
   .then((res) => {
-    dispatch(collections_top_projects(res.ranking));
     callback({success: true, data: res.ranking});
   });
 }
 
 export const opencnft_get_policy = (policy_id, callback) => async (dispatch) => {
   fetch(`https://api.opencnft.io/1/policy/${policy_id}`, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(res => res.json())
+  .then((res) => {
+    callback({success: true, data: res});
+  });
+}
+
+export const opencnft_get_asset_tx = (asset_id, callback) => async (dispatch) => {
+  fetch(`https://api.opencnft.io/1/asset/${asset_id}/tx`, {
     method: 'GET',
     headers: {
       'Accept': 'application/json',

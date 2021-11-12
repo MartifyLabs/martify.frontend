@@ -3,17 +3,18 @@ import { compose } from "redux";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
-// import "./style.css";
+import "./style.css";
 
 import ButtonConnect from "../ButtonConnect";
 import Search from "./Search";
 
 const Navbar = ({state_wallet}) => {
   return (
-    <nav className="navbar is-fixed-top is-transparent has-shadow">
+    <nav className="main-navbar navbar is-fixed-top is-transparent">
+      <div className="the-blur"></div>
       <div className="navbar-brand">
         <a className="navbar-item" href="/">
-          <img src="/images/martify-logo-black-yellow.png" alt="Market place" width="112" height="28"/>
+          <img src="/images/martify-logo-black-yellow-small.png" alt="Market place" width="112" height="28"/>
         </a>
         {/* <div className="navbar-burger" data-target="navbarExampleTransparentExample">
           <span></span>
@@ -26,42 +27,22 @@ const Navbar = ({state_wallet}) => {
 
         <div className="navbar-start">
 
-          <Link className="navbar-item" to="about">About</Link>
-          <Link className="navbar-item" to="faq">FAQ</Link>
-          <Link className="navbar-item" to="howitworks">How It Works</Link>
-
-          {/* <a className="navbar-item" href="https://bulma.io/">
-            Home
-          </a>
+          {/* <Link className="navbar-item" to="about">About</Link> */}
+          {/* <Link className="navbar-item" to="faq">FAQ</Link> */}
+          
           <div className="navbar-item has-dropdown is-hoverable">
-            <a className="navbar-link" href="https://bulma.io/documentation/overview/start/">
-              Docs
+            <a className="navbar-link">
+              How To...
             </a>
             <div className="navbar-dropdown is-boxed">
-              <a className="navbar-item" href="https://bulma.io/documentation/overview/start/">
-                Overview
-              </a>
-              <a className="navbar-item" href="https://bulma.io/documentation/overview/modifiers/">
-                Modifiers
-              </a>
-              <a className="navbar-item" href="https://bulma.io/documentation/columns/basics/">
-                Columns
-              </a>
-              <a className="navbar-item" href="https://bulma.io/documentation/layout/container/">
-                Layout
-              </a>
-              <a className="navbar-item" href="https://bulma.io/documentation/form/general/">
-                Form
-              </a>
+              <Link className="navbar-item" to="how-get-started">Get Started</Link>
+              <Link className="navbar-item" to="how-get-started">Get Started</Link>
+              <Link className="navbar-item" to="how-get-started">Get Started</Link>
               <hr className="navbar-divider"/>
-              <a className="navbar-item" href="https://bulma.io/documentation/elements/box/">
-                Elements
-              </a>
-              <a className="navbar-item is-active" href="https://bulma.io/documentation/components/breadcrumb/">
-                Components
-              </a>
+              <Link className="navbar-item" to="how-get-started">Get Started</Link>
+              <Link className="navbar-item" to="how-get-started">Get Started</Link>
             </div>
-          </div> */}
+          </div>
         </div>
 
         <div className="navbar-end">

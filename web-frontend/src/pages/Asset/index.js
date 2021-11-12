@@ -2,9 +2,10 @@ import React, { useEffect, useState} from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
+import Moment from 'react-moment';
 
 import { urls } from "../../config";
-import { load_collection, get_asset, asset_add_offer, get_asset_transactions } from "../../store/collection/api";
+import { load_collection, get_asset, asset_add_offer, opencnft_get_asset_tx } from "../../store/collection/api";
 import { listToken } from "../../store/market/api";
 
 import ButtonBuy from "../../components/ButtonBuy";
@@ -14,7 +15,7 @@ import AssetImageFigure from "../../components/AssetImageFigure";
 
 import "./style.css";
 
-const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, listToken, asset_add_offer, get_asset_transactions}) => {
+const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, listToken, asset_add_offer, opencnft_get_asset_tx}) => {
 
   const [asset, setAsset] = useState(false);
   const [thisCollection, setThisCollection] = useState(false);
@@ -38,7 +39,7 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
     }
 
     if(query_asset && !state_collection.loading){
-      get_asset(policy_id, asset_id, (res) => {});
+      get_asset(asset_id, (res) => {});
     }
 
   }, [policy_id, asset_id, state_collection]);
@@ -67,7 +68,7 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
 
                     { thisCollection ? <CollectionAbout thisCollection={thisCollection} /> : <></> }
 
-                    {/* <Transactions asset={asset} get_asset_transactions={get_asset_transactions} /> */}
+                    <Transactions asset={asset} opencnft_get_asset_tx={opencnft_get_asset_tx} />
                     
                     <AssetRawMetaData asset={asset} />
                     
@@ -641,42 +642,75 @@ const NoAssetFound = ({state_collection, policy_id, asset_id}) => {
 }
 
 
-// const Transactions = ({asset, get_asset_transactions}) => {
+const Transactions = ({asset, opencnft_get_asset_tx}) => {
 
-//   const [fetching, setFetching] = useState(false);
+  const [firstLoad, setFirstLoad] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const [transactions, setTransactions] = useState(false);
 
-//   function feteh_update(){
-//     setFetching(true);
+  function feteh_update(){
+    setFetching(true);
+    setTransactions(false);
     
-//     get_asset_transactions(asset, (res) => {
-//       setFetching(false);
-//     });
-//   }
+    opencnft_get_asset_tx(asset.info.asset, (res) => {
+      setFirstLoad(true);
+
+      if(res.data.statusCode == 404){
+        setTransactions([]);
+      }else{
+        setTransactions(res.data.items);
+      }
+      setFetching(false);
+    });
+  }
   
-//   return (
-//     <div className="block">
-//       <div className="card">
-//       <header className="card-header">
-//         <p className="card-header-title">
-//           Transactions
-//         </p>
-//         <button className="card-header-icon" aria-label="more options" onClick={() => feteh_update()}>
-//           <span className="icon">  
-//             <i class={"fas fa-sync " + (fetching?"icn-spinner":"")}></i>
-//           </span>
-//         </button>
-//       </header>
-//         <div className="card-content">
-//           <table className="table">
-//             <tbody>
-              
-//             </tbody>
-//           </table>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
+  return (
+    <div className="block">
+      <div className="card">
+        <header className="card-header">
+          <p className="card-header-title">
+            Transactions
+          </p>
+          <button className="card-header-icon" aria-label="more options" onClick={() => feteh_update()}>
+            <span className="icon">  
+              <i className={"fas fa-sync " + (fetching?"icn-spinner":"")}></i>
+            </span>
+          </button>
+        </header>
+        {
+          firstLoad ? (
+            <div className="card-content">
+              {
+                transactions ? transactions.length>0 ? (
+                  <table className="table">
+                    <tbody>
+                      {
+                        transactions.map((tx, i) => {
+                          return (
+                            <tr>
+                              <td>
+                                <Moment format="MMM DD YYYY">
+                                  {tx.sold_at}
+                                </Moment>
+                              </td>
+                              <td>₳{tx.price/1000000}</td>
+                              <td>{tx.marketplace}</td>
+                            </tr>
+                          )
+                        })
+                      }
+                    </tbody>
+                  </table>
+                ) : <div>No transactions found on marketplaces.</div>
+                : <></>
+              }
+            </div>
+          ) : <></>
+        }
+      </div>
+    </div>
+  )
+}
 
 const ShowNoAssetFound = () => {
   return (
@@ -708,10 +742,10 @@ function mapStateToProps(state, props) {
 function mapDispatchToProps(dispatch) {
   return {
     load_collection: (callback) => dispatch(load_collection(callback)),
-    get_asset: (policy_id, asset_id, callback) => dispatch(get_asset(policy_id, asset_id, callback)),
+    get_asset: (asset_id, callback) => dispatch(get_asset(asset_id, callback)),
     listToken: (asset, price, callback) => dispatch(listToken(asset, price, callback)),
     asset_add_offer: (asset_id, price, callback) => dispatch(asset_add_offer(asset_id, price, callback)),
-    get_asset_transactions: (asset, callback) => dispatch(get_asset_transactions(asset, callback)),
+    opencnft_get_asset_tx: (asset_id, callback) => dispatch(opencnft_get_asset_tx(asset_id, callback)),
   };
 }
 
