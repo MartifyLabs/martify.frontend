@@ -1,11 +1,11 @@
 import Cardano from "../serialization-lib";
 import { fromHex, toHex } from "../../utils";
 
-export const serialize = async ({ tn, cs, sellerAddress, price }) => {
+export const serialize = async ({ tn, cs, sa, price }) => {
   await Cardano.load();
   const fields = Cardano.Instance.PlutusList.new();
 
-  fields.add(Cardano.Instance.PlutusData.new_bytes(fromHex(sellerAddress)));
+  fields.add(Cardano.Instance.PlutusData.new_bytes(fromHex(sa)));
   fields.add(
     Cardano.Instance.PlutusData.new_integer(
       Cardano.Instance.BigInt.from_str(price)
@@ -30,7 +30,7 @@ export const deserialize = (datum) => {
   return {
     tn: toHex(details.get(3).as_bytes()),
     cs: toHex(details.get(2).as_bytes()),
-    sellerAddress: toHex(details.get(0).as_bytes()),
+    sa: toHex(details.get(0).as_bytes()),
     price: details.get(1).as_integer().to_str(),
   };
 };
