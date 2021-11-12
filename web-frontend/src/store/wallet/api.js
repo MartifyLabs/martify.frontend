@@ -31,7 +31,7 @@ import { api_host } from "../../config";
 
 import { contractAddress, purchase } from "../../cardano/market-contract/";
 import { createTxUnspentOutput } from "../../cardano/transaction";
-import { getLockedAssetUtxos } from "../../cardano/blockfrost-api";
+import { getLockedUtxosForAsset } from "../../cardano/blockfrost-api";
 
 /////////
 
@@ -247,8 +247,8 @@ export const get_wallet_assets = (callback) => async (dispatch) => {
 
   // TEMP
   try {
-    const utxos = await getLockedAssetUtxos(
-      await contractAddress(),
+    const utxos = await getLockedUtxosForAsset(
+      (await contractAddress()).to_bech32(),
       "9236a326ec65243627d89f60921a42314d0cd407c002280499e1f88b506978656c4865616430303142657461"
     );
     console.log("utxos", utxos);

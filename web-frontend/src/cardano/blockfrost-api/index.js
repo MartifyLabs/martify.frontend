@@ -27,15 +27,47 @@ export const getAssetInfo = async (asset) => {
   }
 };
 
-export const getLockedAssetUtxos = async (contractAddress, asset) => {
+export const getAssetTransactions = async (
+  asset,
+  { page, count, order } = { page: 1, count: 100, order: "asc" }
+) => {
   try {
-    return await cardano(`addresses/${contractAddress.to_bech32()}/utxos/${asset}`);
+    return await cardano(
+      `assets/${asset}/transactions?page=${page}&count=${count}&order=${order}`
+    );
   } catch (error) {
     console.error(
-      `Unexpected error in getLockedAssets. [Message: ${error.message}]`
+      `Unexpected error in getAssetTransactions. [Message: ${error.message}]`
     );
   }
-}
+};
+
+/**
+ * @param {string} address - address must be in bech_32 format.
+ */
+export const getLockedUtxos = async (address) => {
+  try {
+    return await cardano(`addresses/${address}/utxos`);
+  } catch (error) {
+    console.error(
+      `Unexpected error in getLockedUtxos. [Message: ${error.message}]`
+    );
+  }
+};
+
+/**
+ * @param {string} address - address must be in bech_32 format.
+ * @param {string} asset - asset is a Concatenation of the policy_id and hex-encoded asset_name.
+ */
+export const getLockedUtxosForAsset = async (address, asset) => {
+  try {
+    return await cardano(`addresses/${address}/utxos/${asset}`);
+  } catch (error) {
+    console.error(
+      `Unexpected error in getLockedUtxosForAsset. [Message: ${error.message}]`
+    );
+  }
+};
 
 export const getMintedAssets = async (policyId) => {
   try {
@@ -112,37 +144,4 @@ const request = async (base, endpoint, headers, body) => {
     method: body ? "POST" : "GET",
     body,
   }).then((res) => res.json());
-};
-
-
-/**
- * Assets
- */
-
-export const getAssetsPolicy = async (policy_id) => {
-  try {
-    const response = await cardano(`assets/policy/${policy_id}`);
-    return response;
-  } catch (error) {
-    console.error(
-      `Unexpected error in getTxUtxos. [Message: ${error.message}]`
-    );
-  }
-};
-
-export const getAssetTransactions = async (asset) => {
-  try {
-    const response = await cardano(`assets/${asset}/transactions?order=desc`);
-    for(var i in response){
-      console.log(response[i].tx_hash)
-      var tx = await getTxUtxos(response[i].tx_hash);
-      console.log(tx)
-      break
-    }
-    return response;
-  } catch (error) {
-    console.error(
-      `Unexpected error in getTxUtxos. [Message: ${error.message}]`
-    );
-  }
 };
