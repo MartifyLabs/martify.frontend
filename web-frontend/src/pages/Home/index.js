@@ -2,20 +2,22 @@ import React, { useEffect, useState} from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
+import DataTable from 'react-data-table-component';
+
 import "./style.scss";
 
 import Search from "../../components/Navbar/Search";
-import {get_random_assets, get_top_projects} from "../../store/collection/api";
+import { opencnft_get_top_projects } from "../../store/collection/api";
 import { get_asset_image_source, numFormatter } from "../../utils";
 
-const Home = ({state_collection, get_random_assets, get_top_projects}) => {
+const Home = ({opencnft_get_top_projects}) => {
   
   const [listProjects, setListProjects] = useState([]);
 
   return (
     <div className="homepage">
       <Splash listProjects={listProjects} />
-      <TopProjects get_top_projects={get_top_projects} listProjects={listProjects} setListProjects={setListProjects} />
+      <TopProjects opencnft_get_top_projects={opencnft_get_top_projects} listProjects={listProjects} setListProjects={setListProjects} />
     </div>
   );
 };
@@ -24,10 +26,10 @@ const Splash = ({listProjects}) => {
   return (
     <>
       <div className="homepage_gallery">
-        <div className="overlay"></div>
+        <div className={"overlay " + (listProjects.length>0?"overlay_dark":"")}></div>
         <div className="columns is-multiline is-gapless">
         {
-          listProjects.slice(0, 18).map((project, i) => {
+          listProjects.slice(0, 20).map((project, i) => {
             return(
               <div className="column is-one-fifth-desktop is-full-mobile is-4-tablet" key={i}>
                 <div className="card">
@@ -47,13 +49,13 @@ const Splash = ({listProjects}) => {
       <section className="hero is-fullheight-with-navbar">
         <div className="hero-body">
           <div className="container">
-            <div className="columns is-mobile is-multiline">
+            <div className="columns is-mobile is-multiline is-gapless">
               <div className="column is-half is-offset-one-quarter">
-                <img src="/images/martify-logo-white-yellow.png"/>
+                <img src={listProjects.length>0?"/images/martify-logo-white-yellow.png":"/images/martify-logo-yellow.png"}/>
               </div>
               <div className="column is-full has-text-centered">
                 <p className="is-size-1 slogan" style={{color:"#fff", lineHeight:"1"}}>Your new CNFT marketplace.</p>
-                <p className="is-size-5" style={{color:"#fff"}}>Easiest way to buy and sell Cardano NFTs powered by smart contracts.</p>
+                <p className="is-size-5" style={{color:"#fff"}}>The smoothest experience for you to buy and sell Cardano NFTs powered by smart contracts.</p>
               </div>
               <div className="column is-half is-offset-one-quarter">
                 <Search size="is-large" placeholder="Search NFTs by collection name or policy ID" />
@@ -67,10 +69,12 @@ const Splash = ({listProjects}) => {
   )
 }
 
-const TopProjects = ({get_top_projects, listProjects, setListProjects}) => {
-
+const TopProjects = ({opencnft_get_top_projects, listProjects, setListProjects}) => {
+  
+  const [pending, setPending] = useState(false);
   const [window, setWindow] = useState('7d');
   const [showLimit, setShowLimit] = useState(20);
+  const [topProjectData, setTopProjectData] = useState([]);
 
   const window_options = [
     {"value": '24h', "label": "Last 24 hours"},
@@ -78,15 +82,121 @@ const TopProjects = ({get_top_projects, listProjects, setListProjects}) => {
     {"value": '30d', "label": "Last 30 days"},
     {"value": 'all', "label": "All time"},
   ];
+
+  const col_size = "120px";
+
+  const columns = [
+    {
+      name: '',
+      selector: row => row.rank,
+      width: "55px",
+      format: row => parseInt(row.rank)+1
+    },
+    {
+      name: '',
+      selector: row => [row.name, row.image],
+      cell: row =>
+        <Link to={`/collection/${row.policies[0]}`}>
+          <article className="media">
+            {
+              row.thumbnail ? (
+                <figure className="media-left">
+                  <p className="image is-64x64" style={{overflow:"hidden"}}>
+                    <img className="is-rounded top-project-image" src={row.image}/>
+                  </p>
+                </figure>
+              ) : <></>
+            }
+            <div className="media-content m-auto">
+              <div className="content is-size-6">
+                {row.name}
+              </div>
+            </div>
+          </article>
+        </Link>
+    },
+    {
+      name: 'Volume',
+      selector: row => row.volume,
+      sortable: true,
+      width: col_size,
+      format: row => numFormatter(row.volume)
+    },
+    {
+      name: '24h %',
+      selector: row => row["1dChange"],
+      sortable: true,
+      conditionalCellStyles: [
+        {
+          when: row => row["1dChange"] >= 0,
+          classNames: ["has-text-success"]
+        },
+        {
+          when: row => row["1dChange"] < 0,
+          classNames: ["has-text-danger"]
+        }
+      ],
+      width: col_size,
+      format: row => `${parseFloat(decimal(row["1dChange"]))}%`
+    },
+    {
+      name: '7d %',
+      selector: row => row["7dChange"],
+      sortable: true,
+      conditionalCellStyles: [
+        {
+          when: row => row["7dChange"] >= 0,
+          classNames: ["has-text-success"]
+        },
+        {
+          when: row => row["7dChange"] < 0,
+          classNames: ["has-text-danger"]
+        }
+      ],
+      width: col_size,
+      format: row => `${parseFloat(decimal(row["7dChange"]))}%`
+    },
+    {
+      name: 'Floor price',
+      selector: row => row.floor_price,
+      sortable: true,
+      width: col_size,
+      format: row => `₳${row.floor_price}`
+    },
+    {
+      name: '# Owners',
+      selector: row => row.total_owners,
+      width: col_size,
+      format: row => numFormatter(row.total_owners.reduce(add,0))
+    },
+    {
+      name: '# Minted',
+      selector: row => row.total_minted,
+      width: col_size,
+      format: row => numFormatter(row.total_minted.reduce(add,0))
+    },
+  ];
+
+  function prepare_data(project_list, limit){
+    let list = [];
+    for(var i in project_list){
+      let project = project_list[i];
+      project.rank = i;
+      project.image = get_asset_image_source(Array.isArray(project.thumbnail) ? project.thumbnail[0].includes("data:image") ? project.thumbnail : project.thumbnail[0] : project.thumbnail);
+      list.push(project);
+      if(i>=limit) break;
+    }
+    setListProjects(list);
+    setPending(false);
+  }
   
   function onchange_window(win){
     setWindow(win);
-    get_top_projects(win, (res) => {
-      for(var i in res.data){
-        let project = res.data[i];
-        project.image = get_asset_image_source(Array.isArray(project.thumbnail) ? project.thumbnail[0].includes("data:image") ? project.thumbnail : project.thumbnail[0] : project.thumbnail);
-      }
-      setListProjects(res.data);
+    setPending(true);
+    setShowLimit(20);
+    opencnft_get_top_projects(win, (res) => {
+      setTopProjectData(res.data);
+      prepare_data(res.data, 20)
     });
   }
 
@@ -100,19 +210,27 @@ const TopProjects = ({get_top_projects, listProjects, setListProjects}) => {
   }
   function add(accumulator, a) {
     return accumulator + a;
-  }  
+  }
+
+  function show_all(){
+    setPending(true);
+    setShowLimit(100);
+    prepare_data(topProjectData, 100);
+  }
   
   return (
-    <section className="section">
+    <section className="section top-project">
       <div className="container">
-        <p className="is-size-1	has-text-centered">Top Cardano NFTs Projects</p>
-        <p className="has-text-centered">The top CNFTs, ranked by volume, floor price and other statistics.</p>
 
-        <nav className="level">
-          {/* <div className="level-item has-text-centered">
+        <div className="columns">
+          <div className="column is-2">
             
-          </div> */}
-          <div className="level-item has-text-centered">
+          </div>
+          <div className="column is-8 has-text-centered">
+            <p className="is-size-1	has-text-centered">Top Cardano NFTs Projects</p>
+            <p className="has-text-centered">The top CNFTs, ranked by volume, floor price and other statistics.</p>
+          </div>
+          <div className="column is-2">
             <div className="control">
               <span className="select">
                 <select value={window} onChange={(event) => onchange_window(event.target.value)}>
@@ -127,67 +245,18 @@ const TopProjects = ({get_top_projects, listProjects, setListProjects}) => {
               </span>
             </div>
           </div>
-        </nav>
+        </div>
 
-        <table className="table is-fullwidth is-hoverable">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Collection</th>
-              <th>Volume</th>
-              <th data-tooltip="Volume differences past 24 hours">24h %</th>
-              <th data-tooltip="Volume differences past 7 days">7d %</th>
-              <th data-tooltip="Floor price on every marketplaces">Floor price</th>
-              <th data-tooltip="Total unique addresses holding assets"># Owners</th>
-              <th data-tooltip="Number of assets minted"># Minted</th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              listProjects.slice(0, showLimit).map((project, i) => {
-                return(
-                  <tr key={i}>
-                    <td>{i+1}</td>
-                    <td>
-                      <Link to={`/collection/${project.policies[0]}`}>
-                        <article className="media">
-                          {
-                            project.thumbnail ? (
-                              <figure className="media-left">
-                                <p className="image is-64x64" style={{overflow:"hidden"}}>
-                                  <img className="is-rounded" src={project.image}/>
-                                </p>
-                              </figure>
-                            ) : <></>
-                          }
-                          <div className="media-content">
-                            <div className="content">
-                              {project.name}
-                            </div>
-                          </div>
-                        </article>
-                      </Link>
-                    </td>
-                    <td>
-                      ₳{numFormatter(project.volume)}<br/>
-                    </td>
-                    <td>
-                      <span className={project["1dChange"]>=0?"has-text-success":"has-text-danger"}>{decimal(project["1dChange"])}%</span>
-                    </td>
-                    <td>
-                      <span className={project["7dChange"]>=0?"has-text-success":"has-text-danger"}>{decimal(project["7dChange"])}%</span>
-                    </td>
-                    <td>₳{project.floor_price}</td>
-                    <td>{project.total_owners.reduce(add,0)}</td>
-                    <td>{project.total_minted.reduce(add,0)}</td>
-                  </tr>
-                )
-              })
-            }
-          </tbody>
-        </table>
+        <DataTable
+          columns={columns}
+          data={listProjects}
+          defaultSortFieldId={3}
+          defaultSortAsc={false}
+          progressPending={pending}
+          progressComponent={<progress className="progress is-info" max="100"></progress>}
+        />
         {
-          showLimit == 20 ? <button className="button is-outlined is-link is-fullwidth" onClick={() => setShowLimit(100)}>See top 100 collections</button> : <></>
+          topProjectData.length > 0 && showLimit == 20 ? <button className="button is-outlined is-link is-fullwidth" onClick={() => show_all()}>See top 100 collections</button> : <></>
         }
       </div>
     </section>
@@ -196,18 +265,13 @@ const TopProjects = ({get_top_projects, listProjects, setListProjects}) => {
 
 function mapStateToProps(state, props) {
   return {
-    policy_id: props.match.params.policy_id,
-    asset_id: props.match.params.asset_id,
-    state_collection: state.collection,
-    state_wallet: state.wallet,
+    
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    get_random_assets: (callback) => dispatch(get_random_assets(callback)),
-    get_top_projects: (time, callback) => dispatch(get_top_projects(time, callback)),
-    
+    opencnft_get_top_projects: (time, callback) => dispatch(opencnft_get_top_projects(time, callback)),
   };
 }
 

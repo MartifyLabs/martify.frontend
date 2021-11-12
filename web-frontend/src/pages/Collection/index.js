@@ -12,11 +12,8 @@ import "./style.css";
 
 const Collection = ({state_collection, collection_id, get_listings, opencnft_get_policy}) => {
   
-  const [policyIds, setPolicyIds] = useState(false);
-  const [done, setDone] = useState(false);
-
   const default_meta = {
-    policy_id: false,
+    id: "",
     meta: {
 
     },
@@ -26,37 +23,49 @@ const Collection = ({state_collection, collection_id, get_listings, opencnft_get
     },
     links: {}
   };
+
+  const [policyIds, setPolicyIds] = useState(false);
   const [thisCollection, setThisCollection] = useState(default_meta);
   
   useEffect(() => {
-    if(state_collection.loaded && !done){
+    if(state_collection.loaded){
+      
+      let policy_ids = false;
+      var this_collection = false;
+
       if(collection_id in state_collection.collections){
-        var this_collection = {...default_meta, ...state_collection.collections[collection_id]};
-        setPolicyIds(this_collection.policy_id);
-        setThisCollection(this_collection);
-        setDone(true);
+        this_collection = {...default_meta, ...state_collection.collections[collection_id]};
+        policy_ids = this_collection.policy_ids;
       }
       else if(collection_id in state_collection.policies_collections){
-        let policy_id = collection_id;
-        var this_collection = {...default_meta, ...state_collection.policies_collections[policy_id]};
+        this_collection = {...default_meta, ...state_collection.policies_collections[collection_id]};
+        policy_ids = [collection_id];
+      }
+      else{
+        this_collection = {...default_meta, id:collection_id, policy_id: collection_id};
+        policy_ids = [collection_id];
+      }
+      
+      if(this_collection.id != thisCollection.id){
+        setPolicyIds(policy_ids);
+        setThisCollection({...this_collection});
 
-        setPolicyIds([policy_id]);
-        setThisCollection(this_collection);
-
-        opencnft_get_policy(policy_id, (res) => {
-          let new_collection = {
-            ...this_collection,
-            opencnft: res.data,
-          }
-          setThisCollection(new_collection);
-        });
-        setDone(true);
+        for(var i in policy_ids){
+          var policy_id = policy_ids[i];
+          opencnft_get_policy(policy_id, (res) => {
+            if(res.data.statusCode==404){}else{
+              if(!("opencnft" in this_collection)){
+                this_collection.opencnft = [];
+              }
+              this_collection.opencnft.push(res.data);
+              setThisCollection({...this_collection});
+            }
+          });
+        }
       }
     }
   }, [state_collection, collection_id]);
   
-  // console.log(thisCollection)
-
   useEffect(() => {
     if(policyIds){
       for(var i in policyIds){
@@ -68,18 +77,18 @@ const Collection = ({state_collection, collection_id, get_listings, opencnft_get
   return (
     <div className="collection">
 
-      <CollectionBanner thisCollection={thisCollection} size={thisCollection.style.banner_path?"is-medium":"is-small"} />
-
-      {/* {thisCollection.opencnft ? <OpencnftStats thisCollection={thisCollection}/> : <></>} */}
+      <CollectionBanner thisCollection={thisCollection} size={thisCollection.is_martify_verified?"is-medium":"is-small"} />
       
       <section className="section">
         <div className="columns">
           
-          <div className="column is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
-            <div className="block">
-              { thisCollection ? <CollectionAbout thisCollection={thisCollection} /> : <></> }
+          { thisCollection.is_martify_verified || thisCollection.is_cnft_verified ? 
+            <div className="column is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
+              <div className="block">
+                <CollectionAbout thisCollection={thisCollection} />
+              </div>
             </div>
-          </div>
+           : <></> }
       
           <div className="column">
             <ListingSection state_collection={state_collection} policyIds={policyIds} />
@@ -92,61 +101,6 @@ const Collection = ({state_collection, collection_id, get_listings, opencnft_get
   );
 };
 
-const OpencnftStats = ({thisCollection}) => {
-  return (
-    <div className="section">
-      <nav className="level">
-        {/* <div class="level-left"></div> */}
-
-        <div class="level-left">
-          <div className="level-item">
-            <table className="table is-bordered">
-              <tr>
-                <td><div className="has-text-centered">
-                  <div>
-                    <p className="heading has-text-weight-semibold">Volume traded</p>
-                    <p className="is-size-4">₳{numFormatter(thisCollection.opencnft.total_volume/1000000)}</p>
-                  </div>
-                </div>
-                </td>
-                <td><div className="has-text-centered">
-                  <div>
-                    <p className="heading has-text-weight-semibold">Floor price</p>
-                    <p className="is-size-4">₳{thisCollection.opencnft.floor_price/1000000}</p>
-                  </div>
-                </div>
-                </td>
-                <td><div className="has-text-centered">
-                  <div>
-                    <p className="heading has-text-weight-semibold">Total assets</p>
-                    <p className="is-size-4">{thisCollection.opencnft.asset_minted}</p>
-                  </div>
-                </div>
-                </td>
-                <td><div className="has-text-centered">
-                  <div>
-                    <p className="heading has-text-weight-semibold">Number owners</p>
-                    <p className="is-size-4">{thisCollection.opencnft.asset_holders}</p>
-                  </div>
-                </div>
-                </td>
-                <td><div className="has-text-centered">
-                  <div>
-                    <p className="heading has-text-weight-semibold">Total transactions</p>
-                    <p className="is-size-4">{thisCollection.opencnft.total_tx}</p>
-                  </div>
-                </div>
-                </td>
-              </tr>
-            </table>
-          </div>
-
-        </div>
-      </nav>
-    </div>
-  )
-}
-
 const ListingSection = ({state_collection, policyIds}) => {
 
   const [listings, setListings] = useState([]);
@@ -155,7 +109,7 @@ const ListingSection = ({state_collection, policyIds}) => {
     setListings([]);
     let tmp_list = [];
     for(var i in policyIds){
-      var policy_id = policyIds[i]
+      var policy_id = policyIds[i];
       if(policy_id in state_collection.policies_assets){
         let tmp = Object.values(state_collection.policies_assets[policy_id]);
         tmp_list.push(...tmp);
@@ -174,12 +128,12 @@ const ListingSection = ({state_collection, policyIds}) => {
 
 return (
   <>
-  {
-    listings.length > 0 ? <DisplayListing listings={listings} /> : <></>
-  }
-  {
-    listings.length == 0 ? <NoAssetFound state_collection={state_collection} policyIds={policyIds} /> : <></>
-  }
+    {
+      listings.length > 0 ? <DisplayListing listings={listings} /> : <></>
+    }
+    {
+      listings.length == 0 ? <NoAssetFound state_collection={state_collection} policyIds={policyIds} /> : <></>
+    }
   </>
   );
 }

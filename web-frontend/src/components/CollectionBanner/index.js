@@ -1,28 +1,32 @@
 import React, { useEffect, useState} from "react";
 
 import {usePalette} from 'react-palette'
-import useGetAssetImageSrc from "../../utils/useGetAssetImageSrc";
 
 import CollectionLinks from "../CollectionLinks";
 import { numFormatter, get_asset_image_source } from "../../utils";
 
-
 const CollectionBanner = ({thisCollection, size, asset}) => {
   
+  const [currentId, setCurrentId] = useState(false);
   const [assetImgSrc, setAssetImgSrc] = useState(false);
   const [assetColors, setAssetColors] = useState({});
 
   useEffect(() => {
-    if(asset && !assetImgSrc){
+    if(asset && currentId!=thisCollection.id){
       let imgsrc = get_asset_image_source(asset.info.onchainMetadata.image);
       setAssetImgSrc(imgsrc);
     }
   }, [asset]);
 
   useEffect(() => {
-    if(asset==undefined && thisCollection.opencnft && !assetImgSrc){
-      let imgsrc = get_asset_image_source(thisCollection.opencnft.thumbnail);
-      setAssetImgSrc(imgsrc);
+    if(asset==undefined && ("opencnft" in thisCollection) && currentId!=thisCollection.id){
+      setCurrentId(thisCollection.id);
+      if(thisCollection.opencnft.length>0){
+        if(thisCollection.opencnft[0].thumbnail){
+          let imgsrc = get_asset_image_source(thisCollection.opencnft[0].thumbnail);
+          setAssetImgSrc(imgsrc);
+        }
+      }
     }
   }, [thisCollection]);
 
@@ -38,17 +42,25 @@ const CollectionBanner = ({thisCollection, size, asset}) => {
   //   muted: "#64aa8a"
   //   vibrant: "#b4d43c"
   // }
+  
 
   return (
     <section className={"hero collection_name " + (size!=undefined ? size : "is-medium")} 
-    style={thisCollection.style ? thisCollection.style.banner_path ? {backgroundImage: `url(${thisCollection.style.banner_path})`} : assetColors ? 
-    {backgroundImage: `linear-gradient(to bottom right, ${assetColors.darkMuted}, ${assetColors.darkVibrant}`}  : {} : assetColors ? 
-    {backgroundImage: `linear-gradient(to bottom right, ${assetColors.darkMuted}, ${assetColors.darkVibrant}`} : {} }>
+    style={
+      thisCollection.style ? 
+        thisCollection.style.banner_path ? 
+          {backgroundImage: `url(${thisCollection.style.banner_path})`} : 
+        assetColors ? 
+          {backgroundImage: `linear-gradient(to bottom right, ${assetColors.darkMuted}, ${assetColors.darkVibrant}`} : 
+        {} : 
+      assetColors ? 
+        {backgroundImage: `linear-gradient(to bottom right, ${assetColors.darkMuted}, ${assetColors.darkVibrant}`} : 
+      {}
+    }>
 
       <div className="hero-body">
       
         <nav className="level">
-          {/* <Link to={`/collection/${thisCollection.id?thisCollection.id:thisCollection.policy_id}`}> */}
             <div className="level-left">
               {
                 thisCollection.style ? thisCollection.style.logo_path ? (
@@ -79,7 +91,6 @@ const CollectionBanner = ({thisCollection, size, asset}) => {
                 </div>
               </div>
             </div>
-          {/* </Link> */}
 
           <div className="level-right">
             {
@@ -92,7 +103,12 @@ const CollectionBanner = ({thisCollection, size, asset}) => {
                           <div className="has-text-centered">
                             <div>
                               <p className="heading has-text-weight-semibold">Volume traded</p>
-                              <p className="is-size-4">₳{numFormatter(thisCollection.opencnft.total_volume/1000000)}</p>
+                              <p className="is-size-4">
+                                ₳{numFormatter(
+                                (thisCollection.opencnft.reduce(function (result, policy){
+                                  return result + policy.total_volume
+                                },0)/1000000)
+                                )}</p>
                             </div>
                           </div>
                         </td>
@@ -100,7 +116,11 @@ const CollectionBanner = ({thisCollection, size, asset}) => {
                           <div className="has-text-centered">
                             <div>
                               <p className="heading has-text-weight-semibold">Floor price</p>
-                              <p className="is-size-4">₳{thisCollection.opencnft.floor_price/1000000}</p>
+                              <p className="is-size-4">
+                                ₳{
+                                thisCollection.opencnft.reduce(function (result, policy){
+                                  return Math.min(result, policy.floor_price)
+                                },999999*1000000)/1000000}</p>
                             </div>
                           </div>
                         </td>
@@ -108,7 +128,13 @@ const CollectionBanner = ({thisCollection, size, asset}) => {
                           <div className="has-text-centered">
                             <div>
                               <p className="heading has-text-weight-semibold">Total assets</p>
-                              <p className="is-size-4">{thisCollection.opencnft.asset_minted}</p>
+                              <p className="is-size-4">
+                                {
+                                  thisCollection.opencnft.reduce(function (result, policy){
+                                    return result + policy.asset_minted
+                                  },0)
+                                }
+                              </p>
                             </div>
                           </div>
                         </td>
@@ -116,7 +142,13 @@ const CollectionBanner = ({thisCollection, size, asset}) => {
                           <div className="has-text-centered">
                             <div>
                               <p className="heading has-text-weight-semibold">Number owners</p>
-                              <p className="is-size-4">{thisCollection.opencnft.asset_holders}</p>
+                              <p className="is-size-4">
+                                {
+                              thisCollection.opencnft.reduce(function (result, policy){
+                                  return result + policy.asset_holders
+                                },0)
+                              }
+                              </p>
                             </div>
                           </div>
                         </td>
@@ -124,7 +156,13 @@ const CollectionBanner = ({thisCollection, size, asset}) => {
                           <div className="has-text-centered">
                             <div>
                               <p className="heading has-text-weight-semibold">Total transactions</p>
-                              <p className="is-size-4">{thisCollection.opencnft.total_tx}</p>
+                              <p className="is-size-4">
+                                {numFormatter(
+                                thisCollection.opencnft.reduce(function (result, policy){
+                                  return result + policy.total_tx
+                                },0))
+                                }
+                              </p>
                             </div>
                           </div>
                         </td>

@@ -37,10 +37,6 @@ body{
   cursor: pointer;
 }
 
-.search .dropdown-menu{
-  width: 100%;
-}
-
 .icn-spinner {
   animation: spin-animation 0.5s infinite;
   display: inline-block;
@@ -53,9 +49,4 @@ body{
   100% {
     transform: rotate(359deg);
   }
-}
-
-.search input::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-  color: #111111;
-  opacity: 0.7;
 }
