@@ -6,8 +6,7 @@ import { languageViews } from "./languageViews";
 import { fromHex, toHex } from "../../utils";
 import { contractAddress } from "../market-contract/validator";
 
-export const assetsToValue = async (assets) => {
-  await Cardano.load();
+export const assetsToValue = (assets) => {
   const multiAsset = Cardano.Instance.MultiAsset.new();
   const lovelace = assets.find((asset) => asset.unit === "lovelace");
   const policies = [
@@ -43,7 +42,6 @@ export const assetsToValue = async (assets) => {
 };
 
 export const initializeTx = async () => {
-  await Cardano.load();
   const metadata = {};
   const Parameters = await getProtocolParameters();
 
@@ -80,7 +78,6 @@ export const finalizeTx = async ({
   action,
   plutusScripts,
 }) => {
-  await Cardano.load();
   const Parameters = await getProtocolParameters();
   const transactionWitnessSet = Cardano.Instance.TransactionWitnessSet.new();
 
@@ -91,7 +88,7 @@ export const finalizeTx = async ({
     Parameters.maxTxSize.toString()
   );
 
-  let { input, change } = await CoinSelection.randomImprove(
+  let { input, change } = CoinSelection.randomImprove(
     utxos,
     outputs,
     8,
@@ -115,7 +112,7 @@ export const finalizeTx = async ({
     const redeemerIndex = txBuilder
       .index_of_input(scriptUtxo.input())
       .toString();
-    redeemers.add(await action(redeemerIndex));
+    redeemers.add(action(redeemerIndex));
     txBuilder.set_redeemers(
       Cardano.Instance.Redeemers.from_bytes(redeemers.to_bytes())
     );
@@ -127,7 +124,7 @@ export const finalizeTx = async ({
       Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
     );
 
-    await setCollateral(txBuilder, collateral);
+    setCollateral(txBuilder, collateral);
 
     transactionWitnessSet.set_plutus_scripts(plutusScripts);
     transactionWitnessSet.set_plutus_data(datums);
@@ -248,7 +245,7 @@ export const createTxOutput = async (
   value,
   { datum, index, tradeOwnerAddress, metadata } = {}
 ) => {
-  await Cardano.load();
+  
   const Parameters = await getProtocolParameters();
   const v = value;
 
@@ -276,8 +273,6 @@ export const createTxOutput = async (
 };
 
 export const createTxUnspentOutput = async (utxo) => {
-  await Cardano.load();
-
   try {
     return Cardano.Instance.TransactionUnspentOutput.new(
       Cardano.Instance.TransactionInput.new(
@@ -285,8 +280,8 @@ export const createTxUnspentOutput = async (utxo) => {
         utxo.output_index
       ),
       Cardano.Instance.TransactionOutput.new(
-        await contractAddress(),
-        await assetsToValue(utxo.amount)
+        contractAddress(),
+        assetsToValue(utxo.amount)
       )
     );
   } catch (error) {
@@ -297,7 +292,7 @@ export const createTxUnspentOutput = async (utxo) => {
 };
 
 export const getTxUnspentOutputHash = async (hexEncodedBytes) => {
-  await Cardano.load();
+  
 
   try {
     return toHex(
@@ -315,9 +310,7 @@ export const getTxUnspentOutputHash = async (hexEncodedBytes) => {
   }
 };
 
-const setCollateral = async (txBuilder, utxos) => {
-  await Cardano.load();
-
+const setCollateral = (txBuilder, utxos) => {
   const inputs = Cardano.Instance.TransactionInputs.new();
 
   utxos.forEach((utxo) => {

@@ -1,7 +1,6 @@
 import Cardano from "../serialization-lib";
 
-export const BUY = async (index) => {
-  await Cardano.load();
+export const BUY = (index) => {
   const data = Cardano.Instance.PlutusData.new_constr_plutus_data(
     Cardano.Instance.ConstrPlutusData.new(
       Cardano.Instance.Int.new_i32(0),
@@ -22,8 +21,7 @@ export const BUY = async (index) => {
   return redeemer;
 };
 
-export const CANCEL = async (index) => {
-  await Cardano.load();
+export const CANCEL = (index) => {
   const data = Cardano.Instance.PlutusData.new_constr_plutus_data(
     Cardano.Instance.ConstrPlutusData.new(
       Cardano.Instance.Int.new_i32(1),

@@ -13,7 +13,6 @@ import { getUsedAddresses, getUtxos } from "../wallet";
 import { fromHex, toHex, toLovelace } from "../../utils";
 
 export const offer = async (tn, cs, price) => {
-  await Cardano.load();
   const { txBuilder, datums, outputs } = await initializeTx();
 
   const walletAddress = Cardano.Instance.BaseAddress.from_address(
@@ -24,7 +23,7 @@ export const offer = async (tn, cs, price) => {
     Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
   );
 
-  const offerDatum = await serialize({
+  const offerDatum = serialize({
     tn,
     cs,
     sa: toHex(walletAddress.payment_cred().to_keyhash().to_bytes()),
@@ -35,8 +34,8 @@ export const offer = async (tn, cs, price) => {
 
   outputs.add(
     await createTxOutput(
-      await contractAddress(),
-      await assetsToValue([
+      contractAddress(),
+      assetsToValue([
         {
           unit: `${cs}${tn}`,
           quantity: "1",
@@ -59,7 +58,6 @@ export const offer = async (tn, cs, price) => {
 };
 
 export const cancel = async (tn, cs, price, assetUtxos) => {
-  await Cardano.load();
   const { txBuilder, datums, outputs } = await initializeTx();
 
   const walletAddress = Cardano.Instance.BaseAddress.from_address(
@@ -70,7 +68,7 @@ export const cancel = async (tn, cs, price, assetUtxos) => {
     Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
   );
 
-  const cancelDatum = await serialize({
+  const cancelDatum = serialize({
     tn,
     cs,
     sa: toHex(walletAddress.payment_cred().to_keyhash().to_bytes()),
@@ -105,7 +103,7 @@ export const cancel = async (tn, cs, price, assetUtxos) => {
     outputs,
     changeAddress: walletAddress,
     scriptUtxo,
-    plutusScripts: await contractScripts(),
+    plutusScripts: contractScripts(),
     action: CANCEL,
   });
 
@@ -113,7 +111,6 @@ export const cancel = async (tn, cs, price, assetUtxos) => {
 };
 
 export const purchase = async (tn, cs, sa, price, assetUtxos) => {
-  await Cardano.load();
   const { txBuilder, datums, outputs } = await initializeTx();
 
   const walletAddress = Cardano.Instance.BaseAddress.from_address(
@@ -128,7 +125,7 @@ export const purchase = async (tn, cs, sa, price, assetUtxos) => {
     Cardano.Instance.Address.from_bech32(sa)
   );
 
-  const purchaseDatum = await serialize({
+  const purchaseDatum = serialize({
     tn,
     cs,
     sa: toHex(sellerAddress.payment_cred().to_keyhash().to_bytes()),
@@ -155,7 +152,7 @@ export const purchase = async (tn, cs, sa, price, assetUtxos) => {
   outputs.add(
     await createTxOutput(
       sellerAddress.to_address(),
-      await assetsToValue([
+      assetsToValue([
         { unit: "lovelace", quantity: `${toLovelace(price)}` },
       ])
     )
@@ -172,7 +169,7 @@ export const purchase = async (tn, cs, sa, price, assetUtxos) => {
     datums,
     scriptUtxo,
     changeAddress: walletAddress,
-    plutusScripts: await contractScripts(),
+    plutusScripts: contractScripts(),
     action: BUY,
   });
 
