@@ -7,11 +7,14 @@
 {-# LANGUAGE TypeOperators         #-}
 
 module Market.Types
-    ( NFTSale (..)
+    ( MartDatum (..)
     , SaleAction (..)
     , SaleSchema
     , StartParams (..)
     , BuyParams (..)
+    , NFTSale (..)
+    , UpdateVHash (..)
+    , MarketParams (..)
     )
     where
 
@@ -23,15 +26,25 @@ import qualified Prelude                   as Pr
 import           Schema                    (ToSchema)
 import qualified PlutusTx
 import           PlutusTx.Prelude          as Plutus ( Eq(..), (&&), Integer )
-import           Ledger                    ( TokenName, CurrencySymbol, PubKeyHash )
+import           Ledger                    ( TokenName, CurrencySymbol, PubKeyHash, ValidatorHash )
 import           Plutus.Contract           ( Endpoint, type (.\/) )
 
--- This is the datum type, carrying the previous validator params
+data MarketParams = MarketParams
+    { feeAddr  :: PubKeyHash
+    , updateTn :: TokenName
+    , updateCs :: CurrencySymbol
+    } deriving (Pr.Eq, Pr.Ord, Show, Generic, ToJSON, FromJSON, ToSchema)
+
+PlutusTx.makeIsDataIndexed ''MarketParams [('MarketParams, 0)]
+PlutusTx.makeLift ''MarketParams
+
 data NFTSale = NFTSale
     { nSeller    :: !PubKeyHash
-    , nPrice     :: !Integer
+    , nPrice     :: !Plutus.Integer
     , nCurrency  :: !CurrencySymbol
     , nToken     :: !TokenName
+    , nRoyAddr   :: !PubKeyHash
+    , nRoyPrct   :: !Plutus.Integer
     } deriving (Pr.Eq, Pr.Ord, Show, Generic, ToJSON, FromJSON, ToSchema)
 
 instance Eq NFTSale where
@@ -39,16 +52,36 @@ instance Eq NFTSale where
     a == b = (nSeller    a == nSeller    b) &&
              (nPrice     a == nPrice     b) &&
              (nCurrency  a == nCurrency  b) &&
-             (nToken     a == nToken     b)
+             (nToken     a == nToken     b) &&
+             (nRoyAddr   a == nRoyAddr   b) &&
+             (nRoyPrct   a == nRoyPrct   b)
 
 PlutusTx.makeIsDataIndexed ''NFTSale [('NFTSale, 0)]
 PlutusTx.makeLift ''NFTSale
 
 
-data SaleAction = Buy | Close
+newtype UpdateVHash = UpdateVHash
+    { vhash :: ValidatorHash
+    } deriving (Pr.Eq, Pr.Ord, Show, Generic, ToJSON, FromJSON, ToSchema)
+
+instance Eq UpdateVHash where
+    {-# INLINABLE (==) #-}
+    a == b = vhash a == vhash b
+
+PlutusTx.makeIsDataIndexed ''UpdateVHash [('UpdateVHash, 0)]
+PlutusTx.makeLift ''UpdateVHash
+
+
+data MartDatum = UpdateToken UpdateVHash | SaleData NFTSale
+    deriving (Show)
+
+PlutusTx.makeIsDataIndexed ''MartDatum [('UpdateToken, 0), ('SaleData, 1)]
+PlutusTx.makeLift ''MartDatum
+
+data SaleAction = Buy | Update | Close | UpdateC
     deriving Show
 
-PlutusTx.makeIsDataIndexed ''SaleAction [('Buy, 0), ('Close, 1)]
+PlutusTx.makeIsDataIndexed ''SaleAction [('Buy, 0), ('Update, 1), ('Close, 2), ('UpdateC, 3)]
 PlutusTx.makeLift ''SaleAction
 
 
@@ -73,4 +106,14 @@ data StartParams = StartParams
     } deriving (Pr.Eq, Pr.Ord, Show, Generic, ToJSON, FromJSON, ToSchema)
 
 
-type SaleSchema = Endpoint "close" BuyParams .\/ Endpoint "buy" BuyParams .\/ Endpoint "start" StartParams
+type SaleSchema = Endpoint "close" BuyParams
+                  .\/
+                  Endpoint "buy" BuyParams
+                  .\/
+                  Endpoint "update" (BuyParams, Integer)
+                  .\/
+                  Endpoint "start" StartParams
+                  .\/
+                  Endpoint "updateContract" ValidatorHash
+                  .\/
+                  Endpoint "sendToken" Integer
