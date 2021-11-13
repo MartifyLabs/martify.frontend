@@ -18,7 +18,6 @@ export const getNetworkId = async () => {
 
 export const getOwnedAssets = async () => {
   // TODO: refactor using map, filter and reduce.
-  await Cardano.load();
   let assets = {};
 
   const usedAddress = Cardano.Instance.Address.from_bytes(
@@ -76,7 +75,6 @@ export const submitTx = async (tx) => {
 };
 
 export const getWalletAddresses = async () => {
-  await Cardano.load();
   return Cardano.Instance.Address.from_bytes(
     fromHex((await getUsedAddresses())[0])
   ).to_bech32();

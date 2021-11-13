@@ -59,7 +59,7 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
 export const delistToken = () => async (dispatch) => {
   try {
     const assetUtxos = await getLockedUtxosByAsset(
-      (await contractAddress()).to_bech32(),
+      contractAddress().to_bech32(),
       `9236a326ec65243627d89f60921a42314d0cd407c002280499e1f88b506978656c48656164303032`
     );
     console.log(assetUtxos);
@@ -80,7 +80,7 @@ export const delistToken = () => async (dispatch) => {
 export const purchaseToken = () => async (dispatch) => {
   try {
     const assetUtxos = await getLockedUtxosByAsset(
-      (await contractAddress()).to_bech32(),
+      contractAddress().to_bech32(),
       `9236a326ec65243627d89f60921a42314d0cd407c002280499e1f88b506978656c48656164303032`
     );
     console.log(assetUtxos);

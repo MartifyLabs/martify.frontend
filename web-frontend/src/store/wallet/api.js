@@ -1,4 +1,5 @@
 import cbor from "cbor";
+import Cardano from "../../cardano/serialization-lib";
 import {
   getBalance,
   getNetworkId,
@@ -80,6 +81,10 @@ export const connectWallet = (callback) => async (dispatch) => {
     window.cardano
       .enable()
       .then((res) => {
+        Cardano.load().then(() => {
+          console.log("cardano-serialization-lib Loaded.");
+        });
+
         getNetworkId().then((network) => {
           let connected_wallet = {};
 
