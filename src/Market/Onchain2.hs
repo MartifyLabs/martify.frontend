@@ -6,8 +6,6 @@
 {-# LANGUAGE TypeFamilies               #-}
 {-# LANGUAGE DerivingStrategies         #-}
 
--- This is test file, in no way necessary to the use of the regular contract in Onchain.hs
--- It is here to test the update contract mechanism acting as the "new version" that we should update to
 module Market.Onchain2
     ( apiBuyScript
     , buyScriptAsShortBs
