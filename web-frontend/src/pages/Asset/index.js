@@ -6,7 +6,7 @@ import Moment from 'react-moment';
 
 import { urls } from "../../config";
 import { load_collection, get_asset, asset_add_offer, opencnft_get_asset_tx } from "../../store/collection/api";
-import { listToken, delistToken } from "../../store/market/api";
+import { listToken, delistToken, purchaseToken } from "../../store/market/api";
 
 import ButtonBuy from "../../components/ButtonBuy";
 import CollectionAbout from "../../components/CollectionAbout";
@@ -15,7 +15,7 @@ import AssetImageFigure from "../../components/AssetImageFigure";
 
 import "./style.css";
 
-const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, list_token, delist_token, asset_add_offer, opencnft_get_asset_tx}) => {
+const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, list_token, delist_token, purchase_token, asset_add_offer, opencnft_get_asset_tx}) => {
 
   const [asset, setAsset] = useState(false);
   const [thisCollection, setThisCollection] = useState(false);
@@ -56,7 +56,7 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
               <div className="columns">
                 <div className="column is-two-fifths">
                   <AssetImage asset={asset}/>
-                  <Listing asset={asset} state_wallet={state_wallet} list_token={list_token} delist_token={delist_token} asset_add_offer={asset_add_offer} />
+                  <Listing asset={asset} state_wallet={state_wallet} list_token={list_token} delist_token={delist_token} purchase_token={purchase_token} asset_add_offer={asset_add_offer} />
                 </div>
 
                 <div className="column">
@@ -166,18 +166,18 @@ const SocialLinks = ({asset}) => {
   );
 };
 
-const Listing = ({asset, state_wallet, list_token, delist_token, asset_add_offer}) => {
+const Listing = ({asset, state_wallet, list_token, delist_token, purchase_token, asset_add_offer}) => {
   return (
     <div className="block">
       { asset.info.asset in state_wallet.assets ? 
         <OwnerListAsset state_wallet={state_wallet} asset={asset} list_token={list_token} delist_token={delist_token} /> : 
-        <PurchaseAsset asset={asset} asset_add_offer={asset_add_offer} state_wallet={state_wallet} /> 
+        <PurchaseAsset asset={asset} asset_add_offer={asset_add_offer} state_wallet={state_wallet} purchase_token={purchase_token} /> 
       }
     </div>
   )
 }
 
-const PurchaseAsset = ({asset, asset_add_offer, state_wallet}) => {
+const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) => {
 
   const [showTab, setShowTab] = useState( asset.listing ? asset.listing.is_listed ? "buy" : "offer" : "offer");
   const [userInputAmount, setUserInputAmount] = useState("");
@@ -186,6 +186,14 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet}) => {
   function list_this_token(price){
     setSendingBid(true);
     asset_add_offer(asset.info.asset, price, (res) => {
+      setSendingBid(false);
+      setUserInputAmount("");
+    });
+  }
+
+  function purchase_this_token(){
+    setSendingBid(true);
+    purchase_token(asset, (res) => {
       setSendingBid(false);
       setUserInputAmount("");
     });
@@ -237,7 +245,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet}) => {
                 </div>
               </div>
                 <div className="level-item has-text-centered">
-                  <ButtonBuy />
+                  <ButtonBuy purchase_this_token={purchase_this_token} />
                 </div>
             </nav>
           )
@@ -749,6 +757,7 @@ function mapDispatchToProps(dispatch) {
     get_asset: (asset_id, callback) => dispatch(get_asset(asset_id, callback)),
     list_token: (asset, price, callback) => dispatch(listToken(asset, price, callback)),
     delist_token: (asset, callback) => dispatch(delistToken(asset, callback)),
+    purchase_token: (asset, callback) => dispatch(purchaseToken(asset, callback)),
     asset_add_offer: (asset_id, price, callback) => dispatch(asset_add_offer(asset_id, price, callback)),
     opencnft_get_asset_tx: (asset_id, callback) => dispatch(opencnft_get_asset_tx(asset_id, callback)),
   };

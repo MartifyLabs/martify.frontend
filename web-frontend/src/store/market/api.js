@@ -102,7 +102,7 @@ export const delistToken = (asset, callback) => async (dispatch) => {
   }
 };
 
-export const purchaseToken = (asset, price, callback) => async (dispatch) => {
+export const purchaseToken = (asset, callback) => async (dispatch) => {
   try {
     let asset_updated = await getAsset(asset.info.asset);
     
@@ -110,7 +110,7 @@ export const purchaseToken = (asset, price, callback) => async (dispatch) => {
       "purchaseToken on market",
       asset.info.assetName,
       asset.info.policyId,
-      price
+      asset.listing.price
     );
 
     const assetUtxos = await getLockedUtxosByAsset(
@@ -122,7 +122,7 @@ export const purchaseToken = (asset, price, callback) => async (dispatch) => {
       asset.info.assetName,
       asset.info.policyId,
       asset.listing.addr,
-      price,
+      asset.listing.price,
       assetUtxos
     );
     console.log("txHash", txHash);
