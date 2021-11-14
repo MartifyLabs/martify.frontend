@@ -40,7 +40,7 @@ export const offer = async (tn, cs, price) => {
           unit: `${cs}${tn}`,
           quantity: "1",
         },
-        { unit: "lovelace", quantity: "1742000" },
+        { unit: "lovelace", quantity: "2000000" },
       ]),
       { datum: offerDatum }
     )

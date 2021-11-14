@@ -6,7 +6,7 @@ import Moment from 'react-moment';
 
 import { urls } from "../../config";
 import { load_collection, get_asset, asset_add_offer, opencnft_get_asset_tx } from "../../store/collection/api";
-import { listToken } from "../../store/market/api";
+import { listToken, delistToken } from "../../store/market/api";
 
 import ButtonBuy from "../../components/ButtonBuy";
 import CollectionAbout from "../../components/CollectionAbout";
@@ -15,7 +15,7 @@ import AssetImageFigure from "../../components/AssetImageFigure";
 
 import "./style.css";
 
-const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, listToken, asset_add_offer, opencnft_get_asset_tx}) => {
+const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, list_token, delist_token, asset_add_offer, opencnft_get_asset_tx}) => {
 
   const [asset, setAsset] = useState(false);
   const [thisCollection, setThisCollection] = useState(false);
@@ -56,7 +56,7 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
               <div className="columns">
                 <div className="column is-two-fifths">
                   <AssetImage asset={asset}/>
-                  <Listing asset={asset} state_wallet={state_wallet} listToken={listToken} asset_add_offer={asset_add_offer} />
+                  <Listing asset={asset} state_wallet={state_wallet} list_token={list_token} delist_token={delist_token} asset_add_offer={asset_add_offer} />
                 </div>
 
                 <div className="column">
@@ -166,11 +166,11 @@ const SocialLinks = ({asset}) => {
   );
 };
 
-const Listing = ({asset, state_wallet, listToken, asset_add_offer}) => {
+const Listing = ({asset, state_wallet, list_token, delist_token, asset_add_offer}) => {
   return (
     <div className="block">
       { asset.info.asset in state_wallet.assets ? 
-        <OwnerListAsset state_wallet={state_wallet} asset={asset} listToken={listToken} /> : 
+        <OwnerListAsset state_wallet={state_wallet} asset={asset} list_token={list_token} delist_token={delist_token} /> : 
         <PurchaseAsset asset={asset} asset_add_offer={asset_add_offer} state_wallet={state_wallet} /> 
       }
     </div>
@@ -216,8 +216,8 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet}) => {
           asset.listing ? asset.listing.is_listed ? (
             <div className="tabs is-centered">
               <ul>
-                <li className={showTab=="buy"?"is-active":""} onClick={() => setShowTab("buy")}><a>Buy Now</a></li>
-                <li className={showTab=="offer"?"is-active":""} onClick={() => setShowTab("offer")}><a>Offer</a></li>
+                <li className={showTab==="buy"?"is-active":""} onClick={() => setShowTab("buy")}><a>Buy Now</a></li>
+                <li className={showTab==="offer"?"is-active":""} onClick={() => setShowTab("offer")}><a>Offer</a></li>
               </ul>
             </div>
           )
@@ -225,7 +225,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet}) => {
         }
         
         {
-          showTab=="buy" ? asset.listing ? asset.listing.is_listed ? (
+          showTab==="buy" ? asset.listing ? asset.listing.is_listed ? (
             <nav className="level is-mobile">
               <div className="level-item has-text-centered">
                 <div>
@@ -245,7 +245,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet}) => {
         }
 
         {
-          showTab=="offer" ? asset.offers ? Object.keys(asset.offers).length ? 
+          showTab==="offer" ? asset.offers ? Object.keys(asset.offers).length ? 
           (
             <nav className="level is-mobile">
               <div className="level-item has-text-centered">
@@ -280,7 +280,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet}) => {
         }
 
         {
-          showTab=="offer" ? (
+          showTab==="offer" ? (
             <div className="field has-addons">
               <div className="control has-icons-left is-expanded">
                 <input className="input" type="number" placeholder="Offer price"
@@ -310,14 +310,22 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet}) => {
   )
 }
 
-const OwnerListAsset = ({state_wallet, asset, listToken}) => {
+const OwnerListAsset = ({state_wallet, asset, list_token, delist_token}) => {
 
   const [userInputAmount, setUserInputAmount] = useState("");
   const [sendingBid, setSendingBid] = useState(false);
 
   function list_this_token(price){
     setSendingBid(true);
-    listToken(asset, price, (res) => {
+    list_token(asset, price, (res) => {
+      setSendingBid(false);
+      setUserInputAmount("");
+    });
+  }
+
+  function delist_this_token(){
+    setSendingBid(true);
+    delist_token(asset, (res) => {
       setSendingBid(false);
       setUserInputAmount("");
     });
@@ -380,7 +388,7 @@ const OwnerListAsset = ({state_wallet, asset, listToken}) => {
                   </div>
                 </div>
                 <div className="level-item has-text-centered">
-                  <button className={"button is-rounded is-info" + (sendingBid ? " is-loading" : "")} disabled={sendingBid} onClick={() => list_this_token(0)}>
+                  <button className={"button is-rounded is-info" + (sendingBid ? " is-loading" : "")} disabled={sendingBid} onClick={() => delist_this_token()}>
                     <span>Cancel listing</span>
                   </button>
                 </div>
@@ -397,7 +405,7 @@ const OwnerListAsset = ({state_wallet, asset, listToken}) => {
             disabled={sendingBid}
             />
             <span className="icon is-medium is-left">₳</span>
-            { state_wallet.data.collateral.length==0 ? 
+            { state_wallet.data.collateral.length===0 ? 
               <p className="help">Fund the wallet and add collateral (option in Nami).</p> : <></>
             }
           </div>
@@ -532,7 +540,6 @@ const ListAllAttributes = ({asset}) => {
   )
 };
 
-
 const AssetRawMetaData = ({asset}) => {
   const [show, setShow] = useState(false);
 
@@ -576,7 +583,7 @@ const AssetImage = ({asset}) => {
             asset.info.onchainMetadata.files ? (
               <>
               {
-                asset.info.onchainMetadata.files[0].mediaType=="text/html" ? (
+                asset.info.onchainMetadata.files[0].mediaType==="text/html" ? (
                   <iframe src={asset.info.onchainMetadata.files[0].src.join("")} style={{width:"600px",height:"600px"}}>
                     <AssetImageFigure asset={asset} setShow={setShow}/>
                   </iframe>
@@ -595,8 +602,6 @@ const AssetImage = ({asset}) => {
     </div>
   )
 }
-
-
 
 const NoAssetFound = ({state_collection, policy_id, asset_id}) => {
   return (
@@ -641,7 +646,6 @@ const NoAssetFound = ({state_collection, policy_id, asset_id}) => {
   )
 }
 
-
 const Transactions = ({asset, opencnft_get_asset_tx}) => {
 
   const [firstLoad, setFirstLoad] = useState(false);
@@ -655,7 +659,7 @@ const Transactions = ({asset, opencnft_get_asset_tx}) => {
     opencnft_get_asset_tx(asset.info.asset, (res) => {
       setFirstLoad(true);
 
-      if(res.data.statusCode == 404){
+      if(res.data.statusCode === 404){
         setTransactions([]);
       }else{
         setTransactions(res.data.items);
@@ -743,7 +747,8 @@ function mapDispatchToProps(dispatch) {
   return {
     load_collection: (callback) => dispatch(load_collection(callback)),
     get_asset: (asset_id, callback) => dispatch(get_asset(asset_id, callback)),
-    listToken: (asset, price, callback) => dispatch(listToken(asset, price, callback)),
+    list_token: (asset, price, callback) => dispatch(listToken(asset, price, callback)),
+    delist_token: (asset, callback) => dispatch(delistToken(asset, callback)),
     asset_add_offer: (asset_id, price, callback) => dispatch(asset_add_offer(asset_id, price, callback)),
     opencnft_get_asset_tx: (asset_id, callback) => dispatch(opencnft_get_asset_tx(asset_id, callback)),
   };
