@@ -56,20 +56,45 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
   }
 };
 
-export const delistToken = () => async (dispatch) => {
+export const delistToken = (asset, callback) => async (dispatch) => {
   try {
+    let asset_updated = await getAsset(asset.info.asset);
+    
+    console.log(
+      "delistToken on market",
+      asset.info.assetName,
+      asset.info.policyId,
+      asset.listing.price
+    );
+
     const assetUtxos = await getLockedUtxosByAsset(
       contractAddress().to_bech32(),
-      `9236a326ec65243627d89f60921a42314d0cd407c002280499e1f88b506978656c48656164303032`
+      asset.info.asset
     );
-    console.log(assetUtxos);
+
     let txHash = await cancel(
-      "506978656c48656164303032",
-      "9236a326ec65243627d89f60921a42314d0cd407c002280499e1f88b",
-      "99",
+      asset.info.assetName,
+      asset.info.policyId,
+      asset.listing.price,
       assetUtxos
     );
     console.log("txHash", txHash);
+
+    asset_updated.listing = {
+      is_listed: false,
+    };
+
+    await saveAsset(asset_updated);
+
+    let output = {
+      policy_id: asset.info.policyId,
+      listing: {
+        [asset_updated.info.asset]: asset_updated,
+      },
+    };
+    dispatch(collections_add_tokens(output));
+
+    callback({ success: true });
   } catch (error) {
     console.error(
       `Unexpected error in delistToken. [Message: ${error.message}]`
@@ -77,20 +102,45 @@ export const delistToken = () => async (dispatch) => {
   }
 };
 
-export const purchaseToken = () => async (dispatch) => {
+export const purchaseToken = (asset, price, callback) => async (dispatch) => {
   try {
+    let asset_updated = await getAsset(asset.info.asset);
+    
+    console.log(
+      "purchaseToken on market",
+      asset.info.assetName,
+      asset.info.policyId,
+      price
+    );
+
     const assetUtxos = await getLockedUtxosByAsset(
       contractAddress().to_bech32(),
-      `9236a326ec65243627d89f60921a42314d0cd407c002280499e1f88b506978656c48656164303032`
+      asset.info.asset
     );
-    console.log(assetUtxos);
+
     let txHash = await purchase(
-      "506978656c48656164303032",
-      "9236a326ec65243627d89f60921a42314d0cd407c002280499e1f88b",
-      "addr_test1qrsea3gp4svseqz25htcdk3x6jn0xlhpqdtzkq3tx68plnrk6swlz45fv76s89g6ewcennvckqkep36767kwpzchr4nq5yz5ky",
-      "99",
+      asset.info.assetName,
+      asset.info.policyId,
+      asset.listing.addr,
+      price,
       assetUtxos
     );
     console.log("txHash", txHash);
+
+    asset_updated.listing = {
+      is_listed: false,
+    };
+
+    await saveAsset(asset_updated);
+
+    let output = {
+      policy_id: asset.info.policyId,
+      listing: {
+        [asset_updated.info.asset]: asset_updated,
+      },
+    };
+    dispatch(collections_add_tokens(output));
+
+    callback({ success: true });
   } catch (err) {}
 };
