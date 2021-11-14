@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
-
-import { create_txn, buyer_pay } from "../../store/wallet/api";
 import {urls} from "../../config";
 
-const ButtonBuy = ({wallet, create_txn, buyer_pay}) => {
+const ButtonBuy = ({wallet, purchase_this_token}) => {
 
   const [showNotification, setShowNotification] = useState(false);
 
   async function begin_buy_process() {
+    purchase_this_token();
 
     // let amount = 2;
 
