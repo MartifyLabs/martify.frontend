@@ -4,7 +4,7 @@ import { fromHex } from "../../utils";
 
 export const contractAddress = () => {
   return Cardano.Instance.Address.from_bech32(
-    "addr_test1wq2m8ul5twkj8c0mc2nyxgr8ylk2u07rj882hs90a5yrhzgwgatvu"
+    "addr_test1wqmmvr9h6mxgdm5q8s9c0rrwfkskwvrlkshzu6sqhsszxvc47g4d8"
   );
 };
 

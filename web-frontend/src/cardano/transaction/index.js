@@ -219,7 +219,8 @@ export const finalizeTx = async ({
   );
 
   const size = tx.to_bytes().length * 2;
-
+  console.log("size", size);
+  console.log("maxsize", Parameters.maxTxSize);
   if (size > Parameters.maxTxSize) throw new Error("MAX_SIZE_REACHED");
 
   let txVkeyWitnesses = await signTx(toHex(tx.to_bytes()), true);

@@ -71,9 +71,12 @@ const Splash = ({listProjects}) => {
 
 const TopProjects = ({opencnft_get_top_projects, listProjects, setListProjects}) => {
   
+  const col_size = "120px";
+  const show_num_projects_initial = 10;
+
   const [pending, setPending] = useState(false);
   const [window, setWindow] = useState('7d');
-  const [showLimit, setShowLimit] = useState(20);
+  const [showLimit, setShowLimit] = useState(show_num_projects_initial);
   const [topProjectData, setTopProjectData] = useState([]);
 
   const window_options = [
@@ -82,8 +85,6 @@ const TopProjects = ({opencnft_get_top_projects, listProjects, setListProjects})
     {"value": '30d', "label": "Last 30 days"},
     {"value": 'all', "label": "All time"},
   ];
-
-  const col_size = "120px";
 
   const columns = [
     {
@@ -184,7 +185,7 @@ const TopProjects = ({opencnft_get_top_projects, listProjects, setListProjects})
       project.rank = i;
       project.image = get_asset_image_source(Array.isArray(project.thumbnail) ? project.thumbnail[0].includes("data:image") ? project.thumbnail : project.thumbnail[0] : project.thumbnail);
       list.push(project);
-      if(i>=limit) break;
+      // if(i>=limit) break;
     }
     setListProjects(list);
     setPending(false);
@@ -193,10 +194,11 @@ const TopProjects = ({opencnft_get_top_projects, listProjects, setListProjects})
   function onchange_window(win){
     setWindow(win);
     setPending(true);
-    setShowLimit(20);
+    setListProjects([]);
+    setShowLimit(show_num_projects_initial);
     opencnft_get_top_projects(win, (res) => {
       setTopProjectData(res.data);
-      prepare_data(res.data, 20)
+      prepare_data(res.data, show_num_projects_initial)
     });
   }
 
@@ -217,7 +219,7 @@ const TopProjects = ({opencnft_get_top_projects, listProjects, setListProjects})
     setShowLimit(100);
     prepare_data(topProjectData, 100);
   }
-  
+
   return (
     <section className="section top-project">
       <div className="container">
@@ -247,16 +249,52 @@ const TopProjects = ({opencnft_get_top_projects, listProjects, setListProjects})
           </div>
         </div>
 
-        <DataTable
-          columns={columns}
-          data={listProjects}
-          defaultSortFieldId={3}
-          defaultSortAsc={false}
-          progressPending={pending}
-          progressComponent={<progress className="progress is-info" max="100"></progress>}
-        />
         {
-          topProjectData.length > 0 && showLimit == 20 ? <button className="button is-outlined is-link is-fullwidth" onClick={() => show_all()}>See top 100 collections</button> : <></>
+          topProjectData.length > 0 && showLimit == show_num_projects_initial ? (
+            <>
+              <div className="columns is-multiline">
+                {
+                  listProjects.slice(0, show_num_projects_initial).map((project, i) => {
+                    return(
+                      <div className="column is-one-fifth" key={i}>
+                        <Link to={`/collection/${project.policies[0]}`}>
+                          <div className="card">
+                            <div className="card-image">
+                              <figure className="image is-square">
+                                <img className="top-project-image" src={project.image} alt={project.name} />
+                              </figure>
+                            </div>
+                            <div className="card-content">
+                              <div className="media">
+                                <div className="media-content">
+                                  <p className="title is-6 top-project-title">{project.name}</p>
+                                  <p className="subtitle is-6" data-tooltip="Trading volume in ₳">₳{numFormatter(project.volume)} (
+                                    <span data-tooltip={`Change in volume in past ${window=="7d"?"7 days":"1 day"}`} className={parseFloat(decimal(project[ window=="7d"?"7dChange":"1dChange" ]))>=0?"has-text-success":"has-text-danger"}>
+                                      {parseFloat(decimal(project[ window=="7d"?"7dChange":"1dChange" ]))}%
+                                    </span>)
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                      </div>
+                    )
+                  })
+                }
+              </div>
+              <button className="button is-outlined is-link is-fullwidth" onClick={() => show_all()}>See top 100 collections</button>
+            </>
+          ) : (
+            <DataTable
+              columns={columns}
+              data={listProjects}
+              defaultSortFieldId={3}
+              defaultSortAsc={false}
+              progressPending={pending}
+              progressComponent={<progress className="progress is-info" max="100"></progress>}
+            />
+          )
         }
       </div>
     </section>
