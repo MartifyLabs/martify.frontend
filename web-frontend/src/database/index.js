@@ -97,23 +97,3 @@ export const saveAsset = async (asset) => {
     );
   }
 };
-
-
-export const getRandomAssets = async (count) => {
-  try {
-    
-    const result = await query(
-      collection(db, "assets"),
-      where("info.policyId", "!=", null),
-      limit(count)
-    );
-
-    const snapshot = await getDocs(result);
-    return snapshot.docs.map((doc) => doc.data());
-
-  } catch (error) {
-    console.error(
-      `Unexpected error in saveAsset. [Message: ${error.message}]`
-    );
-  }
-};

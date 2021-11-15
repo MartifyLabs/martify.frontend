@@ -62,7 +62,7 @@ const Search = ({state_collection, size, placeholder}) => {
   };
 
   const onSuggestionSelected = (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) => {
-    console.log(suggestion, suggestionValue, suggestionIndex, sectionIndex, method)
+    // console.log(suggestion, suggestionValue, suggestionIndex, sectionIndex, method)
     if(method=="click" || method=="enter"){
       history.push("/collection/"+suggestion.value);
     }

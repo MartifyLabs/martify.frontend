@@ -2,7 +2,6 @@ import {
   collections_loaded,
   collections_add_tokens,
   collections_loading,
-  collections_top_projects,
 } from "./collectionActions";
 
 import data_collections from "../../data/collections.json";
@@ -12,7 +11,6 @@ import {
   getAssets,
   getAsset,
   saveAsset,
-  getRandomAssets,
 } from "../../database";
 
 import { getWalletAddresses } from "../../cardano/wallet";
@@ -118,13 +116,6 @@ export const asset_add_offer = (asset_id, price, callback) => async (dispatch) =
 
   callback(true);
 }
-
-export const get_random_assets = (callback) => async (dispatch) => {
-  let assets = await getRandomAssets(10);
-  callback(assets);
-}
-
-
 
 export const opencnft_get_top_projects = (time, callback) => async (dispatch) => {
   fetch('https://api.opencnft.io/1/rank?window='+time, {
