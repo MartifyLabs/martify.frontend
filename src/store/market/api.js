@@ -40,7 +40,8 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
       };
     }
 
-    await saveAsset(asset_updated);
+    if (txHash)
+      await saveAsset(asset_updated);
 
     let output = {
       policy_id: asset.info.policyId,
@@ -84,7 +85,8 @@ export const delistToken = (asset, callback) => async (dispatch) => {
       is_listed: false,
     };
 
-    await saveAsset(asset_updated);
+    if (txHash)
+      await saveAsset(asset_updated);
 
     let output = {
       policy_id: asset.info.policyId,
@@ -131,7 +133,8 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
       is_listed: false,
     };
 
-    await saveAsset(asset_updated);
+    if (txHash)
+      await saveAsset(asset_updated);
 
     let output = {
       policy_id: asset.info.policyId,
