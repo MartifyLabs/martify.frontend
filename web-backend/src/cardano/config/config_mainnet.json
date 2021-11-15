@@ -1,0 +1,7 @@
+{ 
+    "path_db_node_socket": "/Users/jingles/cardano-src/db/node.socket",
+    "shelleyGenesisPath": "./src/cardano/config/mainnet-shelley-genesis.json",
+    "path_working_dir": "./src/cardano",
+    "network": "mainnet",
+    "is_mainnet": true
+}

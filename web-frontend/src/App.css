@@ -1,0 +1,52 @@
+body{
+  cursor: default;
+}
+
+@font-face {
+  font-family: JosefinSansMediumItalic;
+  src: url(./assets/fonts/Josefin_Sans/static/JosefinSans-MediumItalic.ttf);
+}
+
+.notification-window{
+  border-radius: .375em;
+  bottom: 1em;
+  right: 1em;
+  width: 20rem;
+  background-color: #fff;
+  box-shadow: 0 0 1em rgb(0 0 0 / 10%);
+  padding: 1em 1.5em;
+  position: fixed;
+  z-index: 10;
+}
+
+.collection_logo{
+  object-fit: cover;
+}
+
+.ada_symbol{
+  font-size: 12px;
+}
+.social-icon img{
+  /* padding: 0px; */
+  width: 16px;
+  height: 16px;
+}
+
+.pagination-previous, .pagination-next{
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.icn-spinner {
+  animation: spin-animation 0.5s infinite;
+  display: inline-block;
+}
+
+@keyframes spin-animation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}
