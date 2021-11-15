@@ -2,36 +2,26 @@ import Cardano from "../serialization-lib";
 import { fromHex, toHex } from "../../utils";
 
 export const serializeSale = ({ tn, cs, sa, price, ra, rp }) => {
-  const fieldsNested = Cardano.Instance.PlutusList.new();
+  const fields = Cardano.Instance.PlutusList.new();
 
-  fieldsNested.add(Cardano.Instance.PlutusData.new_bytes(fromHex(sa)));
-  fieldsNested.add(
+  fields.add(Cardano.Instance.PlutusData.new_bytes(fromHex(sa)));
+  fields.add(
     Cardano.Instance.PlutusData.new_integer(
       Cardano.Instance.BigInt.from_str(`${price}`)
     )
   );
-  fieldsNested.add(Cardano.Instance.PlutusData.new_bytes(fromHex(cs)));
-  fieldsNested.add(Cardano.Instance.PlutusData.new_bytes(fromHex(tn)));
-  fieldsNested.add(Cardano.Instance.PlutusData.new_bytes(fromHex(ra)));
-  fieldsNested.add(
+  fields.add(Cardano.Instance.PlutusData.new_bytes(fromHex(cs)));
+  fields.add(Cardano.Instance.PlutusData.new_bytes(fromHex(tn)));
+  fields.add(Cardano.Instance.PlutusData.new_bytes(fromHex(ra)));
+  fields.add(
     Cardano.Instance.PlutusData.new_integer(
       Cardano.Instance.BigInt.from_str(`${rp}`)
     )
   );
 
-  const fields = Cardano.Instance.PlutusList.new();
-  fields.add(
-    Cardano.Instance.PlutusData.new_constr_plutus_data(
-      Cardano.Instance.ConstrPlutusData.new(
-        Cardano.Instance.Int.new_i32(0),
-        fieldsNested
-      )
-    )
-  );
-
   const datum = Cardano.Instance.PlutusData.new_constr_plutus_data(
     Cardano.Instance.ConstrPlutusData.new(
-      Cardano.Instance.Int.new_i32(1),
+      Cardano.Instance.Int.new_i32(0),
       fields
     )
   );
