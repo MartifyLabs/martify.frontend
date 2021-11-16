@@ -1,4 +1,4 @@
-import { offer, cancel, purchase } from "../../cardano/market-contract/";
+import { offer, update, cancel, purchase } from "../../cardano/market-contract/";
 import { getWalletAddresses } from "../../cardano/wallet";
 import { saveAsset, getAsset } from "../../database";
 import { contractAddress } from "../../cardano/market-contract/validator";
@@ -39,6 +39,53 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
         is_listed: false,
       };
     }
+
+    if (txHash)
+      await saveAsset(asset_updated);
+
+    let output = {
+      policy_id: asset.info.policyId,
+      listing: {
+        [asset_updated.info.asset]: asset_updated,
+      },
+    };
+    dispatch(collections_add_tokens(output));
+
+    callback({ success: true });
+  } catch (error) {
+    console.error(`Unexpected error in listToken. [Message: ${error.message}]`);
+  }
+};
+
+export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
+  try {
+    let asset_updated = await getAsset(asset.info.asset);
+    
+    console.log(
+      "updateToken on market",
+      asset.info.assetName,
+      asset.info.policyId,
+      newPrice
+    );
+
+    const assetUtxos = await getLockedUtxosByAsset(
+      contractAddress().to_bech32(),
+      asset.info.asset
+    );
+
+    let txHash = await update(
+      asset.info.assetName,
+      asset.info.policyId,
+      asset.listing.price,
+      newPrice,
+      assetUtxos
+    );
+    console.log("txHash", txHash);
+
+    asset_updated.listing = {
+      ...asset_updated.listing,
+      price: newPrice,
+    };
 
     if (txHash)
       await saveAsset(asset_updated);

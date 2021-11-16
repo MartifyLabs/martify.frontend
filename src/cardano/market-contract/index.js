@@ -64,7 +64,7 @@ export const offer = async (tn, cs, price) => {
   return txHash;
 };
 
-export const updatePrice = async (tn, cs, price, newprice, assetUtxos) => {
+export const update = async (tn, cs, price, newprice, assetUtxos) => {
   const { txBuilder, datums, outputs } = await initializeTx();
 
   const walletAddress = Cardano.Instance.BaseAddress.from_address(
