@@ -50,9 +50,14 @@ export const getAssetTransactions = async (
 /**
  * @param {string} address - address must be in bech_32 format.
  */
-export const getLockedUtxos = async (address) => {
+export const getLockedUtxos = async (
+  address,
+  { page, count, order } = { page: 1, count: 100, order: "asc" }
+) => {
   try {
-    return await cardano(`addresses/${address}/utxos`);
+    return await cardano(
+      `addresses/${address}/utxos?page=${page}&count=${count}&order=${order}`
+    );
   } catch (error) {
     console.error(
       `Unexpected error in getLockedUtxos. [Message: ${error.message}]`
@@ -74,9 +79,14 @@ export const getLockedUtxosByAsset = async (address, asset) => {
   }
 };
 
-export const getMintedAssets = async (policyId) => {
+export const getMintedAssets = async (
+  policyId,
+  { page, count, order } = { page: 1, count: 100, order: "asc" }
+) => {
   try {
-    const response = await cardano(`assets/policy/${policyId}`);
+    const response = await cardano(
+      `assets/policy/${policyId}?page=${page}&count=${count}&order=${order}`
+    );
 
     return response
       .filter((asset) => asset.quantity === 1)
