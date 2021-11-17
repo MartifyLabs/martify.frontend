@@ -30,10 +30,12 @@ export default function walletReducer(state = walletobj, { type, payload }) {
       for(var asset_id in payload){
         if(asset_id!='lovelace'){
           let this_asset = payload[asset_id];
-          tmp_assets[asset_id] = {
-            policy_id: this_asset.info.policyId,
-            quantity: this_asset.quantity,
-            asset_id: asset_id,
+          if(this_asset.info){
+            tmp_assets[asset_id] = {
+              policy_id: this_asset.info.policyId,
+              quantity: this_asset.quantity,
+              asset_id: asset_id,
+            }
           }
         }
       }

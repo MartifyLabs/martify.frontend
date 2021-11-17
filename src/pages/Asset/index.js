@@ -7,6 +7,7 @@ import Moment from 'react-moment';
 import { urls } from "../../config";
 import { load_collection, get_asset, asset_add_offer, opencnft_get_asset_tx } from "../../store/collection/api";
 import { listToken, updateToken, delistToken, purchaseToken } from "../../store/market/api";
+import { WALLET_STATE } from "../../store/wallet/walletTypes";
 
 import ButtonBuy from "../../components/ButtonBuy";
 import CollectionAbout from "../../components/CollectionAbout";
@@ -321,29 +322,30 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
 const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_token}) => {
 
   const [userInputAmount, setUserInputAmount] = useState("");
-  const [sendingBid, setSendingBid] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
+  function successful_transaction(res){
+    setUserInputAmount("");
+    if(res.success){
+      setShowModal(res.type);
+    }
+  }
   function list_this_token(price){
-    setSendingBid(true);
     list_token(asset, price, (res) => {
-      setSendingBid(false);
-      setUserInputAmount("");
+      successful_transaction(res);
     });
   }
 
   function update_this_listing(price){
-    setSendingBid(true);
     update_token(asset, price, (res) => {
-      setSendingBid(false);
-      setUserInputAmount("");
+      successful_transaction(res);
     });
   }
 
   function delist_this_token(){
-    setSendingBid(true);
     delist_token(asset, (res) => {
-      setSendingBid(false);
-      setUserInputAmount("");
+      successful_transaction(res);
     });
   }
 
@@ -359,6 +361,25 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
     }
   }
 
+  useEffect(() => {
+    if(state_wallet.loading){
+      if(state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE){
+        setShowNotification("Awaiting signature...");
+      }
+    }else{
+      setShowNotification(false);
+    }
+  }, [state_wallet]);
+
+  useEffect(() => {
+    if(showModal){
+      const timer = setTimeout(() => {
+        setShowModal(false);
+      }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [showModal]);
+
   return (
     <div className="card">
       <header className="card-header">
@@ -367,58 +388,55 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
         </p>
       </header>
       <div className="card-content">
-
-        <nav className="level is-mobile">
-          {
-            asset.offers ? Object.keys(asset.offers).length ? 
-            (
-              <>
-                <div className="level-item has-text-centered">
-                  <div>
-                    <p className="heading">Highest offer</p>
-                    <p className="title">
-                      {
-                        Math.max.apply(Math, Object.keys(asset.offers).map(function(key){
-                          return asset.offers[key];
-                        }).map(function(o) { return o.p; }))
-                      }
-                      <span className="ada_symbol">₳</span>
-                    </p>
-                  </div>
+        {
+          asset.offers ? Object.keys(asset.offers).length ? 
+          (
+            <nav className="level is-mobile">
+              <div className="level-item has-text-centered">
+                <div>
+                  <p className="heading">Highest offer</p>
+                  <p className="title">
+                    {
+                      Math.max.apply(Math, Object.keys(asset.offers).map(function(key){
+                        return asset.offers[key];
+                      }).map(function(o) { return o.p; }))
+                    }
+                    <span className="ada_symbol">₳</span>
+                  </p>
                 </div>
-              </>
-            )
-            : <></> : <></>
-          }
-
-          {
-            asset.listing ? asset.listing.is_listed ? (
-              <>
-                <div className="level-item has-text-centered">
-                  <div>
-                    <p className="heading">Currently listed for</p>
-                    <p className="title">
-                      {asset.listing.price}
-                      <span className="ada_symbol">₳</span>
-                    </p>
-                  </div>
+              </div>
+            </nav>
+          )
+          : <></> : <></>
+        }
+        {
+          asset.listing ? asset.listing.is_listed ? (
+            <nav className="level is-mobile">
+              <div className="level-item has-text-centered">
+                <div>
+                  <p className="heading">Currently listed for</p>
+                  <p className="title">
+                    {asset.listing.price}
+                    <span className="ada_symbol">₳</span>
+                  </p>
                 </div>
-                <div className="level-item has-text-centered">
-                  <button className={"button is-rounded is-info" + (sendingBid ? " is-loading" : "")} disabled={sendingBid} onClick={() => delist_this_token()}>
-                    <span>Cancel listing</span>
-                  </button>
-                </div>
-              </>
-            )
-            : <></> : <></>
-          }
-        </nav>
+              </div>
+              <div className="level-item has-text-centered">
+                <button className={"button is-rounded is-info" + (state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE ? " is-loading" : "")} 
+                  disabled={state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE} onClick={() => delist_this_token()}>
+                  <span>Cancel listing</span>
+                </button>
+              </div>
+            </nav>
+          )
+          : <></> : <></>
+        }
         
         <div className="field has-addons">
           <div className="control has-icons-left is-expanded">
             <input className="input" type="number" placeholder={asset.listing.is_listed ? "Update listing price" : "Input listing price"}
             value={userInputAmount} onChange={(event) => input_price_changed(event)} 
-            disabled={sendingBid}
+            disabled={state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE}
             />
             <span className="icon is-medium is-left">₳</span>
             { state_wallet.data.collateral.length===0 ? 
@@ -426,8 +444,9 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
             }
           </div>
           <div className="control">
-            <button className="button is-info" onClick={() => asset.listing.is_listed ? update_this_listing(userInputAmount) : list_this_token(userInputAmount)}
-            disabled={sendingBid || userInputAmount < 5}
+            <button className={"button is-info " + (state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE?"is-loading":"")}
+              onClick={() => asset.listing.is_listed ? update_this_listing(userInputAmount) : list_this_token(userInputAmount)}
+              disabled={state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE || userInputAmount < 5}
             >
               {
                 userInputAmount ? `List for ₳${userInputAmount}!` : "List this!"
@@ -437,6 +456,47 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
         </div>
 
       </div>
+
+      {
+        showNotification ? (
+          <div className="notification-window notification is-info">
+            <button className="delete" onClick={() => setShowNotification(false)}></button>
+            <p>
+              {showNotification}
+            </p>
+          </div>
+        ) : <></>
+      }
+
+      {
+        showModal ? (
+          <div className="modal is-active">
+            <div className="modal-background"></div>
+            <div className="modal-card">
+              <section className="modal-card-body has-text-centered">
+                <span className="icon has-text-success" style={{fontSize:"100px", margin:"50px"}}>
+                  <i className="far fa-check-circle"></i>
+                </span>
+                <p className="is-size-4">
+                  {
+                    showModal == "list-success" ? <span>Listed <b>{asset.info.onchainMetadata.name}</b> successfully!</span> : 
+                    showModal == "price-update-success" ? <span>Listing price for <b>{asset.info.onchainMetadata.name}</b> updated!</span> : 
+                    showModal == "delist-success" ? <span><b>{asset.info.onchainMetadata.name}</b> removed from the marketplace.</span> : 
+                    showModal == "purchase-success" ? <span>Purchased <b>{asset.info.onchainMetadata.name}</b>!</span> : 
+                    ""
+                  }
+                </p>
+                <button className="button is-info is-outlined is-medium" onClick={() => setShowModal(false)}>
+                  {
+                    ["Yes!", "Yay!", "Ok!", "Nice!"][(Math.random() * 4) | 0]
+                  }
+                </button>
+              </section>
+            </div>
+          </div>
+        ) : <></>
+      }
+
     </div>
   )
 }

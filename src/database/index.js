@@ -54,7 +54,7 @@ export const getAsset = async (assetId) => {
 
     if (snapshot.empty) {
       const asset = await getAssetInfo(assetId)
-
+      
       await saveAssets([asset]);
 
       return { info: asset };

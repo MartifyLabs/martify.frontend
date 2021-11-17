@@ -87,25 +87,24 @@ export default function collectionReducer(state = collectionobj, { type, payload
         policies_assets: tmp
       };
 
-
     case walletTypes.SET_WALLET_ASSETS:
       var tmp_policies_assets = {...state.policies_assets};
 
       for(var asset_id in payload){
         if(asset_id!='lovelace'){
           var this_asset = payload[asset_id];
-          var policy_id = this_asset.info.policyId;
+          if(this_asset.info){
+            var policy_id = this_asset.info.policyId;
 
-          var tmp_policies_assets_policy = {};
-          if(policy_id in tmp_policies_assets){
-            tmp_policies_assets_policy = {...tmp_policies_assets[policy_id]};
+            var tmp_policies_assets_policy = {};
+            if(policy_id in tmp_policies_assets){
+              tmp_policies_assets_policy = {...tmp_policies_assets[policy_id]};
+            }
+  
+            this_asset = update_tokens(this_asset, policy_id, state.policies_collections);
+            tmp_policies_assets_policy[asset_id] = this_asset;
+            tmp_policies_assets[policy_id] = tmp_policies_assets_policy;
           }
-
-          this_asset = update_tokens(this_asset, policy_id, state.policies_collections);
-
-          tmp_policies_assets_policy[asset_id] = this_asset;
-
-          tmp_policies_assets[policy_id] = tmp_policies_assets_policy;
         }
       }
 
