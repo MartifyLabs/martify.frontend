@@ -74,9 +74,9 @@ function receive_txn_for_user_sign(res, callback) {
 
 /////////
 
-export const connectWallet = (callback) => async (dispatch) => {
+export const connectWallet = (is_silent, callback) => async (dispatch) => {
   try {
-    dispatch(setWalletLoading(WALLET_STATE.CONNECTING));
+    if(!is_silent) dispatch(setWalletLoading(WALLET_STATE.CONNECTING));
 
     window.cardano
       .enable()

@@ -12,16 +12,26 @@ const ButtonConnect = ({state_wallet, connectWallet, get_wallet_assets}) => {
   const [showNotification, setShowNotification] = useState(false);
   const [showNotificationMessage, setShowNotificationMessage] = useState(false);
 
+  function reconnect_wallet(){
+    const timer = setTimeout(() => {
+      connectWallet(true, (res) => {
+        reconnect_wallet();
+      });
+    }, 10000);
+    return () => clearTimeout(timer);
+  }
+
   function connect_wallet(){
-    connectWallet((res) => {
+    connectWallet(false, (res) => {
       if(!res.success){
         setShowNotificationMessage(res.msg);
+      }else{
+        reconnect_wallet();
       }
     });
   }
 
   useEffect(() => {
-
     if(state_wallet.loading){
       if(["no-nami", "no-accept", "connected", WALLET_STATE.CONNECTING, WALLET_STATE.GETTING_ASSETS].includes(state_wallet.loading))
         setShowNotification(state_wallet.loading);
@@ -34,7 +44,6 @@ const ButtonConnect = ({state_wallet, connectWallet, get_wallet_assets}) => {
         
       });
     }
-
   }, [state_wallet]);
 
 
@@ -103,7 +112,7 @@ function mapStateToProps(state, props) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    connectWallet: (callback) => dispatch(connectWallet(callback)),
+    connectWallet: (is_silent, callback) => dispatch(connectWallet(is_silent, callback)),
     get_wallet_assets: (callback) => dispatch(get_wallet_assets(callback)),
   };
 }

@@ -9,7 +9,6 @@ import { load_collection, get_asset, asset_add_offer, opencnft_get_asset_tx } fr
 import { listToken, updateToken, delistToken, purchaseToken } from "../../store/market/api";
 import { WALLET_STATE } from "../../store/wallet/walletTypes";
 
-import ButtonBuy from "../../components/ButtonBuy";
 import CollectionAbout from "../../components/CollectionAbout";
 import CollectionBanner from "../../components/CollectionBanner";
 import AssetImageFigure from "../../components/AssetImageFigure";
@@ -182,21 +181,24 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
 
   const [showTab, setShowTab] = useState( asset.listing ? asset.listing.is_listed ? "buy" : "offer" : "offer");
   const [userInputAmount, setUserInputAmount] = useState("");
-  const [sendingBid, setSendingBid] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  function successful_transaction(res){
+    setUserInputAmount("");
+    if(res.success){
+      setShowModal(res.type);
+    }
+  }
 
   function list_this_token(price){
-    setSendingBid(true);
     asset_add_offer(asset.info.asset, price, (res) => {
-      setSendingBid(false);
-      setUserInputAmount("");
+      successful_transaction(res);
     });
   }
 
   function purchase_this_token(){
-    setSendingBid(true);
     purchase_token(asset, (res) => {
-      setSendingBid(false);
-      setUserInputAmount("");
+      successful_transaction(res);
     });
   }
 
@@ -212,6 +214,15 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
     }
   }
 
+  useEffect(() => {
+    if(showModal){
+      const timer = setTimeout(() => {
+        setShowModal(false);
+      }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [showModal]);
+
   return (
     <div className="card">
       <header className="card-header">
@@ -219,8 +230,8 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
           Buy {asset.info.onchainMetadata.name}
         </p>
       </header>
-      <div className="card-content">
-        
+
+      <div className="card-content">  
         {
           asset.listing ? asset.listing.is_listed ? (
             <div className="tabs is-centered">
@@ -235,20 +246,25 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
         
         {
           showTab==="buy" ? asset.listing ? asset.listing.is_listed ? (
-            <nav className="level is-mobile">
-              <div className="level-item has-text-centered">
-                <div>
-                  <p className="heading">Buy now</p>
-                  <p className="title">
-                    {asset.listing.price}
-                    <span className="ada_symbol">₳</span>
-                  </p>
-                </div>
-              </div>
+            <>
+              <nav className="level is-mobile">
                 <div className="level-item has-text-centered">
-                  <ButtonBuy purchase_this_token={purchase_this_token} />
+                  <div>
+                    <p className="heading">Buy now</p>
+                    <p className="title">
+                      {asset.listing.price}
+                      <span className="ada_symbol">₳</span>
+                    </p>
+                  </div>
                 </div>
-            </nav>
+                <div className="level-item has-text-centered">
+                  <ButtonBuy state_wallet={state_wallet} purchase_this_token={purchase_this_token} />
+                </div>
+              </nav>
+              { state_wallet.connected ? state_wallet.data.collateral.length===0 ? 
+                <p className="help">Fund the wallet and add collateral (option in Nami).</p> : <></> : <></>
+              }
+            </>
           )
           : <></> : <></> : <></>
         }
@@ -294,7 +310,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
               <div className="control has-icons-left is-expanded">
                 <input className="input" type="number" placeholder="Offer price"
                 value={userInputAmount} onChange={(event) => input_price_changed(event)} 
-                disabled={sendingBid || !state_wallet.connected}
+                disabled={state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE || !state_wallet.connected}
                 />
                 <span className="icon is-medium is-left">₳</span>
                 { !state_wallet.connected ? 
@@ -303,7 +319,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
               </div>
               <div className="control">
                 <button className="button is-info" onClick={() => list_this_token(userInputAmount)}
-                disabled={sendingBid || userInputAmount < 5 || !state_wallet.connected}
+                disabled={state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE || userInputAmount < 5 || !state_wallet.connected}
                 >
                   {
                     userInputAmount ? `Offer for ₳${userInputAmount}` : "Offer a price"
@@ -315,9 +331,77 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
         }
 
       </div>
+
+      {
+        showModal ? (
+          <div className="modal is-active">
+            <div className="modal-background"></div>
+            <div className="modal-card">
+              <section className="modal-card-body has-text-centered">
+                <span className="icon has-text-success" style={{fontSize:"100px", margin:"50px"}}>
+                  <i className="far fa-check-circle"></i>
+                </span>
+                <p className="is-size-4">
+                  {
+                    showModal == "purchase-success" ? <span>Purchased <b>{asset.info.onchainMetadata.name}</b>!</span> : 
+                    showModal == "offer-success" ? <span>You made an offer for <b>{asset.info.onchainMetadata.name}</b>!</span> : 
+                    ""
+                  }
+                </p>
+                <button className="button is-info is-outlined is-medium" onClick={() => setShowModal(false)}>
+                  {
+                    ["Yes!", "Yay!", "Ok!", "Nice!"][(Math.random() * 4) | 0]
+                  }
+                </button>
+              </section>
+            </div>
+          </div>
+        ) : <></>
+      }
+
     </div>
   )
 }
+
+const ButtonBuy = ({state_wallet, purchase_this_token}) => {
+
+  const [showNotification, setShowNotification] = useState(false);
+
+  async function begin_buy_process() {
+    purchase_this_token();
+  }
+
+  return (
+    <>
+      <button className={"button is-rounded is-info" + (state_wallet.loading ? " is-loading" : "")} 
+        disabled={state_wallet.loading || !state_wallet.connected || state_wallet.data.collateral.length===0} 
+        onClick={() => begin_buy_process()}>
+        <span>Buy Now</span>
+      </button>
+      {
+        showNotification ? (
+          <div className="notification-window notification ">
+            <button className="delete" onClick={() => setShowNotification(false)}></button>
+            {
+              showNotification ? (
+                <>
+                {
+                  showNotification.type === "payment-success" ? (
+                    <p>
+                      Payment successful.<br/>
+                      <a href={urls.cardanoscan+showNotification.data} target="_blank" rel="noreferrer">{showNotification.data}</a>.
+                    </p>
+                  ) : <></>
+                }
+                </> 
+              ) : <></>
+            }
+          </div>
+        ) : <></>
+      }
+    </>
+  );
+};
 
 const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_token}) => {
 
@@ -338,6 +422,7 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
   }
 
   function update_this_listing(price){
+    console.log("update listing ", price)
     update_token(asset, price, (res) => {
       successful_transaction(res);
     });
@@ -482,7 +567,6 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
                     showModal == "list-success" ? <span>Listed <b>{asset.info.onchainMetadata.name}</b> successfully!</span> : 
                     showModal == "price-update-success" ? <span>Listing price for <b>{asset.info.onchainMetadata.name}</b> updated!</span> : 
                     showModal == "delist-success" ? <span><b>{asset.info.onchainMetadata.name}</b> removed from the marketplace.</span> : 
-                    showModal == "purchase-success" ? <span>Purchased <b>{asset.info.onchainMetadata.name}</b>!</span> : 
                     ""
                   }
                 </p>

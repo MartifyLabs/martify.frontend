@@ -81,7 +81,7 @@ const Events = ({state_wallet, state_collection}) => {
           .map((this_event, i) => {
             let this_asset = state_collection.policies_assets[this_event.policy_id][this_event.asset_id];
             return(
-              <tr>
+              <tr key={i}>
                 <td>
                   <Moment format="MMM DD YYYY HH:mm">
                     {this_event.on}
@@ -97,7 +97,9 @@ const Events = ({state_wallet, state_collection}) => {
                   {
                     this_event.type=="new-listing" ? `${this_asset.info.onchainMetadata.name} has been listed for ₳${this_event.price}` : 
                     this_event.type=="offer" ? `Someone has offered ${this_asset.info.onchainMetadata.name} for ₳${this_event.price}` : 
-                    this_event.type=="delist" ? `${this_asset.info.onchainMetadata.name} has been removed from the marketplace.` : 
+                    this_event.type=="delist" ? `${this_asset.info.onchainMetadata.name} has been removed from the marketplace` : 
+                    this_event.type=="price-update" ? `${this_asset.info.onchainMetadata.name} listing price updated to ₳${this_event.price}` : 
+                    this_event.type=="purchase" ? `${this_asset.info.onchainMetadata.name} purchased from the marketplace for ₳${this_event.price}` : 
                     ""
                   }
                 </td>

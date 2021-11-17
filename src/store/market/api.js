@@ -67,8 +67,6 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
     dispatch(collections_add_tokens(output));
     dispatch(setWalletLoading(false));
     callback({ success: true, type: "list-success" });
-  
-    
   } catch (error) {
     console.error(`Unexpected error in listToken. [Message: ${error.message}]`);
     dispatch(setWalletLoading(false));
@@ -227,6 +225,7 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
       type: "purchase",
       on: new Date().getTime(),
       tx: txHash,
+      price: asset.listing.price
     }
     add_event_asset_history(asset_updated, event);
 

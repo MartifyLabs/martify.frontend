@@ -112,9 +112,9 @@ export const asset_add_offer = (asset_id, price, callback) => async (dispatch) =
   
   await saveAsset(asset);
 
-  add_token(asset, dispatch)
+  add_token(asset, dispatch);
 
-  callback(true);
+  callback({ success: true, type: "offer-success" });
 }
 
 export const opencnft_get_top_projects = (time, callback) => async (dispatch) => {
