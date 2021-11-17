@@ -32,11 +32,12 @@ export const getAsset = async (assetId) => {
 /**
  * @param {string} address - address needs to be in bech32 format.
  */
-export const saveAssetTx = async (asset, datum, txHash, address) => {
-  if (datum && txHash && address) {
+export const saveAssetTx = async (asset, {datum, datumHash, txHash, address}) => {
+  if (datum && datumHash && txHash && address) {
     await saveAsset({
       ...asset,
       datum,
+      datumHash,
       txHash,
       submittedBy: address,
       submittedOn: new Date().getTime(),
