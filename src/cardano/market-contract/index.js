@@ -110,7 +110,7 @@ export const update = async (tn, cs, price, newprice, assetUtxos) => {
 
   outputs.add(
     await createTxOutput(
-      walletAddress.to_address(),
+      contractAddress(),
       scriptUtxo.output().amount()
     ),
     { datum: updateDatumNew }
