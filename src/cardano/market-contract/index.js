@@ -99,6 +99,7 @@ export const update = async (tn, cs, price, newprice, assetUtxos) => {
   });
 
   datums.add(updateDatum);
+  datums.add(updateDatumNew);
 
   const assetUtxo = assetUtxos.filter(
     (utxo) =>
@@ -111,9 +112,9 @@ export const update = async (tn, cs, price, newprice, assetUtxos) => {
   outputs.add(
     await createTxOutput(
       contractAddress(),
-      scriptUtxo.output().amount()
+      scriptUtxo.output().amount(),
+      { datum: updateDatumNew }
     ),
-    { datum: updateDatumNew }
   );
 
   const requiredSigners = Cardano.Instance.Ed25519KeyHashes.new();
