@@ -9,7 +9,7 @@ import {
   where,
   limit,
 } from "firebase/firestore";
-import { getAssetInfo, getMintedAssets } from "../cardano/blockfrost-api";
+import { getAssetDetails, getMintedAssets } from "../cardano/blockfrost-api";
 import { firebaseOptions } from "../config";
 
 const app = initializeApp(firebaseOptions);
@@ -28,7 +28,7 @@ export const getAssets = async (policyId) => {
     if (snapshot.empty) {
       const assetIds = await getMintedAssets(policyId);
       const assets = await Promise.all(
-        assetIds.map(async (assetId) => await getAssetInfo(assetId))
+        assetIds.map(async (assetId) => await getAssetDetails(assetId))
       );
 
       await saveAssets(assets);
@@ -53,7 +53,7 @@ export const getAsset = async (assetId) => {
     const snapshot = await getDocs(result);
 
     if (snapshot.empty) {
-      const asset = await getAssetInfo(assetId)
+      const asset = await getAssetDetails(assetId)
       
       await saveAssets([asset]);
 

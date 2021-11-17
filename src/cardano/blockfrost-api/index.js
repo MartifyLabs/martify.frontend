@@ -5,7 +5,7 @@ import { fromHex, toString } from "../../utils";
  * @param {string} asset - asset is a Concatenation of the policy_id and hex-encoded asset_name.
  * @throws ASSET_QUANTITY_NOT_EQUAL_TO_ONE quantity must be exactly one for NFTs.
  */
-export const getAssetInfo = async (asset) => {
+export const getAssetDetails = async (asset) => {
   try {
     const response = await cardano(`assets/${asset}`);
 
@@ -27,7 +27,7 @@ export const getAssetInfo = async (asset) => {
     };
   } catch (error) {
     console.error(
-      `Unexpected error in getAssetInfo. [Message: ${error.message}]`
+      `Unexpected error in getAssetDetails. [Message: ${error.message}]`
     );
   }
 };
