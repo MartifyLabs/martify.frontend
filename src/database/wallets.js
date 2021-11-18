@@ -11,54 +11,92 @@ const db = getFirestore(app);
  */
 export const getWallet = async (address) => {
   try {
-    const reference = doc(db, "wallets", address);
+    if (address) {
+      const reference = doc(db, "wallets", address);
 
-    const snapshot = await getDoc(reference);
+      const snapshot = await getDoc(reference);
 
-    if (snapshot.exists()) {
-      return snapshot.data();
-    } else {
-      return null;
+      if (snapshot.exists()) {
+        return snapshot.data();
+      } else {
+        const wallet = {
+          address,
+          assets: [],
+          events: [],
+          offers: [],
+        };
+
+        saveWallet(wallet, address);
+
+        return wallet;
+      }
     }
   } catch (error) {
     console.error(`Unexpected error in getWallet. [Message: ${error.message}]`);
   }
 };
 
-/**
- * @param {string} address - address needs to be in bech32 format.
- */
-export const setWalletAssets = async (address, assets) => {
-  if (address && assets) {
-    await saveWallet({ assets }, address);
+export const addWalletAsset = async (wallet, newAsset) => {
+  if (wallet && newAsset) {
+    await saveWallet({
+      ...wallet,
+      assets: [...wallet.assets, newAsset],
+    });
+  }
+};
+
+export const addWalletEvent = async (wallet, newEvent) => {
+  if (wallet && newEvent) {
+    await saveWallet({
+      ...wallet,
+      events: [...wallet.events, newEvent],
+    });
+  }
+};
+
+export const addWalletOffer = async (wallet, newOffer) => {
+  if (wallet && newOffer) {
+    await saveWallet({
+      ...wallet,
+      offers: [...wallet.offers, newOffer],
+    });
   }
 };
 
 /**
  * @param {string} address - address needs to be in bech32 format.
  */
-export const setWalletEvents = async (address, events) => {
-  if (address && events) {
-    await saveWallet({ events }, address);
+export const setWalletAssets = async (wallet, assets) => {
+  if (assets) {
+    await saveWallet({ ...wallet, assets });
   }
 };
 
 /**
  * @param {string} address - address needs to be in bech32 format.
  */
-export const setWalletOffers = async (address, offers) => {
-  if (address && offers) {
-    await saveWallet({ offers }, address);
+export const setWalletEvents = async (wallet, events) => {
+  if (events) {
+    await saveWallet({ ...wallet, events });
   }
 };
 
 /**
  * @param {string} address - address needs to be in bech32 format.
  */
-export const saveWallet = async (wallet, address) => {
+export const setWalletOffers = async (wallet, offers) => {
+  if (offers) {
+    await saveWallet({ ...wallet, offers });
+  }
+};
+
+/**
+ * @param {string} address - address needs to be in bech32 format.
+ */
+export const saveWallet = async (wallet) => {
   try {
     if (wallet) {
-      const reference = doc(db, "wallets", address);
+      const reference = doc(db, "wallets", wallet.address);
 
       await setDoc(reference, wallet, { merge: true });
     }

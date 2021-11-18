@@ -19,6 +19,43 @@ const app = initializeApp(firebaseOptions);
 
 const db = getFirestore(app);
 
+export const addAssetOffer = async (asset, newOffer) => {
+  if (asset && newOffer) {
+    await saveAsset({
+      ...asset,
+      offers: [...asset.offers, newOffer],
+    });
+  }
+};
+
+export const getAsset = async (assetId) => {
+  try {
+    if (assetId) {
+      const reference = doc(db, "assets", assetId);
+
+      const snapshot = await getDoc(reference);
+
+      if (snapshot.exists()) {
+        return snapshot.data();
+      } else {
+        const assetDetails = await getAssetDetails(assetId);
+
+        const asset = {
+          details: assetDetails,
+          offers: [],
+          status: { locked: false },
+        };
+
+        await saveAsset(asset);
+
+        return asset;
+      }
+    }
+  } catch (error) {
+    console.error(`Unexpected error in getAsset. [Message: ${error.message}]`);
+  }
+};
+
 export const getAssets = async (assetIds) => {
   try {
     const assets = await Promise.all(
@@ -28,32 +65,6 @@ export const getAssets = async (assetIds) => {
     return assets;
   } catch (error) {
     console.error(`Unexpected error in getAssets. [Message: ${error.message}]`);
-  }
-};
-
-export const getAsset = async (assetId) => {
-  try {
-    const reference = doc(db, "assets", assetId);
-
-    const snapshot = await getDoc(reference);
-
-    if (snapshot.exists()) {
-      return snapshot.data();
-    } else {
-      const assetDetails = await getAssetDetails(assetId);
-
-      const asset = {
-        details: assetDetails,
-        offers: [],
-        status: { locked: false },
-      };
-
-      await saveAsset(asset);
-
-      return asset;
-    }
-  } catch (error) {
-    console.error(`Unexpected error in getAsset. [Message: ${error.message}]`);
   }
 };
 
