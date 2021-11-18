@@ -31,22 +31,6 @@ export const getCollection = async (policyId) => {
   }
 };
 
-export const saveCollectionRoyalties = async (
-  collection,
-  { address, percentage }
-) => {
-  if (address && percentage) {
-    await saveCollection({ ...collection, royalties: { address, percentage } });
-  }
-};
-
-export const saveCollectionVerificationStatus = async (
-  collection,
-  verified: Boolean
-) => {
-  await saveCollection({ ...collection, verified });
-};
-
 export const saveCollection = async (collection, policyId) => {
   try {
     if (collection) {
@@ -59,6 +43,25 @@ export const saveCollection = async (collection, policyId) => {
       `Unexpected error in saveCollection. [Message: ${error.message}]`
     );
   }
+};
+
+/**
+ * @param {string} address - address needs to be in bech32 format.
+ */
+export const setCollectionRoyalties = async (
+  collection,
+  { address, percentage }
+) => {
+  if (address && percentage) {
+    await saveCollection({ ...collection, royalties: { address, percentage } });
+  }
+};
+
+export const setCollectionStatus = async (
+  collection,
+  verified: Boolean
+) => {
+  await saveCollection({ ...collection, verified });
 };
 
 const fetchAllAssetsForCollection = async (policyId, page = 1) => {
