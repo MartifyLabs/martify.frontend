@@ -100,7 +100,6 @@ export const saveAsset = async (asset) => {
   }
 };
 
-
 export const getListedAssets = async (count, page) => {
   try {
     const result = await query(
@@ -108,9 +107,8 @@ export const getListedAssets = async (count, page) => {
       where("listing.is_listed", "==", true),
       // orderBy("listing.on"), // TODO: The query requires an index
       limit(count),
-      // startAfter(page),
+      // startAfter(page), // TODO: because of limit, need a way to paginate
     );
-
 
     const snapshot = await getDocs(result);
 

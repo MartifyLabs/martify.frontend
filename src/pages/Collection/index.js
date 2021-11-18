@@ -120,11 +120,11 @@ const ListingSection = ({state_collection, policyIds}) => {
   }
 
   useEffect(() => {
-    load()
+    load();
   }, [policyIds, state_collection]);
 
   useEffect(() => {
-    load()
+    load();
   }, []);
 
 return (
