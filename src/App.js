@@ -11,6 +11,7 @@ import Account from "./pages/Account";
 import About from "./pages/About";
 import HowGetStarted from "./pages/HowGetStarted";
 import FAQ from "./pages/FAQ";
+import Explore from "./pages/Explore";
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "@creativebulma/bulma-tooltip/dist/bulma-tooltip.min.css";
@@ -34,6 +35,7 @@ const App = ({ state_collection, load_collection }) => {
         <Route exact path="/" component={Home} />
         <Route exact path="/collection/:collection_id" component={Collection} />
         <Route exact path="/assets/:policy_id/:asset_id" component={Asset} />
+        <Route exact path="/explore" component={Explore} />
         <Route exact path="/account" component={Account} />
         <Route exact path="/about" component={About} />
         <Route exact path="/faq" component={FAQ} />

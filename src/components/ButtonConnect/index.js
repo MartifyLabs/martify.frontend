@@ -11,22 +11,25 @@ const ButtonConnect = ({state_wallet, connectWallet, get_wallet_assets}) => {
 
   const [showNotification, setShowNotification] = useState(false);
   const [showNotificationMessage, setShowNotificationMessage] = useState(false);
+  const [listCurrentUtxos, setlistCurrentUtxos] = useState(false);
 
   function reconnect_wallet(){
     const timer = setTimeout(() => {
-      connectWallet(true, (res) => {
-        reconnect_wallet();
+      connectWallet(state_wallet, true, (res) => {
+        // get_wallet_assets((res) => {
+          reconnect_wallet();
+        // });
       });
     }, 10000);
     return () => clearTimeout(timer);
   }
 
   function connect_wallet(){
-    connectWallet(false, (res) => {
+    connectWallet(state_wallet, false, (res) => {
       if(!res.success){
         setShowNotificationMessage(res.msg);
       }else{
-        reconnect_wallet();
+        // reconnect_wallet();
       }
     });
   }
@@ -40,10 +43,34 @@ const ButtonConnect = ({state_wallet, connectWallet, get_wallet_assets}) => {
     }
 
     if(state_wallet.connected && !state_wallet.loading && !state_wallet.loaded_assets){
-      get_wallet_assets((res) => {
-        
-      });
+      setlistCurrentUtxos(state_wallet.data.utxos);
+      get_wallet_assets((res) => {});
     }
+
+    // if(state_wallet.connected && !state_wallet.loading && state_wallet.loaded_assets){
+    //   console.log(11, state_wallet.data.utxos, listCurrentUtxos)
+    //   let get_latest = false;
+
+    //   if(listCurrentUtxos){
+    //     if(state_wallet.data.utxos.sort().join(',')=== listCurrentUtxos.sort().join(',')){
+    //       console.log("SAME!!!");
+    //     }else{
+    //       console.log("NOT SAME do something");
+    //       get_latest = true;
+    //     }
+    //   }else{
+    //     console.log("NOT SAME do something 2");
+    //     get_latest = true;
+    //   }
+
+    //   if(get_latest){
+    //     get_wallet_assets((res) => {
+    //       setlistCurrentUtxos(state_wallet.data.utxos);
+    //     });
+    //   }
+    // }
+
+
   }, [state_wallet]);
 
 
@@ -112,7 +139,7 @@ function mapStateToProps(state, props) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    connectWallet: (is_silent, callback) => dispatch(connectWallet(is_silent, callback)),
+    connectWallet: (wallet, is_silent, callback) => dispatch(connectWallet(wallet, is_silent, callback)),
     get_wallet_assets: (callback) => dispatch(get_wallet_assets(callback)),
   };
 }

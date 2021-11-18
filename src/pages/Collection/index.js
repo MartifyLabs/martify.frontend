@@ -115,6 +115,7 @@ const ListingSection = ({state_collection, policyIds}) => {
         tmp_list.push(...tmp);
       }
     }
+    console.log(tmp_list)
     setListings(tmp_list);
   }
 

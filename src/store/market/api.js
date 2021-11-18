@@ -64,6 +64,7 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
         [asset_updated.info.asset]: asset_updated,
       },
     };
+    
     dispatch(collections_add_tokens(output));
     dispatch(setWalletLoading(false));
     callback({ success: true, type: "list-success" });

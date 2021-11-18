@@ -8,6 +8,8 @@ import {
   setDoc,
   where,
   limit,
+  orderBy,
+  startAfter,
 } from "firebase/firestore";
 import { getAssetDetails, getMintedAssets } from "../cardano/blockfrost-api";
 import { firebaseOptions } from "../config";
@@ -95,5 +97,26 @@ export const saveAsset = async (asset) => {
     console.error(
       `Unexpected error in saveAsset. [Message: ${error.message}]`
     );
+  }
+};
+
+
+export const getListedAssets = async (count, page) => {
+  try {
+    const result = await query(
+      collection(db, "assets"),
+      where("listing.is_listed", "==", true),
+      // orderBy("listing.on"), // TODO: The query requires an index
+      limit(count),
+      // startAfter(page),
+    );
+
+
+    const snapshot = await getDocs(result);
+
+    return snapshot.docs.map((doc) => doc.data());
+
+  } catch (error) {
+    console.error(`Unexpected error in getListedAssets. [Message: ${error.message}]`);
   }
 };

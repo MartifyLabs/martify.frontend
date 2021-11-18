@@ -9,25 +9,6 @@ const ButtonBuy = ({wallet, purchase_this_token}) => {
 
   async function begin_buy_process() {
     purchase_this_token();
-
-    // let amount = 2;
-
-    // if(amount){
-    //   create_txn(wallet.data.used_addr, amount, (res) => {
-    //     if(res.success){
-    //       setShowNotification({
-    //         type: "payment-success",
-    //         data: res.txn
-    //       });
-    //       setTimeout(function(){ setShowNotification(false); }, 30000);
-    //     }
-    //   });
-    // }
-
-    // buyer_pay(wallet.data.used_addr, (res) => {
-    //   console.log(res)
-    // });
-
   }
 
   return (

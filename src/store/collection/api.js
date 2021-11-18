@@ -11,6 +11,7 @@ import {
   getAssets,
   getAsset,
   saveAsset,
+  getListedAssets,
 } from "../../database";
 
 import { getWalletAddresses } from "../../cardano/wallet";
@@ -91,6 +92,40 @@ export const get_asset = (asset_id, callback) => async (dispatch) => {
 
   if(asset) add_token(asset, dispatch);
   callback(true);
+}
+
+
+export const get_listed_assets = (callback) => async (dispatch) => {
+
+  // dispatch(collections_loading(true));
+  
+  let listed_assets = await getListedAssets(20, 0);
+
+  let listed_assets_by_policy = {};
+
+  for(var i in listed_assets){
+    let asset = listed_assets[i];
+
+    if(asset){
+      if(asset.info){
+
+        if(!(asset.info.policyId in listed_assets_by_policy)){
+          listed_assets_by_policy[asset.info.policyId] = {
+            "policy_id": asset.info.policyId,
+            "listing": {}
+          };
+        }
+        listed_assets_by_policy[asset.info.policyId].listing[asset.info.asset] = asset;
+      }
+    }
+
+  }
+
+  for(var policy_id in listed_assets_by_policy){
+    dispatch(collections_add_tokens(listed_assets_by_policy[policy_id]));
+  }
+
+  callback({success:true, data:listed_assets});
 }
 
 

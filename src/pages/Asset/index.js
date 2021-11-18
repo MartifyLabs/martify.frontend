@@ -329,7 +329,6 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
             </div>
           ) : <></>
         }
-
       </div>
 
       {
@@ -422,7 +421,6 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
   }
 
   function update_this_listing(price){
-    console.log("update listing ", price)
     update_token(asset, price, (res) => {
       successful_transaction(res);
     });
@@ -702,7 +700,6 @@ const ListAllAttributes = ({asset}) => {
 
 const AssetRawMetaData = ({asset}) => {
   const [show, setShow] = useState(false);
-
   return (
     <div className="card">
       <header className="card-header" onClick={() => setShow(!show)} style={{cursor:"pointer"}}>
@@ -815,17 +812,34 @@ const Transactions = ({asset, opencnft_get_asset_tx}) => {
   function feteh_update(){
     setFetching(true);
     setTransactions(false);
+    setTransactions([]);
+    let tmp_transactions = [];
+    console.log(asset.history)
+
+    if(asset.history){
+      let asset_purchase_history = asset.history.filter((tx) => {
+        if(tx.type=="purchase") return true;
+        return false;
+      })
+      .map((tx, i) => {
+        return {
+          sold_at: tx.on,
+          marketplace: "Martify",
+          price: tx.price*1000000
+        }
+      });
+      tmp_transactions.push.apply(tmp_transactions, asset_purchase_history);
+    }
     
     opencnft_get_asset_tx(asset.info.asset, (res) => {
       setFirstLoad(true);
-
-      if(res.data.statusCode === 404){
-        setTransactions([]);
-      }else{
-        setTransactions(res.data.items);
+      if(res.data.items){
+        tmp_transactions.push.apply(tmp_transactions, res.data.items);
       }
+      setTransactions(tmp_transactions);
       setFetching(false);
     });
+    
   }
   
   return (
@@ -849,11 +863,15 @@ const Transactions = ({asset, opencnft_get_asset_tx}) => {
                   <table className="table">
                     <tbody>
                       {
-                        transactions.map((tx, i) => {
+                        transactions
+                        .sort((a, b) => {
+                          return b.sold_at - a.sold_at;
+                        })
+                        .map((tx, i) => {
                           return (
-                            <tr>
+                            <tr key={i}>
                               <td>
-                                <Moment format="MMM DD YYYY">
+                                <Moment format="MMM DD YYYY HH:mm">
                                   {tx.sold_at}
                                 </Moment>
                               </td>

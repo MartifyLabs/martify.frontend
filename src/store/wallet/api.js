@@ -74,8 +74,9 @@ function receive_txn_for_user_sign(res, callback) {
 
 /////////
 
-export const connectWallet = (is_silent, callback) => async (dispatch) => {
+export const connectWallet = (current_wallet, is_silent, callback) => async (dispatch) => {
   try {
+    // console.log(current_wallet);
     if(!is_silent) dispatch(setWalletLoading(WALLET_STATE.CONNECTING));
 
     window.cardano
@@ -93,6 +94,17 @@ export const connectWallet = (is_silent, callback) => async (dispatch) => {
           if(nami_network == network){
             getUtxos().then((res_utxos) => {
               connected_wallet.utxos = res_utxos;
+
+              // console.log(current_wallet.data.utxos)
+              // if(current_wallet.data.utxos){
+              //   if(connected_wallet.utxos.sort().join(',')=== current_wallet.data.utxos.sort().join(',')){
+              //     console.log("SAME!!!");
+              //   }else{
+              //     console.log("NOT SAME do something");
+              //   }
+              // }else{
+              //   console.log("NOT SAME do something 2");
+              // }
   
               getUsedAddresses().then((res) => {
                 let used_address = res[0];
