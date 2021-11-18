@@ -46,14 +46,14 @@ const Collection = ({state_collection, collection_id, get_listings, opencnft_get
         policy_ids = [collection_id];
       }
       
-      if(this_collection.id != thisCollection.id){
+      if(this_collection.id !== thisCollection.id){
         setPolicyIds(policy_ids);
         setThisCollection({...this_collection});
 
         for(var i in policy_ids){
           var policy_id = policy_ids[i];
           opencnft_get_policy(policy_id, (res) => {
-            if(res.data.statusCode==404){}else{
+            if(res.data.statusCode===404){}else{
               if(!("opencnft" in this_collection)){
                 this_collection.opencnft = [];
               }
@@ -133,7 +133,7 @@ return (
       listings.length > 0 ? <DisplayListing listings={listings} /> : <></>
     }
     {
-      listings.length == 0 ? <NoAssetFound state_collection={state_collection} policyIds={policyIds} /> : <></>
+      listings.length === 0 ? <NoAssetFound state_collection={state_collection} policyIds={policyIds} /> : <></>
     }
   </>
   );
@@ -188,8 +188,8 @@ const DisplayListing = ({listings}) => {
     return false;
   })
   .sort((a, b) => {
-    let a_price = a.listing.price!=undefined ? a.listing.price : 999999;
-    let b_price = b.listing.price!=undefined ? b.listing.price : 999999;
+    let a_price = a.listing.price!==undefined ? a.listing.price : 999999;
+    let b_price = b.listing.price!==undefined ? b.listing.price : 999999;
 
     if(sortby==='lowtohigh'){
       return a_price - b_price;
@@ -243,11 +243,11 @@ return (
     {
       (matchedtokens.length/pageSize) > 1 ? (
         <nav className="pagination is-rounded" role="navigation" aria-label="pagination">
-          <button className="pagination-previous" onClick={() => setCurrentPage(currentPage-1)} disabled={currentPage==1}>Previous</button>
-          <button className="pagination-next" onClick={() => setCurrentPage(currentPage+1)} disabled={currentPage==(matchedtokens.length/pageSize)}>Next page</button>
+          <button className="pagination-previous" onClick={() => setCurrentPage(currentPage-1)} disabled={currentPage===1}>Previous</button>
+          <button className="pagination-next" onClick={() => setCurrentPage(currentPage+1)} disabled={currentPage===(matchedtokens.length/pageSize)}>Next page</button>
           <ul className="pagination-list">
             {
-              currentPage!=1?(
+              currentPage!==1?(
                 <li><a className="pagination-link" aria-label="Goto page 1" onClick={() => setCurrentPage(1)}>1</a></li>
               ) : <></>
             }
