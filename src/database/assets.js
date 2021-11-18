@@ -58,11 +58,13 @@ export const getAsset = async (assetId) => {
 
 export const getAssets = async (assetIds) => {
   try {
-    const assets = await Promise.all(
-      assetIds.map(async (assetId) => await getAsset(assetId))
-    );
+    if (assetIds) {
+      const assets = await Promise.all(
+        assetIds.map(async (assetId) => await getAsset(assetId))
+      );
 
-    return assets;
+      return assets;
+    }
   } catch (error) {
     console.error(`Unexpected error in getAssets. [Message: ${error.message}]`);
   }
@@ -95,7 +97,7 @@ export const lockAsset = async (
   asset,
   { datum, datumHash, txHash, address }
 ) => {
-  if (datum && datumHash && txHash && address) {
+  if (asset && datum && datumHash && txHash && address) {
     await saveAsset({
       ...asset,
       status: {
@@ -114,7 +116,7 @@ export const lockAsset = async (
  * @param {string} address - address needs to be in bech32 format.
  */
 export const unlockAsset = async (asset, { txHash, address }) => {
-  if (txHash && address) {
+  if (asset && txHash && address) {
     await saveAsset({
       ...asset,
       status: {
@@ -141,11 +143,13 @@ export const saveAsset = async (asset) => {
 
 export const saveAssets = async (assets) => {
   try {
-    await Promise.all(
-      assets.map(async (asset) => {
-        await saveAsset(asset);
-      })
-    );
+    if (assets) {
+      await Promise.all(
+        assets.map(async (asset) => {
+          await saveAsset(asset);
+        })
+      );
+    }
   } catch (error) {
     console.error(
       `Unexpected error in saveAssets. [Message: ${error.message}]`
@@ -154,7 +158,7 @@ export const saveAssets = async (assets) => {
 };
 
 export const setAssetOffers = async (asset, offers) => {
-  if (offers) {
+  if (asset && offers) {
     await saveAsset({ ...asset, offers });
   }
 };

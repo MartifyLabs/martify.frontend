@@ -9,20 +9,22 @@ const db = getFirestore(app);
 
 export const getCollection = async (policyId) => {
   try {
-    const reference = doc(db, "collections", policyId);
+    if (policyId) {
+      const reference = doc(db, "collections", policyId);
 
-    const snapshot = await getDoc(reference);
+      const snapshot = await getDoc(reference);
 
-    if (snapshot.exists()) {
-      return snapshot.data();
-    } else {
-      const assets = await fetchAllAssetsForCollection(policyId);
+      if (snapshot.exists()) {
+        return snapshot.data();
+      } else {
+        const assets = await fetchAllAssetsForCollection(policyId);
 
-      const collection = { assets };
+        const collection = { assets, verified: false };
 
-      await saveCollection(collection, policyId);
+        await saveCollection(collection, policyId);
 
-      return collection;
+        return collection;
+      }
     }
   } catch (error) {
     console.error(
@@ -52,23 +54,25 @@ export const setCollectionRoyalties = async (
   collection,
   { address, percentage }
 ) => {
-  if (address && percentage) {
+  if (collection && address && percentage) {
     await saveCollection({ ...collection, royalties: { address, percentage } });
   }
 };
 
-export const setCollectionStatus = async (
-  collection,
-  verified: Boolean
-) => {
-  await saveCollection({ ...collection, verified });
+export const setCollectionStatus = async (collection, verified: Boolean) => {
+  if (collection) {
+    await saveCollection({ ...collection, verified });
+  }
 };
 
 const fetchAllAssetsForCollection = async (policyId, page = 1) => {
   const assets = await getMintedAssets(policyId, { page });
 
   if (assets) {
-    return [...assets, ...(await fetchAllAssetsForCollection(policyId, page++))];
+    return [
+      ...assets,
+      ...(await fetchAllAssetsForCollection(policyId, page++)),
+    ];
   }
 
   return [];

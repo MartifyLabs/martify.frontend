@@ -67,7 +67,7 @@ export const addWalletOffer = async (wallet, newOffer) => {
  * @param {string} address - address needs to be in bech32 format.
  */
 export const setWalletAssets = async (wallet, assets) => {
-  if (assets) {
+  if (wallet && assets) {
     await saveWallet({ ...wallet, assets });
   }
 };
@@ -76,7 +76,7 @@ export const setWalletAssets = async (wallet, assets) => {
  * @param {string} address - address needs to be in bech32 format.
  */
 export const setWalletEvents = async (wallet, events) => {
-  if (events) {
+  if (wallet && events) {
     await saveWallet({ ...wallet, events });
   }
 };
@@ -85,7 +85,7 @@ export const setWalletEvents = async (wallet, events) => {
  * @param {string} address - address needs to be in bech32 format.
  */
 export const setWalletOffers = async (wallet, offers) => {
-  if (offers) {
+  if (wallet && offers) {
     await saveWallet({ ...wallet, offers });
   }
 };
