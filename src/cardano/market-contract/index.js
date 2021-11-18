@@ -1,5 +1,5 @@
 import Cardano from "../serialization-lib";
-import { serializeSale, serializeUpdate } from "./datums";
+import { serializeSale } from "./datums";
 import { BUY, CANCEL, UPDATE } from "./redeemers";
 import { contractAddress, contractScripts } from "./validator";
 import {
@@ -9,14 +9,14 @@ import {
   finalizeTx,
   initializeTx,
 } from "../transaction";
-import { getUsedAddresses, getUtxos } from "../wallet";
+import { getUsedAddress, getUtxos } from "../wallet";
 import { fromHex, toHex, toLovelace } from "../../utils";
 
 export const offer = async (tn, cs, price) => {
   const { txBuilder, datums, outputs } = await initializeTx();
 
   const walletAddress = Cardano.Instance.BaseAddress.from_address(
-    Cardano.Instance.Address.from_bytes(fromHex((await getUsedAddresses())[0]))
+    await getUsedAddress()
   );
 
   const utxos = (await getUtxos()).map((utxo) =>
@@ -24,7 +24,9 @@ export const offer = async (tn, cs, price) => {
   );
 
   const raddr = Cardano.Instance.BaseAddress.from_address(
-    Cardano.Instance.Address.from_bech32("addr_test1qrm4m0p8nn9mxsgzu8dejtf2glqz0k556tac34tpw40zefllt9l9jhn3tlkatyue3w4f47zhgscu7y5mpzdtdh7d7qwquyes0x")
+    Cardano.Instance.Address.from_bech32(
+      "addr_test1qrm4m0p8nn9mxsgzu8dejtf2glqz0k556tac34tpw40zefllt9l9jhn3tlkatyue3w4f47zhgscu7y5mpzdtdh7d7qwquyes0x"
+    )
   );
   const rp = 3;
 
@@ -34,7 +36,7 @@ export const offer = async (tn, cs, price) => {
     sa: toHex(walletAddress.payment_cred().to_keyhash().to_bytes()),
     price: toLovelace(price),
     ra: toHex(raddr.payment_cred().to_keyhash().to_bytes()),
-    rp
+    rp,
   });
 
   datums.add(offerDatum);
@@ -68,7 +70,7 @@ export const update = async (tn, cs, price, newprice, assetUtxos) => {
   const { txBuilder, datums, outputs } = await initializeTx();
 
   const walletAddress = Cardano.Instance.BaseAddress.from_address(
-    Cardano.Instance.Address.from_bytes(fromHex((await getUsedAddresses())[0]))
+    await getUsedAddress()
   );
 
   const utxos = (await getUtxos()).map((utxo) =>
@@ -76,7 +78,9 @@ export const update = async (tn, cs, price, newprice, assetUtxos) => {
   );
 
   const raddr = Cardano.Instance.BaseAddress.from_address(
-    Cardano.Instance.Address.from_bech32("addr_test1qrm4m0p8nn9mxsgzu8dejtf2glqz0k556tac34tpw40zefllt9l9jhn3tlkatyue3w4f47zhgscu7y5mpzdtdh7d7qwquyes0x")
+    Cardano.Instance.Address.from_bech32(
+      "addr_test1qrm4m0p8nn9mxsgzu8dejtf2glqz0k556tac34tpw40zefllt9l9jhn3tlkatyue3w4f47zhgscu7y5mpzdtdh7d7qwquyes0x"
+    )
   );
   const rp = 3;
 
@@ -86,7 +90,7 @@ export const update = async (tn, cs, price, newprice, assetUtxos) => {
     sa: toHex(walletAddress.payment_cred().to_keyhash().to_bytes()),
     price: toLovelace(price),
     ra: toHex(raddr.payment_cred().to_keyhash().to_bytes()),
-    rp
+    rp,
   });
 
   const updateDatumNew = serializeSale({
@@ -95,7 +99,7 @@ export const update = async (tn, cs, price, newprice, assetUtxos) => {
     sa: toHex(walletAddress.payment_cred().to_keyhash().to_bytes()),
     price: toLovelace(newprice),
     ra: toHex(raddr.payment_cred().to_keyhash().to_bytes()),
-    rp
+    rp,
   });
 
   datums.add(updateDatum);
@@ -110,11 +114,9 @@ export const update = async (tn, cs, price, newprice, assetUtxos) => {
   const scriptUtxo = await createTxUnspentOutput(assetUtxo);
 
   outputs.add(
-    await createTxOutput(
-      contractAddress(),
-      scriptUtxo.output().amount(),
-      { datum: updateDatumNew }
-    ),
+    await createTxOutput(contractAddress(), scriptUtxo.output().amount(), {
+      datum: updateDatumNew,
+    })
   );
 
   const requiredSigners = Cardano.Instance.Ed25519KeyHashes.new();
@@ -139,7 +141,7 @@ export const cancel = async (tn, cs, price, assetUtxos) => {
   const { txBuilder, datums, outputs } = await initializeTx();
 
   const walletAddress = Cardano.Instance.BaseAddress.from_address(
-    Cardano.Instance.Address.from_bytes(fromHex((await getUsedAddresses())[0]))
+    await getUsedAddress()
   );
 
   const utxos = (await getUtxos()).map((utxo) =>
@@ -147,7 +149,9 @@ export const cancel = async (tn, cs, price, assetUtxos) => {
   );
 
   const raddr = Cardano.Instance.BaseAddress.from_address(
-    Cardano.Instance.Address.from_bech32("addr_test1qrm4m0p8nn9mxsgzu8dejtf2glqz0k556tac34tpw40zefllt9l9jhn3tlkatyue3w4f47zhgscu7y5mpzdtdh7d7qwquyes0x")
+    Cardano.Instance.Address.from_bech32(
+      "addr_test1qrm4m0p8nn9mxsgzu8dejtf2glqz0k556tac34tpw40zefllt9l9jhn3tlkatyue3w4f47zhgscu7y5mpzdtdh7d7qwquyes0x"
+    )
   );
   const rp = 3;
 
@@ -157,7 +161,7 @@ export const cancel = async (tn, cs, price, assetUtxos) => {
     sa: toHex(walletAddress.payment_cred().to_keyhash().to_bytes()),
     price: toLovelace(price),
     ra: toHex(raddr.payment_cred().to_keyhash().to_bytes()),
-    rp
+    rp,
   });
 
   datums.add(cancelDatum);
@@ -199,7 +203,7 @@ export const purchase = async (tn, cs, sa, price, assetUtxos) => {
   const { txBuilder, datums, outputs } = await initializeTx();
 
   const walletAddress = Cardano.Instance.BaseAddress.from_address(
-    Cardano.Instance.Address.from_bytes(fromHex((await getUsedAddresses())[0]))
+    await getUsedAddress()
   );
 
   const utxos = (await getUtxos()).map((utxo) =>
@@ -211,11 +215,15 @@ export const purchase = async (tn, cs, sa, price, assetUtxos) => {
   );
 
   const feeaddr = Cardano.Instance.BaseAddress.from_address(
-    Cardano.Instance.Address.from_bech32("addr_test1qp6pykcc0kgaqj27z3jg4sjt7768p375qr8q4z3f4xdmf38skpyf2kgu5wqpnm54y5rqgee4uwyksg6eyd364qhmpwqsv2jjt3")
+    Cardano.Instance.Address.from_bech32(
+      "addr_test1qp6pykcc0kgaqj27z3jg4sjt7768p375qr8q4z3f4xdmf38skpyf2kgu5wqpnm54y5rqgee4uwyksg6eyd364qhmpwqsv2jjt3"
+    )
   );
 
   const raddr = Cardano.Instance.BaseAddress.from_address(
-    Cardano.Instance.Address.from_bech32("addr_test1qrm4m0p8nn9mxsgzu8dejtf2glqz0k556tac34tpw40zefllt9l9jhn3tlkatyue3w4f47zhgscu7y5mpzdtdh7d7qwquyes0x")
+    Cardano.Instance.Address.from_bech32(
+      "addr_test1qrm4m0p8nn9mxsgzu8dejtf2glqz0k556tac34tpw40zefllt9l9jhn3tlkatyue3w4f47zhgscu7y5mpzdtdh7d7qwquyes0x"
+    )
   );
   const rp = 3;
 
@@ -225,7 +233,7 @@ export const purchase = async (tn, cs, sa, price, assetUtxos) => {
     sa: toHex(sellerAddress.payment_cred().to_keyhash().to_bytes()),
     price: toLovelace(price),
     ra: toHex(raddr.payment_cred().to_keyhash().to_bytes()),
-    rp
+    rp,
   });
 
   datums.add(purchaseDatum);
@@ -245,45 +253,40 @@ export const purchase = async (tn, cs, sa, price, assetUtxos) => {
     )
   );
 
-  var sellerOut = toLovelace(price) - 0.02*toLovelace(price) - (rp/100)*toLovelace(price)
+  var sellerOut =
+    toLovelace(price) -
+    0.02 * toLovelace(price) -
+    (rp / 100) * toLovelace(price);
   if (sellerOut <= 1600000) {
-    sellerOut = 1600000
-  };
-  var feeOut = 0.02*toLovelace(price)
+    sellerOut = 1600000;
+  }
+  var feeOut = 0.02 * toLovelace(price);
   if (feeOut <= 1600000) {
-    feeOut = 1600000
-  };
-  var royOut = (rp/100)*toLovelace(price)
+    feeOut = 1600000;
+  }
+  var royOut = (rp / 100) * toLovelace(price);
   if (royOut <= 1600000) {
-    royOut = 1600000
-  };
+    royOut = 1600000;
+  }
 
   outputs.add(
     await createTxOutput(
       sellerAddress.to_address(),
-      assetsToValue([
-        { unit: "lovelace", quantity: `${sellerOut}` },
-      ])
+      assetsToValue([{ unit: "lovelace", quantity: `${sellerOut}` }])
     )
   );
 
   outputs.add(
     await createTxOutput(
       raddr.to_address(),
-      assetsToValue([
-        { unit: "lovelace", quantity: `${royOut}` },
-      ])
+      assetsToValue([{ unit: "lovelace", quantity: `${royOut}` }])
     )
   );
-
-
 
   outputs.add(
     await createTxOutput(
       feeaddr.to_address(),
-      assetsToValue([
-        { unit: "lovelace", quantity: `${feeOut}` },
-      ])
+      assetsToValue([{ unit: "lovelace", quantity: `${feeOut}` }])
     )
   );
 

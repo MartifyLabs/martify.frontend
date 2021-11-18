@@ -20,9 +20,7 @@ export const getOwnedAssets = async () => {
   // TODO: refactor using map, filter and reduce.
   let assets = {};
 
-  const usedAddress = Cardano.Instance.Address.from_bytes(
-    fromHex((await getUsedAddresses())[0])
-  ).to_bech32();
+  const usedAddress = await getUsedAddress();
 
   const utxos = await getUtxos();
 
@@ -33,7 +31,7 @@ export const getOwnedAssets = async () => {
     let txUtxos = await getTxUtxos(utxo_hash);
 
     const ownedOutputs = txUtxos.outputs.filter((o) => {
-      return o.address === usedAddress;
+      return o.address === usedAddress.to_bech32();
     });
 
     for (var o_i in ownedOutputs) {
@@ -58,8 +56,11 @@ export const getOwnedAssets = async () => {
   return assets;
 };
 
-export const getUsedAddresses = async () => {
-  return await window.cardano.getUsedAddresses();
+export const getUsedAddress = async () => {
+  const usedAddresses = await window.cardano.getUsedAddresses();
+  return Cardano.Instance.Address.from_bytes(
+    fromHex(usedAddresses[0])
+  );
 };
 
 export const getUtxos = async () => {
@@ -72,10 +73,4 @@ export const signTx = async (tx, partialSign = true) => {
 
 export const submitTx = async (tx) => {
   return await window.cardano.submitTx(tx);
-};
-
-export const getWalletAddresses = async () => {
-  return Cardano.Instance.Address.from_bytes(
-    fromHex((await getUsedAddresses())[0])
-  ).to_bech32();
 };

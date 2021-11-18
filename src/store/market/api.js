@@ -1,5 +1,5 @@
 import { offer, update, cancel, purchase } from "../../cardano/market-contract/";
-import { getWalletAddresses } from "../../cardano/wallet";
+import { getUsedAddress } from "../../cardano/wallet";
 import { saveAsset, getAsset } from "../../database";
 import { contractAddress } from "../../cardano/market-contract/validator";
 import { getLockedUtxosByAsset } from "../../cardano/blockfrost-api";
@@ -38,7 +38,7 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
     console.log("txHash", txHash);
 
     if (price > 0) {
-      let wallet_address = await getWalletAddresses();
+      let wallet_address = (await getUsedAddress()).to_bech32();
       let event = {
         type: "new-listing",
         is_listed: true,

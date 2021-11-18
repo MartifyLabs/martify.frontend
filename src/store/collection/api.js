@@ -14,8 +14,7 @@ import {
   getListedAssets,
 } from "../../database";
 
-import { getWalletAddresses } from "../../cardano/wallet";
-import { getAssetsPolicy , getAssetTransactions } from "../../cardano/blockfrost-api";
+import { getUsedAddress } from "../../cardano/wallet";
 
 export const load_collection = (callback) => async (dispatch) => {
 
@@ -132,7 +131,7 @@ export const get_listed_assets = (callback) => async (dispatch) => {
 export const asset_add_offer = (asset_id, price, callback) => async (dispatch) => {
   let asset = await getAsset(asset_id);
 
-  let wallet_address = await getWalletAddresses();
+  let wallet_address = (await getUsedAddress()).to_bech32();
 
   if(!("offers" in asset)){
     asset.offers = {};

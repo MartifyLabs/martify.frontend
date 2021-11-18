@@ -4,10 +4,9 @@ import {
   getBalance,
   getNetworkId,
   getOwnedAssets,
-  getUsedAddresses,
   getUtxos,
   signTx,
-  getWalletAddresses,
+  getUsedAddress,
   getCollateral,
 } from "../../cardano/wallet";
 
@@ -91,7 +90,7 @@ export const connectWallet = (current_wallet, is_silent, callback) => async (dis
 
           connected_wallet.network = network;
 
-          if(nami_network == network){
+          if(nami_network === network){
             getUtxos().then((res_utxos) => {
               connected_wallet.utxos = res_utxos;
 
@@ -106,15 +105,15 @@ export const connectWallet = (current_wallet, is_silent, callback) => async (dis
               //   console.log("NOT SAME do something 2");
               // }
   
-              getUsedAddresses().then((res) => {
+              window.cardano.getUsedAddresses().then((res) => {
                 let used_address = res[0];
                 connected_wallet.used_addr = used_address;
   
                 getCollateral().then((resCollateral) => {
                   connected_wallet.collateral = resCollateral;
   
-                  getWalletAddresses().then((res_walletaddr) => {
-                    connected_wallet.wallet_address = res_walletaddr;
+                  getUsedAddress().then((res_walletaddr) => {
+                    connected_wallet.wallet_address = res_walletaddr.to_bech32();
   
                     getBalance().then((res) => {
                       const balance = cbor.decode(res);
