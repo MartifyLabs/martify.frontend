@@ -40,15 +40,19 @@ export const getAsset = async (assetId) => {
       } else {
         const assetDetails = await getAssetDetails(assetId);
 
-        const asset = {
-          details: assetDetails,
-          offers: [],
-          status: { locked: false },
-        };
+        if (assetDetails) {
+          const asset = {
+            details: assetDetails,
+            offers: [],
+            status: { locked: false },
+          };
 
-        await saveAsset(asset);
+          await saveAsset(asset);
 
-        return asset;
+          return asset;
+        }
+
+        return undefined;
       }
     }
   } catch (error) {
@@ -60,7 +64,9 @@ export const getAssets = async (assetIds) => {
   try {
     if (assetIds) {
       const assets = await Promise.all(
-        assetIds.map(async (assetId) => await getAsset(assetId))
+        assetIds
+          .map(async (assetId) => await getAsset(assetId))
+          .filter((asset) => asset !== undefined)
       );
 
       return assets;
