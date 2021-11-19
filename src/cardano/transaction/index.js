@@ -246,7 +246,6 @@ export const createTxOutput = async (
   value,
   { datum, index, tradeOwnerAddress, metadata } = {}
 ) => {
-  
   const Parameters = await getProtocolParameters();
   const v = value;
 
@@ -273,7 +272,7 @@ export const createTxOutput = async (
   return output;
 };
 
-export const createTxUnspentOutput = async (utxo) => {
+export const createTxUnspentOutput = (utxo) => {
   try {
     return Cardano.Instance.TransactionUnspentOutput.new(
       Cardano.Instance.TransactionInput.new(
@@ -287,14 +286,24 @@ export const createTxUnspentOutput = async (utxo) => {
     );
   } catch (error) {
     console.error(
+      `Unexpected error in createTxUnspentOutput. [Message: ${error.message}]`
+    );
+  }
+};
+
+export const getTxUnspentOutput = (hexEncodedBytes) => {
+  try {
+    return Cardano.Instance.TransactionUnspentOutput.from_bytes(
+      fromHex(hexEncodedBytes)
+    );
+  } catch (error) {
+    console.error(
       `Unexpected error in getTxUnspentOutput. [Message: ${error.message}]`
     );
   }
 };
 
 export const getTxUnspentOutputHash = async (hexEncodedBytes) => {
-  
-
   try {
     return toHex(
       Cardano.Instance.TransactionUnspentOutput.from_bytes(
@@ -309,6 +318,31 @@ export const getTxUnspentOutputHash = async (hexEncodedBytes) => {
       `Unexpected error in getTxUnspentOutputHash. [Message: ${error.message}]`
     );
   }
+};
+
+export const valueToAssets = (value) => {
+  const assets = [];
+  assets.push({ unit: "lovelace", quantity: value.coin().to_str() });
+  if (value.multiasset()) {
+    const multiAssets = value.multiasset().keys();
+    for (let j = 0; j < multiAssets.len(); j++) {
+      const policy = multiAssets.get(j);
+      const policyAssets = value.multiasset().get(policy);
+      const assetNames = policyAssets.keys();
+      for (let k = 0; k < assetNames.len(); k++) {
+        const policyAsset = assetNames.get(k);
+        const quantity = policyAssets.get(policyAsset);
+        const asset =
+          Buffer.from(policy.to_bytes(), "hex").toString("hex") +
+          Buffer.from(policyAsset.name(), "hex").toString("hex");
+        assets.push({
+          unit: asset,
+          quantity: quantity.to_str(),
+        });
+      }
+    }
+  }
+  return assets;
 };
 
 const setCollateral = (txBuilder, utxos) => {

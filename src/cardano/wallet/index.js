@@ -1,7 +1,5 @@
 import Cardano from "../serialization-lib";
-import { getTxUtxos } from "../blockfrost-api";
-import { getAsset } from "../../database";
-import { getTxUnspentOutputHash } from "../transaction";
+import { getTxUnspentOutput, valueToAssets } from "../transaction";
 import { fromHex } from "../../utils";
 
 export const getBalance = async () => {
@@ -17,50 +15,28 @@ export const getNetworkId = async () => {
 };
 
 export const getOwnedAssets = async () => {
-  // TODO: refactor using map, filter and reduce.
-  let assets = {};
-
   const usedAddress = await getUsedAddress();
-
   const utxos = await getUtxos();
 
-  for (var u_i in utxos) {
-    let utxo_hex_byte_string = utxos[u_i];
-    let utxo_hash = await getTxUnspentOutputHash(utxo_hex_byte_string);
-
-    let txUtxos = await getTxUtxos(utxo_hash);
-
-    const ownedOutputs = txUtxos.outputs.filter((o) => {
-      return o.address === usedAddress.to_bech32();
-    });
-
-    for (var o_i in ownedOutputs) {
-      let this_tx_out = ownedOutputs[o_i];
-      for (var a_i in this_tx_out.amount) {
-        let this_unit = this_tx_out.amount[a_i].unit;
-        if (!(this_unit in assets)) assets[this_unit] = { quantity: 0 };
-        assets[this_unit].quantity += parseInt(
-          this_tx_out.amount[a_i].quantity
-        );
-      }
-    }
-  }
-
-  for (var asset_id in assets) {
-    if (asset_id !== "lovelace") {
-      let asset_info = await getAsset(asset_id);
-      assets[asset_id] = asset_info;
-    }
-  }
-
-  return assets;
+  const ownedAssets = utxos
+    .map((utxo) => getTxUnspentOutput(utxo).output())
+    .filter(
+      (txOut) =>
+        txOut.amount().multiasset() !== undefined &&
+        txOut.address().to_bech32() === usedAddress.to_bech32()
+    )
+    .map((txOut) => valueToAssets(txOut.amount()))
+    .flatMap((assets) =>
+      assets
+        .filter((asset) => asset.unit !== "lovelace")
+        .map((asset) => asset.unit)
+    );
+  return [...new Set(ownedAssets)];
 };
 
 export const getUsedAddress = async () => {
   const usedAddresses = await window.cardano.getUsedAddresses();
-  return Cardano.Instance.Address.from_bytes(
-    fromHex(usedAddresses[0])
-  );
+  return Cardano.Instance.Address.from_bytes(fromHex(usedAddresses[0]));
 };
 
 export const getUtxos = async () => {

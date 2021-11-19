@@ -111,7 +111,7 @@ export const update = async (tn, cs, price, newprice, assetUtxos) => {
       utxo.data_hash
   )[0];
 
-  const scriptUtxo = await createTxUnspentOutput(assetUtxo);
+  const scriptUtxo = createTxUnspentOutput(assetUtxo);
 
   outputs.add(
     await createTxOutput(contractAddress(), scriptUtxo.output().amount(), {
@@ -172,7 +172,7 @@ export const cancel = async (tn, cs, price, assetUtxos) => {
       utxo.data_hash
   )[0];
 
-  const scriptUtxo = await createTxUnspentOutput(assetUtxo);
+  const scriptUtxo = createTxUnspentOutput(assetUtxo);
 
   outputs.add(
     await createTxOutput(
@@ -244,7 +244,7 @@ export const purchase = async (tn, cs, sa, price, assetUtxos) => {
       utxo.data_hash
   )[0];
 
-  const scriptUtxo = await createTxUnspentOutput(assetUtxo);
+  const scriptUtxo = createTxUnspentOutput(assetUtxo);
 
   outputs.add(
     await createTxOutput(

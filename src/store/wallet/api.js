@@ -11,6 +11,7 @@ import {
 } from "../../cardano/wallet";
 
 import { saveAssets } from "../../database";
+import { getAssets } from "../../database/assets";
 
 import { WALLET_STATE } from "./walletTypes";
 
@@ -240,7 +241,7 @@ export const get_wallet_assets = (callback) => async (dispatch) => {
   console.log("getting wallet assets", WALLET_STATE.GETTING_ASSETS);
   dispatch(setWalletLoading(WALLET_STATE.GETTING_ASSETS));
 
-  const wallet_assets = await getOwnedAssets();
+  const wallet_assets = await getAssets(await getOwnedAssets());
   console.log("gotten wallet_assets", wallet_assets);
 
   var list_assets = Object.keys(wallet_assets).map(function (key) {
