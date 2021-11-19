@@ -1,3 +1,36 @@
+import Cardano from "../cardano/serialization-lib";
+import { toHex } from "./index";
+
+export const createDatum = (
+  tokenName,
+  currencySymbol,
+  sellerAddress,
+  royaltiesAddress,
+  royaltiesPercentage,
+  price
+) => {
+  if (
+    tokenName &&
+    currencySymbol &&
+    sellerAddress &&
+    royaltiesAddress &&
+    royaltiesPercentage &&
+    price
+  ) {
+    return {
+      tn: tokenName,
+      cs: currencySymbol,
+      sa: getAddressKeyHash(sellerAddress),
+      ra: getAddressKeyHash(royaltiesAddress),
+      rp: royaltiesPercentage,
+      price,
+    };
+  }
+};
+
+/**
+ * @param {string} byWallet - a wallet address needs to be in bech32 format.
+ */
 export const createEvent = (action, datum, txHash, byWallet) => {
   if (action && datum && txHash && byWallet) {
     return {
@@ -10,6 +43,9 @@ export const createEvent = (action, datum, txHash, byWallet) => {
   }
 };
 
+/**
+ * @param {string} byWallet - a wallet address needs to be in bech32 format.
+ */
 export const createOffer = (byWallet, forAsset, value) => {
   if (byWallet && forAsset && value) {
     return {
@@ -19,4 +55,15 @@ export const createOffer = (byWallet, forAsset, value) => {
       value,
     };
   }
+};
+
+const getAddressKeyHash = (address) => {
+  return toHex(
+    Cardano.Instance.BaseAddress.from_address(
+      Cardano.Instance.Address.from_bech32(address)
+    )
+      .payment_cred()
+      .to_keyhash()
+      .to_bytes()
+  );
 };
