@@ -11,6 +11,7 @@ import { MARKET_TYPE } from "./marketTypes";
 
 import { createEvent, createDatum } from "../../utils/factory";
 import { getWallet, addWalletEvent } from "../../database/wallets";
+import { lockAsset, unlockAsset } from "../../database/assets";
 
 function add_event_asset_history(asset, event){
   if(!("history" in asset)){
@@ -33,15 +34,64 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
       asset.details.policyId,
       price
     );
-    let txHash = await offer(
+    let offer_obj = await offer(
       asset.details.assetName,
       asset.details.policyId,
       price.toString()
     );
 
-    console.log("txHash", txHash);
+    console.log("offer_obj", offer_obj);
 
-    if (price > 0) {
+    // if (price > 0) {
+
+    //   let wallet_address = (await getUsedAddress()).to_bech32();
+
+    //   let wallet = await getWallet(wallet_address);
+    //   console.log("wallet", wallet);
+
+    //   let royaltiesAddress = wallet_address;
+    //   let royaltiesPercentage = 0;
+
+    //   let datum = createDatum(
+    //     asset.details.asset,
+    //     asset.details.policyId,
+    //     wallet_address,
+    //     royaltiesAddress,
+    //     royaltiesPercentage,
+    //     price,
+    //   );
+
+    //   let this_event = createEvent(
+    //     MARKET_TYPE.NEW_LISTING,
+    //     datum,
+    //     txHash,
+    //     wallet_address,
+    //   );
+    //   console.log("this_event", this_event);
+    //   await addWalletEvent(wallet, this_event);
+
+    //   // await lockAsset(
+    //   //   asset_updated,
+    //   //   {
+    //   //     datum,
+
+    //   //   }
+    //   // )
+
+    //   // let this_listing = {
+    //   //   is_listed: true,
+    //   //   on: new Date().getTime(),
+    //   //   datum: datum,
+    //   // }
+    //   // asset_updated.listing = this_listing;
+
+    // } else {
+    //   asset_updated.listing = {
+    //     is_listed: false,
+    //   };
+    // }
+
+    if (offer_obj){
 
       let wallet_address = (await getUsedAddress()).to_bech32();
 
@@ -63,27 +113,26 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
       let this_event = createEvent(
         MARKET_TYPE.NEW_LISTING,
         datum,
-        txHash,
+        offer_obj.txHash,
         wallet_address,
       );
       console.log("this_event", this_event);
+
       await addWalletEvent(wallet, this_event);
 
-      let this_listing = {
-        is_listed: true,
-        on: new Date().getTime(),
-        datum: datum,
-      }
-      asset_updated.listing = this_listing;
+      await lockAsset(
+        asset_updated,
+        {
+          datum: datum,
+          datumHash: offer_obj.datumHash,
+          txHash: offer_obj.txHash,
+          address: wallet_address,
+        }
+      )
 
-    } else {
-      asset_updated.listing = {
-        is_listed: false,
-      };
+      // await saveAsset(asset_updated);
+
     }
-
-    if (txHash)
-      await saveAsset(asset_updated);
 
     let output = {
       policy_id: asset.details.policyId,

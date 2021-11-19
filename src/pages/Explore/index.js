@@ -12,7 +12,7 @@ const Explore = ({get_listed_assets}) => {
   useEffect(() => {
     get_listed_assets((res) => {
       console.log(res.data)
-      setListings(res.data);
+      if(res.data) setListings(res.data);
     });
   }, []);
 
