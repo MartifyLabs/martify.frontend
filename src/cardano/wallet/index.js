@@ -31,6 +31,7 @@ export const getOwnedAssets = async () => {
         .filter((asset) => asset.unit !== "lovelace")
         .map((asset) => asset.unit)
     );
+  
   return [...new Set(ownedAssets)];
 };
 

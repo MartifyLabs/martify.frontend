@@ -33,7 +33,7 @@ export const getAssetDetails = async (asset) => {
 
 export const getAssetTransactions = async (
   asset,
-  { page, count, order } = { page: 1, count: 100, order: "asc" }
+  { page = 1, count = 100, order = "asc" }
 ) => {
   try {
     return await cardano(
@@ -51,7 +51,7 @@ export const getAssetTransactions = async (
  */
 export const getLockedUtxos = async (
   address,
-  { page, count, order } = { page: 1, count: 100, order: "asc" }
+  { page = 1, count = 100, order = "asc" }
 ) => {
   try {
     return await cardano(
@@ -80,8 +80,7 @@ export const getLockedUtxosByAsset = async (address, asset) => {
 
 export const getMintedAssets = async (
   policyId,
-  // { page, count, order } = { page: 1, count: 100, order: "asc" }
-  page=1, count=100, order="asc"
+  { page = 1, count = 100, order = "asc" }
 ) => {
   try {
     console.log(888, policyId, page, count, order)
@@ -90,7 +89,7 @@ export const getMintedAssets = async (
     );
 
     return response
-      .filter((asset) => asset.quantity === 1)
+      .filter((asset) => parseInt(asset.quantity) === 1)
       .map((asset) => asset.asset);
   } catch (error) {
     console.error(

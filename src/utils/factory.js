@@ -14,7 +14,7 @@ export const createDatum = (
     currencySymbol &&
     sellerAddress &&
     royaltiesAddress &&
-    royaltiesPercentage != undefined && 
+    royaltiesPercentage !== undefined && 
     price
   ) {
     return {

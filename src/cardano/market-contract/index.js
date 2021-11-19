@@ -55,6 +55,7 @@ export const offer = async (tn, cs, price) => {
     )
   );
 
+  const datumHash = Cardano.Instance.hash_plutus_data(offerDatum);
   const txHash = await finalizeTx({
     txBuilder,
     datums,
@@ -63,7 +64,10 @@ export const offer = async (tn, cs, price) => {
     changeAddress: walletAddress,
   });
 
-  return txHash;
+  return {
+    datumHash,
+    txHash,
+  };
 };
 
 export const update = async (tn, cs, price, newprice, assetUtxos) => {
@@ -123,6 +127,7 @@ export const update = async (tn, cs, price, newprice, assetUtxos) => {
   requiredSigners.add(walletAddress.payment_cred().to_keyhash());
   txBuilder.set_required_signers(requiredSigners);
 
+  const datumHash = Cardano.Instance.hash_plutus_data(updateDatumNew);
   const txHash = await finalizeTx({
     txBuilder,
     datums,
@@ -134,7 +139,10 @@ export const update = async (tn, cs, price, newprice, assetUtxos) => {
     action: UPDATE,
   });
 
-  return txHash;
+  return {
+    datumHash,
+    txHash,
+  };
 };
 
 export const cancel = async (tn, cs, price, assetUtxos) => {
