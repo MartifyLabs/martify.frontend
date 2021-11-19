@@ -93,8 +93,8 @@ export default function collectionReducer(state = collectionobj, { type, payload
       for(var asset_id in payload){
         if(asset_id!='lovelace'){
           var this_asset = payload[asset_id];
-          if(this_asset.info){
-            var policy_id = this_asset.info.policyId;
+          if(this_asset){
+            var policy_id = this_asset.details.policyId;
 
             var tmp_policies_assets_policy = {};
             if(policy_id in tmp_policies_assets){

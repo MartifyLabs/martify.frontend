@@ -14,7 +14,7 @@ export const createDatum = (
     currencySymbol &&
     sellerAddress &&
     royaltiesAddress &&
-    royaltiesPercentage &&
+    royaltiesPercentage != undefined && 
     price
   ) {
     return {
@@ -22,7 +22,7 @@ export const createDatum = (
       cs: currencySymbol,
       sa: getAddressKeyHash(sellerAddress),
       ra: getAddressKeyHash(royaltiesAddress),
-      rp: royaltiesPercentage,
+      rp: royaltiesPercentage ? royaltiesPercentage : 0,
       price,
     };
   }

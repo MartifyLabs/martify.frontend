@@ -80,9 +80,11 @@ export const getLockedUtxosByAsset = async (address, asset) => {
 
 export const getMintedAssets = async (
   policyId,
-  { page, count, order } = { page: 1, count: 100, order: "asc" }
+  // { page, count, order } = { page: 1, count: 100, order: "asc" }
+  page=1, count=100, order="asc"
 ) => {
   try {
+    console.log(888, policyId, page, count, order)
     const response = await cardano(
       `assets/policy/${policyId}?page=${page}&count=${count}&order=${order}`
     );

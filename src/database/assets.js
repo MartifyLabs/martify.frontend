@@ -139,11 +139,10 @@ export const saveAsset = async (asset) => {
   try {
     if (asset) {
       const reference = doc(db, "assets", asset.details.asset);
-
       await setDoc(reference, asset, { merge: true });
     }
   } catch (error) {
-    console.error(`Unexpected error in saveAsset. [Message: ${error.message}]`);
+    console.error(`Unexpected error in saveAsset1. [Message: ${error.message}]`);
   }
 };
 

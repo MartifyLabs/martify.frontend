@@ -8,6 +8,7 @@ import { urls } from "../../config";
 import { load_collection, get_asset, asset_add_offer, opencnft_get_asset_tx } from "../../store/collection/api";
 import { listToken, updateToken, delistToken, purchaseToken } from "../../store/market/api";
 import { WALLET_STATE } from "../../store/wallet/walletTypes";
+import { MARKET_TYPE } from "../../store/market/marketTypes";
 
 import CollectionAbout from "../../components/CollectionAbout";
 import CollectionBanner from "../../components/CollectionBanner";
@@ -94,15 +95,15 @@ const AssetHeader = ({asset, thisCollection}) => {
 
         <div className="level-left">
           <div className="level-item asset_name_block">
-            <h1>{asset.info.onchainMetadata.name}</h1>
+            <h1>{asset.details.onchainMetadata.name}</h1>
             {
               thisCollection ? (
                 <Link to={`/collection/${thisCollection.id}`}>
                   {thisCollection.meta.name}
                 </Link>
               ) : (
-                <Link to={`/collection/${asset.info.policyId}`}>
-                  {asset.info.policyId}
+                <Link to={`/collection/${asset.details.policyId}`}>
+                  {asset.details.policyId}
                 </Link>
               )
             }
@@ -135,28 +136,28 @@ const SocialLinks = ({asset}) => {
   return (
     <div className="field has-addons social-links">
       <p className="control">
-        <a className="button is-small social-icon" href={`https://twitter.com/share?url=${urls.root}assets/${asset.info.policyId}/${asset.info.asset}`} rel="noreferrer" target="_blank" data-tooltip="Share on Twitter">
+        <a className="button is-small social-icon" href={`https://twitter.com/share?url=${urls.root}assets/${asset.details.policyId}/${asset.details.asset}`} rel="noreferrer" target="_blank" data-tooltip="Share on Twitter">
           <span className="icon">
             <img src="/images/icons/twitter.svg"/>
           </span>
         </a>
       </p>
       <p className="control">
-        <a className="button is-small social-icon" href={`https://www.facebook.com/sharer/sharer.php?u=${urls.root}assets/${asset.info.policyId}/${asset.info.asset}`} rel="noreferrer" target="_blank"  data-tooltip="Share on Facebook">
+        <a className="button is-small social-icon" href={`https://www.facebook.com/sharer/sharer.php?u=${urls.root}assets/${asset.details.policyId}/${asset.details.asset}`} rel="noreferrer" target="_blank"  data-tooltip="Share on Facebook">
           <span className="icon">
             <img src="/images/icons/facebook.svg"/>
           </span>
         </a>
       </p>
       <p className="control">
-        <a className="button is-small social-icon" href={`${urls.cardanoscan}token/${asset.info.asset}`} rel="noreferrer" target="_blank"  data-tooltip="Check Cardanoscan">
+        <a className="button is-small social-icon" href={`${urls.cardanoscan}token/${asset.details.asset}`} rel="noreferrer" target="_blank"  data-tooltip="Check Cardanoscan">
           <span className="icon">
             <img src="/images/icons/cardanoscan.png"/>
           </span>
         </a>
       </p>
       <p className="control">
-        <a className="button is-small social-icon" href={`https://pool.pm/${asset.info.policyId}.${asset.info.readableAssetName}`} rel="noreferrer" target="_blank" data-tooltip="View it on pool.pm">
+        <a className="button is-small social-icon" href={`https://pool.pm/${asset.details.policyId}.${asset.details.readableAssetName}`} rel="noreferrer" target="_blank" data-tooltip="View it on pool.pm">
           <span className="icon">
             <img src="/images/icons/poolpm.png"/>
           </span>
@@ -169,7 +170,7 @@ const SocialLinks = ({asset}) => {
 const Listing = ({asset, state_wallet, list_token, update_token, delist_token, purchase_token, asset_add_offer}) => {
   return (
     <div className="block">
-      { asset.info.asset in state_wallet.assets ? 
+      { asset.details.asset in state_wallet.assets ? 
         <OwnerListAsset state_wallet={state_wallet} asset={asset} list_token={list_token} update_token={update_token} delist_token={delist_token} /> : 
         <PurchaseAsset asset={asset} asset_add_offer={asset_add_offer} state_wallet={state_wallet} purchase_token={purchase_token} /> 
       }
@@ -191,7 +192,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
   }
 
   function list_this_token(price){
-    asset_add_offer(asset.info.asset, price, (res) => {
+    asset_add_offer(asset.details.asset, price, (res) => {
       successful_transaction(res);
     });
   }
@@ -227,7 +228,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
     <div className="card">
       <header className="card-header">
         <p className="card-header-title">
-          Buy {asset.info.onchainMetadata.name}
+          Buy {asset.details.onchainMetadata.name}
         </p>
       </header>
 
@@ -342,8 +343,8 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
                 </span>
                 <p className="is-size-4">
                   {
-                    showModal == "purchase-success" ? <span>Purchased <b>{asset.info.onchainMetadata.name}</b>!</span> : 
-                    showModal == "offer-success" ? <span>You made an offer for <b>{asset.info.onchainMetadata.name}</b>!</span> : 
+                    showModal == "purchase-success" ? <span>Purchased <b>{asset.details.onchainMetadata.name}</b>!</span> : 
+                    showModal == "offer-success" ? <span>You made an offer for <b>{asset.details.onchainMetadata.name}</b>!</span> : 
                     ""
                   }
                 </p>
@@ -467,7 +468,7 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
     <div className="card">
       <header className="card-header">
         <p className="card-header-title">
-          List {asset.info.onchainMetadata.name} for sale in the Marketplace
+          List {asset.details.onchainMetadata.name} for sale in the Marketplace
         </p>
       </header>
       <div className="card-content">
@@ -562,9 +563,9 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
                 </span>
                 <p className="is-size-4">
                   {
-                    showModal == "list-success" ? <span>Listed <b>{asset.info.onchainMetadata.name}</b> successfully!</span> : 
-                    showModal == "price-update-success" ? <span>Listing price for <b>{asset.info.onchainMetadata.name}</b> updated!</span> : 
-                    showModal == "delist-success" ? <span><b>{asset.info.onchainMetadata.name}</b> removed from the marketplace.</span> : 
+                    showModal == MARKET_TYPE.NEW_LISTING_SUCCESS ? <span>Listed <b>{asset.details.onchainMetadata.name}</b> successfully!</span> : 
+                    showModal == MARKET_TYPE.PRICE_UPDATE_SUCCESS ? <span>Listing price for <b>{asset.details.onchainMetadata.name}</b> updated!</span> : 
+                    showModal == MARKET_TYPE.DELIST_SUCCESS ? <span><b>{asset.details.onchainMetadata.name}</b> removed from the marketplace.</span> : 
                     ""
                   }
                 </p>
@@ -600,7 +601,7 @@ const AboutAsset = ({thisCollection, asset}) => {
                   <>
                     {
                       thisCollection.asset_attributes ? 
-                        getArraysIntersection(thisCollection.asset_attributes,Object.keys(asset.info.onchainMetadata)).length > 0 ? 
+                        getArraysIntersection(thisCollection.asset_attributes,Object.keys(asset.details.onchainMetadata)).length > 0 ? 
                           thisCollection.asset_attributes.map((attr, i) => {
                             return(
                               <ListAttributes asset={asset} attr={attr} key={i}/>
@@ -618,12 +619,12 @@ const AboutAsset = ({thisCollection, asset}) => {
                   <nav className="level" style={{"marginBottom":"0px"}}>
                     <div className="level-left">
                       <div className="level-item">
-                        <pre>{asset.info.policyId}</pre>
+                        <pre>{asset.details.policyId}</pre>
                       </div>
                     </div>
                     <div className="level-right">
                       <div className="level-item">
-                        <a className="button social-icon" href={`${urls.cardanoscan}tokenPolicy/${asset.info.policyId}`} rel="noreferrer" target="_blank" data-tooltip="Check Cardanoscan" style={{marginLeft:"10px"}}>
+                        <a className="button social-icon" href={`${urls.cardanoscan}tokenPolicy/${asset.details.policyId}`} rel="noreferrer" target="_blank" data-tooltip="Check Cardanoscan" style={{marginLeft:"10px"}}>
                           <span className="icon">
                             <img src="/images/icons/cardanoscan.png"/>
                           </span>
@@ -650,16 +651,16 @@ const ListAttributes = ({asset, attr}) => {
   return (
     <>
     {
-      attr in asset.info.onchainMetadata ? (
+      attr in asset.details.onchainMetadata ? (
         <tr>
           <th className="attr">{attr}</th>
           <td>
             {
-              typeof(asset.info.onchainMetadata[attr])=="object" ? (
+              typeof(asset.details.onchainMetadata[attr])=="object" ? (
                 <table className="table is-narrow">
                   <tbody>
                   {
-                    asset.info.onchainMetadata[attr]
+                    asset.details.onchainMetadata[attr]
                     .map((att, i) => {
                       return(
                         <tr key={i}><td>{att}</td></tr>
@@ -668,7 +669,7 @@ const ListAttributes = ({asset, attr}) => {
                   )}
                   </tbody>
                 </table> 
-              ) : asset.info.onchainMetadata[attr]
+              ) : asset.details.onchainMetadata[attr]
             }
           </td>
         </tr>
@@ -682,7 +683,7 @@ const ListAllAttributes = ({asset}) => {
   return (
     <>
       {
-        Object.keys(asset.info.onchainMetadata)
+        Object.keys(asset.details.onchainMetadata)
         .filter((attr)=>{
           return !["files","image","name","mediatype"].includes(attr.toLowerCase())
         })
@@ -717,7 +718,7 @@ const AssetRawMetaData = ({asset}) => {
           <div className="card-content">
             <div className="content" style={{display:"grid"}}>
               <pre>
-                {JSON.stringify(asset.info, null, 1) }
+                {JSON.stringify(asset.details, null, 1) }
               </pre>
             </div>
           </div>
@@ -737,11 +738,11 @@ const AssetImage = ({asset}) => {
         <div className="modal-background" onClick={() => setShow(false)}></div>
         <div className="modal-content">
           {
-            asset.info.onchainMetadata.files ? (
+            asset.details.onchainMetadata.files ? (
               <>
               {
-                asset.info.onchainMetadata.files[0].mediaType==="text/html" ? (
-                  <iframe src={asset.info.onchainMetadata.files[0].src.join("")} style={{width:"600px",height:"600px"}}>
+                asset.details.onchainMetadata.files[0].mediaType==="text/html" ? (
+                  <iframe src={asset.details.onchainMetadata.files[0].src.join("")} style={{width:"600px",height:"600px"}}>
                     <AssetImageFigure asset={asset} setShow={setShow}/>
                   </iframe>
                 ) : (
@@ -831,7 +832,7 @@ const Transactions = ({asset, opencnft_get_asset_tx}) => {
       tmp_transactions.push.apply(tmp_transactions, asset_purchase_history);
     }
     
-    opencnft_get_asset_tx(asset.info.asset, (res) => {
+    opencnft_get_asset_tx(asset.details.asset, (res) => {
       setFirstLoad(true);
       if(res.data.items){
         tmp_transactions.push.apply(tmp_transactions, res.data.items);

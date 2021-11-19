@@ -60,9 +60,9 @@ const Listings = ({state_wallet, state_collection}) => {
       if (searchText === "") {
         return_this = true;
       }
-      else if (searchText !== "" && x.info.onchainMetadata){
+      else if (searchText !== "" && x.details.onchainMetadata){
         if(
-          x.info.onchainMetadata.name.toLowerCase().includes(searchText.toLowerCase())
+          x.details.onchainMetadata.name.toLowerCase().includes(searchText.toLowerCase())
         ){
           return_this = true;
         }
@@ -78,7 +78,7 @@ const Listings = ({state_wallet, state_collection}) => {
     let allow_project = false;
 
     if(filterProject=="all") allow_project = true;
-    else allow_project = filterProject == asset.info.policyId;
+    else allow_project = filterProject == asset.details.policyId;
 
     if(allow_project){
       if(filterAsset=="all"){

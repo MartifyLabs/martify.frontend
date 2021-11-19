@@ -18,7 +18,7 @@ const ListingDisplayListing = ({listings}) => {
     return x => {
       let return_this = false;
 
-      if(x.info.onchainMetadata==null){
+      if(x.details.onchainMetadata==null){
         return false
       }
 
@@ -28,7 +28,7 @@ const ListingDisplayListing = ({listings}) => {
       else if (
         searchText !== "" &&
         (
-          x.info.onchainMetadata.name.toLowerCase().includes(searchText.toLowerCase())
+          x.details.onchainMetadata.name.toLowerCase().includes(searchText.toLowerCase())
         )
       ) {
         return_this = true;

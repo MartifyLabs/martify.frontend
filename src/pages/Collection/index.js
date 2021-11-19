@@ -115,7 +115,6 @@ const ListingSection = ({state_collection, policyIds}) => {
         tmp_list.push(...tmp);
       }
     }
-    console.log(tmp_list)
     setListings(tmp_list);
   }
 
@@ -157,7 +156,7 @@ const DisplayListing = ({listings}) => {
     return x => {
       let return_this = false;
 
-      if(x.info.onchainMetadata==null){
+      if(x.details.onchainMetadata==null){
         return false
       }
 
@@ -167,7 +166,7 @@ const DisplayListing = ({listings}) => {
       else if (
         searchText !== "" &&
         (
-          x.info.onchainMetadata.name.toLowerCase().includes(searchText.toLowerCase())
+          x.details.onchainMetadata.name.toLowerCase().includes(searchText.toLowerCase())
         )
       ) {
         return_this = true;

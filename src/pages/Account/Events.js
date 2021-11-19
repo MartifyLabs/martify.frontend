@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import Moment from 'react-moment';
 import { Link } from "react-router-dom";
 import { urls } from "../../config";
+import { MARKET_TYPE } from "../../store/market/marketTypes";
 
 const Events = ({state_wallet, state_collection}) => {
 
@@ -90,21 +91,21 @@ const Events = ({state_wallet, state_collection}) => {
                 <td style={{"textTransform": "capitalize"}}>{this_event.type}</td>
                 <td>
                   <Link to={`/assets/${this_event.policy_id}/${this_event.asset_id}`}>
-                    {this_asset.info.onchainMetadata.name}
+                    {this_asset.details.onchainMetadata.name}
                   </Link>
                 </td>
                 <td>
                   {
-                    this_event.type=="new-listing" ? `${this_asset.info.onchainMetadata.name} has been listed for ₳${this_event.price}` : 
-                    this_event.type=="offer" ? `Someone has offered ${this_asset.info.onchainMetadata.name} for ₳${this_event.price}` : 
-                    this_event.type=="delist" ? `${this_asset.info.onchainMetadata.name} has been removed from the marketplace` : 
-                    this_event.type=="price-update" ? `${this_asset.info.onchainMetadata.name} listing price updated to ₳${this_event.price}` : 
-                    this_event.type=="purchase" ? `${this_asset.info.onchainMetadata.name} purchased from the marketplace for ₳${this_event.price}` : 
+                    this_event.type==MARKET_TYPE.NEW_LISTING ? `${this_asset.details.onchainMetadata.name} has been listed for ₳${this_event.price}` : 
+                    this_event.type=="offer" ? `Someone has offered ${this_asset.details.onchainMetadata.name} for ₳${this_event.price}` : 
+                    this_event.type==MARKET_TYPE.DELIST ? `${this_asset.details.onchainMetadata.name} has been removed from the marketplace` : 
+                    this_event.type==MARKET_TYPE.PRICE_UPDATE ? `${this_asset.details.onchainMetadata.name} listing price updated to ₳${this_event.price}` : 
+                    this_event.type==MARKET_TYPE.PURCHASE ? `${this_asset.details.onchainMetadata.name} purchased from the marketplace for ₳${this_event.price}` : 
                     ""
                   }
                 </td>
                 <td>
-                  <a href={urls.cardanoscan+this_event.tx} target="_blank" rel="noreferrer">{this_event.tx}</a>
+                  <a href={urls.cardanoscan+"transaction/"+this_event.tx} target="_blank" rel="noreferrer">{this_event.tx}</a>
                 </td>
               </tr>
             )

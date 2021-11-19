@@ -13,7 +13,7 @@ const CollectionBanner = ({thisCollection, size, asset}) => {
 
   useEffect(() => {
     if(asset && currentId!=thisCollection.id){
-      let imgsrc = get_asset_image_source(asset.info.onchainMetadata.image);
+      let imgsrc = get_asset_image_source(asset.details.onchainMetadata.image);
       setAssetImgSrc(imgsrc);
     }
   }, [asset]);

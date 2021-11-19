@@ -27,9 +27,9 @@ export default function useGetAssetImageSrc(asset) {
 
   React.useEffect(() => {
     if(asset){      
-      if(asset.info){
-        if(asset.info.onchainMetadata){
-          const img_src = get_src(asset.info.onchainMetadata.image)
+      if(asset.details){
+        if(asset.details.onchainMetadata){
+          const img_src = get_src(asset.details.onchainMetadata.image)
           setSrc(img_src);
           
         }

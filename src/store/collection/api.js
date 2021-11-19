@@ -8,11 +8,14 @@ import data_collections from "../../data/collections.json";
 import data_collections_cnft from "../../data/collections-cnft.json";
 
 import {
-  getAssets,
   getAsset,
   saveAsset,
-  getListedAssets,
-} from "../../database";
+  getLockedAssets,
+} from "../../database/assets";
+
+import {
+  getCollection,
+} from "../../database/collections";
 
 import { getUsedAddress } from "../../cardano/wallet";
 
@@ -39,7 +42,6 @@ export const load_collection = (callback) => async (dispatch) => {
       tmp.is_cnft_verified = true;
       all_collections[collection_id] = tmp;
     }
-    
   }
 
   dispatch(collections_loaded(all_collections));
@@ -55,13 +57,13 @@ export const get_listings = (policy_id, callback) => async (dispatch) => {
     "listing": {}
   };
 
-  let policyids_projectid = {}
-  let assets = await getAssets(policy_id);
+  let assets = await getCollection(policy_id);
+  console.log(999, policy_id, assets)
   for(var i in assets){
     let asset = assets[i];
     if(asset){
-      if(asset.info){
-        output.listing[asset.info.asset] = asset;
+      if(asset.details){
+        output.listing[asset.details.asset] = asset;
       }
     }
   }
@@ -75,9 +77,9 @@ export const get_listings = (policy_id, callback) => async (dispatch) => {
 
 function add_token(asset, dispatch){
   let output = {
-    "policy_id": asset.info.policyId,
+    "policy_id": asset.details.policyId,
     "listing": {
-      [asset.info.asset]: asset
+      [asset.details.asset]: asset
     }
   };
   dispatch(collections_add_tokens(output));
@@ -98,7 +100,7 @@ export const get_listed_assets = (callback) => async (dispatch) => {
 
   // dispatch(collections_loading(true));
   
-  let listed_assets = await getListedAssets(20, 0);
+  let listed_assets = await getLockedAssets(1);
 
   let listed_assets_by_policy = {};
 
@@ -106,15 +108,15 @@ export const get_listed_assets = (callback) => async (dispatch) => {
     let asset = listed_assets[i];
 
     if(asset){
-      if(asset.info){
+      if(asset.details){
 
-        if(!(asset.info.policyId in listed_assets_by_policy)){
-          listed_assets_by_policy[asset.info.policyId] = {
-            "policy_id": asset.info.policyId,
+        if(!(asset.details.policyId in listed_assets_by_policy)){
+          listed_assets_by_policy[asset.details.policyId] = {
+            "policy_id": asset.details.policyId,
             "listing": {}
           };
         }
-        listed_assets_by_policy[asset.info.policyId].listing[asset.info.asset] = asset;
+        listed_assets_by_policy[asset.details.policyId].listing[asset.details.asset] = asset;
       }
     }
 

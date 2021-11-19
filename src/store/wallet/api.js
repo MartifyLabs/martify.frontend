@@ -10,8 +10,7 @@ import {
   getCollateral,
 } from "../../cardano/wallet";
 
-import { saveAssets } from "../../database";
-import { getAssets } from "../../database/assets";
+import { getAssets, saveAssets } from "../../database/assets";
 
 import { WALLET_STATE } from "./walletTypes";
 
@@ -244,12 +243,23 @@ export const get_wallet_assets = (callback) => async (dispatch) => {
   const wallet_assets = await getAssets(await getOwnedAssets());
   console.log("gotten wallet_assets", wallet_assets);
 
-  var list_assets = Object.keys(wallet_assets).map(function (key) {
-    return wallet_assets[key].info ? wallet_assets[key].info : false;
-  });
+  // var list_assets = Object.keys(wallet_assets).map(function (key) {
+  //   if(wallet_assets[key]){
+  //     return wallet_assets[key]
+  //   }
+  //   return false;
+  // });
 
-  await saveAssets(list_assets);
+  let wallet_assets_dictionary = {};
+  for(var i in wallet_assets){
+    var this_asset = wallet_assets[i];
+    if(this_asset){
+      wallet_assets_dictionary[this_asset.details.asset] = this_asset;
+    }
+  }
+  
+  // await saveAssets(list_assets);
 
-  dispatch(setWalletAssets(wallet_assets));
-  callback({ success: true, assets: wallet_assets });
+  dispatch(setWalletAssets(wallet_assets_dictionary));
+  callback({ success: true, assets: wallet_assets_dictionary });
 };
