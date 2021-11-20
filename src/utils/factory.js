@@ -1,5 +1,5 @@
 import Cardano from "../cardano/serialization-lib";
-import { toHex } from "./index";
+import { toHex, toLovelace } from "./index";
 
 export const createDatum = (
   tokenName,
@@ -14,7 +14,7 @@ export const createDatum = (
     currencySymbol &&
     sellerAddress &&
     royaltiesAddress &&
-    royaltiesPercentage !== undefined && 
+    royaltiesPercentage !== undefined &&
     price
   ) {
     return {
@@ -23,7 +23,7 @@ export const createDatum = (
       sa: getAddressKeyHash(sellerAddress),
       ra: getAddressKeyHash(royaltiesAddress),
       rp: royaltiesPercentage ? royaltiesPercentage : 0,
-      price,
+      price: toLovelace(price),
     };
   }
 };
