@@ -81,8 +81,8 @@ export const getLockedAssets = async (page = 1, count = 100) => {
     const reference = await query(
       collection(db, "assets"),
       where("status.locked", "==", true),
-      orderBy("status.submittedOn"),
-      startAfter((page - 1) * count),
+      // orderBy("status.submittedOn"), // TODO: The query requires an index.
+      // startAfter((page - 1) * count), // TODO: having this returns undefined
       limit(count)
     );
 

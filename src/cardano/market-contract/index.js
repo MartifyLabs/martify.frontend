@@ -34,11 +34,11 @@ export const offer = async (tn, cs, price) => {
     tn,
     cs,
     sa: toHex(walletAddress.payment_cred().to_keyhash().to_bytes()),
-    price: toLovelace(price),
+    price: price,
     ra: toHex(raddr.payment_cred().to_keyhash().to_bytes()),
     rp,
   });
-
+  
   datums.add(offerDatum);
 
   outputs.add(
@@ -92,7 +92,7 @@ export const update = async (tn, cs, price, newprice, assetUtxos) => {
     tn,
     cs,
     sa: toHex(walletAddress.payment_cred().to_keyhash().to_bytes()),
-    price: toLovelace(price),
+    price: price,
     ra: toHex(raddr.payment_cred().to_keyhash().to_bytes()),
     rp,
   });
@@ -101,7 +101,7 @@ export const update = async (tn, cs, price, newprice, assetUtxos) => {
     tn,
     cs,
     sa: toHex(walletAddress.payment_cred().to_keyhash().to_bytes()),
-    price: toLovelace(newprice),
+    price: newprice,
     ra: toHex(raddr.payment_cred().to_keyhash().to_bytes()),
     rp,
   });
@@ -167,7 +167,7 @@ export const cancel = async (tn, cs, price, assetUtxos) => {
     tn,
     cs,
     sa: toHex(walletAddress.payment_cred().to_keyhash().to_bytes()),
-    price: toLovelace(price),
+    price: price,
     ra: toHex(raddr.payment_cred().to_keyhash().to_bytes()),
     rp,
   });
@@ -239,7 +239,7 @@ export const purchase = async (tn, cs, sa, price, assetUtxos) => {
     tn,
     cs,
     sa: toHex(sellerAddress.payment_cred().to_keyhash().to_bytes()),
-    price: toLovelace(price),
+    price: price,
     ra: toHex(raddr.payment_cred().to_keyhash().to_bytes()),
     rp,
   });
@@ -262,17 +262,17 @@ export const purchase = async (tn, cs, sa, price, assetUtxos) => {
   );
 
   var sellerOut =
-    toLovelace(price) -
-    0.02 * toLovelace(price) -
-    (rp / 100) * toLovelace(price);
+    price -
+    0.02 * price -
+    (rp / 100) * price;
   if (sellerOut <= 1600000) {
     sellerOut = 1600000;
   }
-  var feeOut = 0.02 * toLovelace(price);
+  var feeOut = 0.02 * price;
   if (feeOut <= 1600000) {
     feeOut = 1600000;
   }
-  var royOut = (rp / 100) * toLovelace(price);
+  var royOut = (rp / 100) * price;
   if (royOut <= 1600000) {
     royOut = 1600000;
   }

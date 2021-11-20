@@ -14,6 +14,7 @@ import CollectionAbout from "../../components/CollectionAbout";
 import CollectionBanner from "../../components/CollectionBanner";
 import AssetImageFigure from "../../components/AssetImageFigure";
 
+import { fromLovelace } from "../../utils";
 import "./style.css";
 
 const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, list_token, update_token, delist_token, purchase_token, asset_add_offer, opencnft_get_asset_tx}) => {
@@ -168,9 +169,22 @@ const SocialLinks = ({asset}) => {
 };
 
 const Listing = ({asset, state_wallet, list_token, update_token, delist_token, purchase_token, asset_add_offer}) => {
+  
+  let is_owner = false;
+  if(asset.details.asset in state_wallet.assets){
+    is_owner = true;
+  }
+  if(asset.status && state_wallet.connected){
+    if(asset.status.locked){
+      if(asset.status.submittedBy == state_wallet.data.wallet_address){
+        is_owner = true;
+      }
+    }
+  }
+
   return (
     <div className="block">
-      { asset.details.asset in state_wallet.assets ? 
+      { is_owner ? 
         <OwnerListAsset state_wallet={state_wallet} asset={asset} list_token={list_token} update_token={update_token} delist_token={delist_token} /> : 
         <PurchaseAsset asset={asset} asset_add_offer={asset_add_offer} state_wallet={state_wallet} purchase_token={purchase_token} /> 
       }
@@ -180,7 +194,7 @@ const Listing = ({asset, state_wallet, list_token, update_token, delist_token, p
 
 const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) => {
 
-  const [showTab, setShowTab] = useState( asset.listing ? asset.listing.is_listed ? "buy" : "offer" : "offer");
+  const [showTab, setShowTab] = useState( asset.status ? asset.status.locked ? "buy" : "offer" : "offer");
   const [userInputAmount, setUserInputAmount] = useState("");
   const [showModal, setShowModal] = useState(false);
 
@@ -234,7 +248,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
 
       <div className="card-content">  
         {
-          asset.listing ? asset.listing.is_listed ? (
+          asset.status ? asset.status.locked ? (
             <div className="tabs is-centered">
               <ul>
                 <li className={showTab==="buy"?"is-active":""} onClick={() => setShowTab("buy")}><a>Buy Now</a></li>
@@ -246,14 +260,14 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
         }
         
         {
-          showTab==="buy" ? asset.listing ? asset.listing.is_listed ? (
+          showTab==="buy" ? asset.status ? asset.status.locked ? (
             <>
               <nav className="level is-mobile">
                 <div className="level-item has-text-centered">
                   <div>
                     <p className="heading">Buy now</p>
                     <p className="title">
-                      {asset.listing.price}
+                      {fromLovelace(asset.status.datum.price)}
                       <span className="ada_symbol">₳</span>
                     </p>
                   </div>
@@ -494,13 +508,13 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
           : <></> : <></>
         }
         {
-          asset.listing ? asset.listing.is_listed ? (
+          asset.status ? asset.status.locked ? (
             <nav className="level is-mobile">
               <div className="level-item has-text-centered">
                 <div>
                   <p className="heading">Currently listed for</p>
                   <p className="title">
-                    {asset.listing.price}
+                    {fromLovelace(asset.status.datum.price)}
                     <span className="ada_symbol">₳</span>
                   </p>
                 </div>
@@ -518,7 +532,7 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
         
         <div className="field has-addons">
           <div className="control has-icons-left is-expanded">
-            <input className="input" type="number" placeholder={asset.listing.is_listed ? "Update listing price" : "Input listing price"}
+            <input className="input" type="number" placeholder={asset.status.locked ? "Update listing price" : "Input listing price"}
             value={userInputAmount} onChange={(event) => input_price_changed(event)} 
             disabled={state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE}
             />
@@ -529,7 +543,7 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
           </div>
           <div className="control">
             <button className={"button is-info " + (state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE?"is-loading":"")}
-              onClick={() => asset.listing.is_listed ? update_this_listing(userInputAmount) : list_this_token(userInputAmount)}
+              onClick={() => asset.status.locked ? update_this_listing(userInputAmount) : list_this_token(userInputAmount)}
               disabled={state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE || userInputAmount < 5}
             >
               {

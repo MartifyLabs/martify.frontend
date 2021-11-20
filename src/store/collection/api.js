@@ -59,7 +59,6 @@ export const get_listings = (policy_id, callback) => async (dispatch) => {
   };
 
   let assets = await getAssets((await getCollection(policy_id)).assets);
-  console.log(999, policy_id, assets)
   for(var i in assets){
     let asset = assets[i];
     if(asset){
