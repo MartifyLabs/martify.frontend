@@ -64,12 +64,10 @@ export const getAssets = async (assetIds) => {
   try {
     if (assetIds) {
       const assets = await Promise.all(
-        assetIds
-          .map(async (assetId) => await getAsset(assetId))
-          .filter((asset) => asset !== undefined)
+        assetIds.map(async (assetId) => await getAsset(assetId))
       );
 
-      return assets;
+      return assets.filter((asset) => asset !== undefined);
     }
   } catch (error) {
     console.error(`Unexpected error in getAssets. [Message: ${error.message}]`);
@@ -114,7 +112,7 @@ export const lockAsset = async (
         submittedBy: address,
         submittedOn: new Date().getTime(),
       },
-    }
+    };
     await saveAsset(assetUpdated);
     return assetUpdated;
   }
@@ -148,7 +146,9 @@ export const saveAsset = async (asset) => {
       await setDoc(reference, asset, { merge: true });
     }
   } catch (error) {
-    console.error(`Unexpected error in saveAsset1. [Message: ${error.message}]`);
+    console.error(
+      `Unexpected error in saveAsset1. [Message: ${error.message}]`
+    );
   }
 };
 
