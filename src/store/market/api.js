@@ -59,7 +59,7 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
       await addWalletEvent(wallet, this_event);
       console.log("this_event", this_event);
 
-      await lockAsset(
+      asset_updated = await lockAsset(
         asset_updated,
         {
           datum: datum,
@@ -117,20 +117,20 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
       wallet_address,
       royaltiesAddress,
       royaltiesPercentage,
-      toLovelace(newPrice),
+      newPrice,
     );
     console.log("datum", datum)
 
-    let txHash = await update(
+    let offer_obj = await update(
       asset.status.datum.tn,
       asset.status.datum.cs,
       asset.status.datum.price,
       datum.price,
       assetUtxos
     );
-    console.log("txHash", txHash);
+    console.log("offer_obj", offer_obj);
 
-    if (txHash){
+    if (offer_obj){
 
       let wallet = await getWallet(wallet_address);
       console.log("wallet", wallet);
@@ -138,12 +138,22 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
       let this_event = createEvent(
         MARKET_TYPE.PRICE_UPDATE,
         datum,
-        txHash,
+        offer_obj.txHash,
         wallet_address,
       );
       console.log("this_event", this_event);
   
       await addWalletEvent(wallet, this_event);
+
+      asset_updated = await lockAsset(
+        asset_updated,
+        {
+          datum: datum,
+          datumHash: offer_obj.datumHash,
+          txHash: offer_obj.txHash,
+          address: wallet_address,
+        }
+      );
       
       let output = {
         policy_id: asset.details.policyId,
@@ -194,7 +204,7 @@ export const delistToken = (asset, callback) => async (dispatch) => {
       let wallet_address = (await getUsedAddress()).to_bech32();
       let wallet = await getWallet(wallet_address);
 
-      await unlockAsset(
+      asset_updated = await unlockAsset(
         asset_updated,
         {
           txHash: txHash,
@@ -263,7 +273,7 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
       let wallet_address = (await getUsedAddress()).to_bech32();
       let wallet = await getWallet(wallet_address);
       
-      await unlockAsset(
+      asset_updated = await unlockAsset(
         asset_updated,
         {
           txHash: txHash,
@@ -279,15 +289,17 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
       );
       await addWalletEvent(wallet, this_event);
       console.log("this_event", this_event);
+
+      let output = {
+        policy_id: asset.details.policyId,
+        listing: {
+          [asset_updated.details.asset]: asset_updated,
+        },
+      };
+      dispatch(collections_add_tokens(output));
+
     }
 
-    let output = {
-      policy_id: asset.details.policyId,
-      listing: {
-        [asset_updated.details.asset]: asset_updated,
-      },
-    };
-    dispatch(collections_add_tokens(output));
     dispatch(setWalletLoading(false));
     callback({ success: true, type: MARKET_TYPE.PURCHASE_SUCCESS });
   } catch (error) {

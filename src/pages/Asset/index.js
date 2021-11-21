@@ -427,6 +427,8 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
     setUserInputAmount("");
     if(res.success){
       setShowModal(res.type);
+    }else{
+      console.log("fail", res);
     }
   }
   function list_this_token(price){
@@ -477,7 +479,7 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
       return () => clearTimeout(timer);
     }
   }, [showModal]);
-
+  console.log(11, asset)
   return (
     <div className="card">
       <header className="card-header">

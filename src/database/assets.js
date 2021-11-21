@@ -104,7 +104,7 @@ export const lockAsset = async (
   { datum, datumHash, txHash, address }
 ) => {
   if (asset && datum && datumHash && txHash && address) {
-    await saveAsset({
+    let asset_updated = {
       ...asset,
       status: {
         datum,
@@ -114,8 +114,11 @@ export const lockAsset = async (
         submittedBy: address,
         submittedOn: new Date().getTime(),
       },
-    });
+    }
+    await saveAsset(asset_updated);
+    return asset_updated;
   }
+  return asset;
 };
 
 /**
@@ -123,7 +126,7 @@ export const lockAsset = async (
  */
 export const unlockAsset = async (asset, { txHash, address }) => {
   if (asset && txHash && address) {
-    await saveAsset({
+    let asset_updated = {
       ...asset,
       status: {
         locked: false,
@@ -131,8 +134,11 @@ export const unlockAsset = async (asset, { txHash, address }) => {
         submittedBy: address,
         submittedOn: new Date().getTime(),
       },
-    });
+    };
+    await saveAsset(asset_updated);
+    return asset_updated;
   }
+  return asset;
 };
 
 export const saveAsset = async (asset) => {
