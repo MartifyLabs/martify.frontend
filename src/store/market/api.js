@@ -1,86 +1,83 @@
-import { offer, update, cancel, purchase } from "../../cardano/market-contract/";
-import { getUsedAddress } from "../../cardano/wallet";
+import {
+  listAsset,
+  updateListing,
+  cancelListing,
+  purchaseAsset,
+} from "../../cardano/market-contract/";
+import { getUsedAddress, getUtxos } from "../../cardano/wallet";
 import { contractAddress } from "../../cardano/market-contract/validator";
 import { getLockedUtxosByAsset } from "../../cardano/blockfrost-api";
 
 import { getWallet, addWalletEvent } from "../../database/wallets";
-import { saveAsset, getAsset, lockAsset, unlockAsset } from "../../database/assets";
+import { getAsset, lockAsset, unlockAsset } from "../../database/assets";
 
 import { collections_add_tokens } from "../collection/collectionActions";
 import { setWalletLoading } from "../wallet/walletActions";
 import { WALLET_STATE } from "../wallet/walletTypes";
 import { MARKET_TYPE } from "./marketTypes";
+import { fromBech32 } from "../../utils";
 import { createEvent, createDatum } from "../../utils/factory";
-import { toLovelace } from "../../utils";
-
-function add_event_asset_history(asset, event){
-  if(!("history" in asset)) asset.history = [];  
-  asset.history.push(event);
-}
 
 export const listToken = (asset, price, callback) => async (dispatch) => {
   try {
-    // note: if price == 0, means user wanna delist it
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
-    let asset_updated = await getAsset(asset.details.asset);
+    const assetOld = await getAsset(asset.details.asset);
+    const walletAddress = (await getUsedAddress()).to_bech32();
+    const walletUtxos = await getUtxos();
+    // TODO: Fetch royalties from collection
+    const royaltiesAddress = walletAddress;
+    const royaltiesPercentage = 0;
+    // _____________________________________
 
-    let wallet_address = (await getUsedAddress()).to_bech32();
-    let royaltiesAddress = wallet_address; // TODO, got no royalties now
-    let royaltiesPercentage = 0;
-
-    let datum = createDatum(
-      asset.details.assetName,
-      asset.details.policyId,
-      wallet_address,
+    const datum = createDatum(
+      assetOld.details.assetName,
+      assetOld.details.policyId,
+      walletAddress,
       royaltiesAddress,
       royaltiesPercentage,
-      price,
+      price
     );
-    console.log("datum", datum)
 
-    let offer_obj = await offer(
-      datum.tn,
-      datum.cs,
-      datum.price
-    );
-    console.log("offer_obj", offer_obj);
+    const listObj = await listAsset(datum, {
+      address: fromBech32(walletAddress),
+      utxos: walletUtxos,
+    });
 
-    if (offer_obj){
+    if (listObj && listObj.datumHash && listObj.txHash) {
+      const walletObj = await getWallet(walletAddress);
 
-      let wallet = await getWallet(wallet_address);
-      
-      let this_event = createEvent(
+      const event = createEvent(
         MARKET_TYPE.NEW_LISTING,
         datum,
-        offer_obj.txHash,
-        wallet_address,
-      );
-      await addWalletEvent(wallet, this_event);
-      console.log("this_event", this_event);
-
-      asset_updated = await lockAsset(
-        asset_updated,
-        {
-          datum: datum,
-          datumHash: offer_obj.datumHash,
-          txHash: offer_obj.txHash,
-          address: wallet_address,
-        }
+        listObj.txHash,
+        walletAddress
       );
 
-      let output = {
-        policy_id: asset.details.policyId,
+      await addWalletEvent(walletObj, event);
+
+      const assetNew = await lockAsset(assetOld, {
+        datum: datum,
+        datumHash: listObj.datumHash,
+        txHash: listObj.txHash,
+        address: walletAddress,
+      });
+
+      const output = {
+        policy_id: assetNew.details.policyId,
         listing: {
-          [asset_updated.details.asset]: asset_updated,
+          [assetNew.details.asset]: assetNew,
         },
       };
-      
-      dispatch(collections_add_tokens(output));
-    }
 
-    dispatch(setWalletLoading(false));
-    callback({ success: true, type: MARKET_TYPE.NEW_LISTING_SUCCESS });
+      dispatch(setWalletLoading(false));
+      dispatch(collections_add_tokens(output));
+      callback({ success: true, type: MARKET_TYPE.NEW_LISTING_SUCCESS });
+    } else {
+      console.error("List Failed...");
+      dispatch(setWalletLoading(false));
+      callback({ success: false });
+    }
   } catch (error) {
     console.error(`Unexpected error in listToken. [Message: ${error.message}]`);
     dispatch(setWalletLoading(false));
@@ -92,83 +89,83 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
-    let asset_updated = await getAsset(asset.details.asset);
-    
-    console.log(
-      "updateToken on market",
-      asset.status.datum.tn,
-      asset.status.datum.cs,
-      asset.status.datum.price,
-      newPrice
-    );
+    const assetOld = await getAsset(asset.details.asset);
+    const walletAddress = (await getUsedAddress()).to_bech32();
+    const walletUtxos = await getUtxos();
+    // TODO: Fetch royalties from collection
+    const royaltiesAddress = walletAddress;
+    // _____________________________________
 
-    const assetUtxos = await getLockedUtxosByAsset(
-      contractAddress().to_bech32(),
-      asset.details.asset
-    );
+    const assetUtxo = (
+      await getLockedUtxosByAsset(
+        contractAddress().to_bech32(),
+        assetOld.details.asset
+      )
+    ).find((utxo) => utxo.data_hash === assetOld.status.datumHash);
 
-    let wallet_address = (await getUsedAddress()).to_bech32();
-    let royaltiesAddress = wallet_address;
-    let royaltiesPercentage = 0;
-
-    let datum = createDatum(
-      asset.details.assetName,
-      asset.details.policyId,
-      wallet_address,
-      royaltiesAddress,
-      royaltiesPercentage,
-      newPrice,
-    );
-    console.log("datum", datum)
-
-    let offer_obj = await update(
-      asset.status.datum.tn,
-      asset.status.datum.cs,
-      asset.status.datum.price,
-      datum.price,
-      assetUtxos
-    );
-    console.log("offer_obj", offer_obj);
-
-    if (offer_obj){
-
-      let wallet = await getWallet(wallet_address);
-      console.log("wallet", wallet);
-
-      let this_event = createEvent(
-        MARKET_TYPE.PRICE_UPDATE,
-        datum,
-        offer_obj.txHash,
-        wallet_address,
+    if (assetUtxo) {
+      console.log("assetOld: ", assetOld);
+      const datumNew = createDatum(
+        assetOld.status.datum.tn,
+        assetOld.status.datum.cs,
+        walletAddress,
+        royaltiesAddress,
+        assetOld.status.datum.rp,
+        newPrice
       );
-      console.log("this_event", this_event);
-  
-      await addWalletEvent(wallet, this_event);
-
-      asset_updated = await lockAsset(
-        asset_updated,
+      const updateObj = await updateListing(
+        assetOld.status.datum,
+        datumNew,
         {
-          datum: datum,
-          datumHash: offer_obj.datumHash,
-          txHash: offer_obj.txHash,
-          address: wallet_address,
-        }
-      );
-      
-      let output = {
-        policy_id: asset.details.policyId,
-        listing: {
-          [asset_updated.details.asset]: asset_updated,
+          address: fromBech32(walletAddress),
+          utxos: walletUtxos,
         },
-      };
-  
-      dispatch(collections_add_tokens(output));
+        assetUtxo
+      );
+
+      if (updateObj) {
+        const walletObj = await getWallet(walletAddress);
+
+        const event = createEvent(
+          MARKET_TYPE.PRICE_UPDATE,
+          datumNew,
+          updateObj.txHash,
+          walletAddress
+        );
+
+        await addWalletEvent(walletObj, event);
+
+        const assetNew = await lockAsset(assetOld, {
+          datum: datumNew,
+          datumHash: updateObj.datumHash,
+          txHash: updateObj.txHash,
+          address: walletAddress,
+        });
+
+        const output = {
+          policy_id: asset.details.policyId,
+          listing: {
+            [assetNew.details.asset]: assetNew,
+          },
+        };
+
+        dispatch(setWalletLoading(false));
+        dispatch(collections_add_tokens(output));
+        callback({ success: true, type: MARKET_TYPE.PRICE_UPDATE_SUCCESS });
+      } else {
+        console.error("Update Failed...");
+        dispatch(setWalletLoading(false));
+        callback({ success: false });
+      }
+    } else {
+      console.error("Update Failed, Datum Hash not matching...");
+      dispatch(setWalletLoading(false));
+      callback({ success: false });
     }
-    
-    dispatch(setWalletLoading(false));
-    callback({ success: true, type: MARKET_TYPE.PRICE_UPDATE_SUCCESS });
   } catch (error) {
-    console.error(`Unexpected error in updateToken. [Message: ${error.message}]`);
+    console.error(
+      `Unexpected error in updateToken. [Message: ${error.message}]`
+    );
     dispatch(setWalletLoading(false));
     callback({ success: false });
   }
@@ -178,64 +175,68 @@ export const delistToken = (asset, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
-    let asset_updated = await getAsset(asset.details.asset);
-    
-    console.log(
-      "delistToken on market",
-      asset.status.datum.tn,
-      asset.status.datum.cs,
-      asset.status.datum.price,
-    );
+    const assetOld = await getAsset(asset.details.asset);
+    const walletAddress = (await getUsedAddress()).to_bech32();
+    const walletUtxos = await getUtxos();
 
-    const assetUtxos = await getLockedUtxosByAsset(
-      contractAddress().to_bech32(),
-      asset.details.asset
-    );
+    const assetUtxo = (
+      await getLockedUtxosByAsset(
+        contractAddress().to_bech32(),
+        assetOld.details.asset
+      )
+    ).find((utxo) => utxo.data_hash === assetOld.status.datumHash);
 
-    let txHash = await cancel(
-      asset.status.datum.tn,
-      asset.status.datum.cs,
-      asset.status.datum.price,
-      assetUtxos
-    );
-    console.log("txHash", txHash);
-
-    if (txHash){
-      let wallet_address = (await getUsedAddress()).to_bech32();
-      let wallet = await getWallet(wallet_address);
-
-      asset_updated = await unlockAsset(
-        asset_updated,
+    if (assetUtxo) {
+      const txHash = await cancelListing(
+        assetOld.status.datum,
         {
-          txHash: txHash,
-          address: wallet_address,
-        }
-      );
-
-      let this_event = createEvent(
-        MARKET_TYPE.DELIST,
-        {},
-        txHash,
-        wallet_address,
-      );
-      console.log("this_event", this_event);
-  
-      await addWalletEvent(wallet, this_event);
-
-      let output = {
-        policy_id: asset.details.policyId,
-        listing: {
-          [asset_updated.details.asset]: asset_updated,
+          address: fromBech32(walletAddress),
+          utxos: walletUtxos,
         },
-      };
-  
-      dispatch(collections_add_tokens(output));
+        assetUtxo
+      );
+
+      if (txHash) {
+        const assetNew = await unlockAsset(assetOld, {
+          txHash: txHash,
+          address: walletAddress,
+        });
+
+        const walletObj = await getWallet(walletAddress);
+
+        const event = createEvent(
+          MARKET_TYPE.DELIST,
+          {},
+          txHash,
+          walletAddress
+        );
+
+        await addWalletEvent(walletObj, event);
+
+        const output = {
+          policy_id: assetNew.details.policyId,
+          listing: {
+            [assetNew.details.asset]: assetNew,
+          },
+        };
+
+        dispatch(setWalletLoading(false));
+        dispatch(collections_add_tokens(output));
+        callback({ success: true, type: MARKET_TYPE.DELIST_SUCCESS });
+      } else {
+        console.error("Cancel Failed...");
+        dispatch(setWalletLoading(false));
+        callback({ success: false });
+      }
+    } else {
+      console.error("Cancel Failed, Datum Hash not matching...");
+      dispatch(setWalletLoading(false));
+      callback({ success: false });
     }
-    
-    dispatch(setWalletLoading(false));
-    callback({ success: true, type: MARKET_TYPE.DELIST_SUCCESS });
   } catch (error) {
-    console.error(`Unexpected error in delistToken. [Message: ${error.message}]`);
+    console.error(
+      `Unexpected error in delistToken. [Message: ${error.message}]`
+    );
     dispatch(setWalletLoading(false));
     callback({ success: false });
   }
@@ -245,65 +246,75 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
-    let asset_updated = await getAsset(asset.details.asset);
-    
-    console.log(
-      "purchaseToken on market",
-      asset.status.datum.tn,
-      asset.status.datum.cs,
-      asset.status.datum.sa,
-      asset.status.datum.price,
-    );
+    const assetOld = await getAsset(asset.details.asset);
+    const walletAddress = (await getUsedAddress()).to_bech32();
+    const walletUtxos = await getUtxos();
 
-    const assetUtxos = await getLockedUtxosByAsset(
-      contractAddress().to_bech32(),
-      asset.details.asset
-    );
+    const assetUtxo = (
+      await getLockedUtxosByAsset(
+        contractAddress().to_bech32(),
+        assetOld.details.asset
+      )
+    ).find((utxo) => utxo.data_hash === assetOld.status.datumHash);
 
-    let txHash = await purchase(
-      asset.status.datum.tn,
-      asset.status.datum.cs,
-      asset.status.datum.sa,
-      asset.status.datum.price,
-      assetUtxos
-    );
-    console.log("txHash", txHash);
-
-    if (txHash){
-      let wallet_address = (await getUsedAddress()).to_bech32();
-      let wallet = await getWallet(wallet_address);
-      
-      asset_updated = await unlockAsset(
-        asset_updated,
+    if (assetUtxo) {
+      const txHash = await purchaseAsset(
+        assetOld.status.datum,
         {
-          txHash: txHash,
-          address: wallet_address,
-        }
-      );
-
-      let this_event = createEvent(
-        MARKET_TYPE.PURCHASE,
-        {},
-        txHash,
-        wallet_address,
-      );
-      await addWalletEvent(wallet, this_event);
-      console.log("this_event", this_event);
-
-      let output = {
-        policy_id: asset.details.policyId,
-        listing: {
-          [asset_updated.details.asset]: asset_updated,
+          address: fromBech32(walletAddress),
+          utxos: walletUtxos,
         },
-      };
-      dispatch(collections_add_tokens(output));
+        {
+          seller: fromBech32(assetOld.status.submittedBy),
+          // TODO: Fetch royalties and market address
+          artist: fromBech32(assetOld.status.submittedBy),
+          market: fromBech32("addr_test1qp6pykcc0kgaqj27z3jg4sjt7768p375qr8q4z3f4xdmf38skpyf2kgu5wqpnm54y5rqgee4uwyksg6eyd364qhmpwqsv2jjt3"),
+          // ----------------------------------------
+        },
+        assetUtxo
+      );
 
+      if (txHash) {
+        const walletObj = await getWallet(walletAddress);
+
+        const event = createEvent(
+          MARKET_TYPE.PURCHASE,
+          {},
+          txHash,
+          walletAddress
+        );
+
+        await addWalletEvent(walletObj, event);
+
+        const assetNew = await unlockAsset(assetOld, {
+          txHash: txHash,
+          address: walletAddress,
+        });
+
+        const output = {
+          policy_id: asset.details.policyId,
+          listing: {
+            [assetNew.details.asset]: assetNew,
+          },
+        };
+
+        dispatch(setWalletLoading(false));
+        dispatch(collections_add_tokens(output));
+        callback({ success: true, type: MARKET_TYPE.PURCHASE_SUCCESS });
+      } else {
+        console.error("Purchase Failed...");
+        dispatch(setWalletLoading(false));
+        callback({ success: false });
+      }
+    } else {
+      console.error("Purchase Failed, Datum Hash not matching...");
+      dispatch(setWalletLoading(false));
+      callback({ success: false });
     }
-
-    dispatch(setWalletLoading(false));
-    callback({ success: true, type: MARKET_TYPE.PURCHASE_SUCCESS });
   } catch (error) {
-    console.error(`Unexpected error in purchaseToken. [Message: ${error.message}]`);
+    console.error(
+      `Unexpected error in purchaseToken. [Message: ${error.message}]`
+    );
     dispatch(setWalletLoading(false));
     callback({ success: false });
   }
