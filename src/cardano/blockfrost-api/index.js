@@ -83,7 +83,7 @@ export const getMintedAssets = async (
   { page = 1, count = 100, order = "asc" }
 ) => {
   try {
-    console.log(888, policyId, page, count, order)
+    console.log(888, policyId, page, count, order);
     const response = await cardano(
       `assets/policy/${policyId}?page=${page}&count=${count}&order=${order}`
     );
@@ -160,5 +160,10 @@ const request = async (base, endpoint, headers, body) => {
     },
     method: body ? "POST" : "GET",
     body,
-  }).then((res) => res.json());
+  }).then((response) => {
+    if (!response.ok) {
+      throw response;
+    }
+    return response.json();
+  });
 };
