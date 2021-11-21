@@ -212,10 +212,7 @@ const splitAmount = async (
   const marketFeePercentage = 2 / 100;
   const royaltyFeePercentage = royalties / 100;
 
-  const royaltyFees =
-    royaltyFeePercentage * price > minimumAmount
-      ? royaltyFeePercentage * price
-      : minimumAmount;
+  const royaltyFees = Math.max(royaltyFeePercentage * price, minimumAmount);
   outputs.add(
     await createTxOutput(
       artist.to_address(),
@@ -223,10 +220,7 @@ const splitAmount = async (
     )
   );
 
-  const marketFees =
-    marketFeePercentage * price > minimumAmount
-      ? marketFeePercentage * price
-      : minimumAmount;
+  const marketFees = Math.max(marketFeePercentage * price, minimumAmount);
   outputs.add(
     await createTxOutput(
       market.to_address(),
@@ -235,13 +229,13 @@ const splitAmount = async (
   );
 
   const netPrice =
-    price - royaltyFees - marketFees > minimumAmount
-      ? price - royaltyFees - marketFees
-      : minimumAmount;
+    price - royaltyFeePercentage * price - marketFeePercentage * price;
   outputs.add(
     await createTxOutput(
       seller.to_address(),
-      assetsToValue([{ unit: "lovelace", quantity: `${netPrice}` }])
+      assetsToValue([
+        { unit: "lovelace", quantity: `${Math.max(netPrice, minimumAmount)}` },
+      ])
     )
   );
 };
