@@ -60,11 +60,11 @@ const Events = ({state_wallet, state_collection, get_assets}) => {
                 </td>
                 <td>
                   {
-                    this_event.action==MARKET_TYPE.NEW_LISTING ? `${this_asset.details.onchainMetadata.name} has been listed for ₳${fromLovelace(this_event.datum.price)}` : 
-                    this_event.action=="offer" ? `Someone has offered ${this_asset.details.onchainMetadata.name} for ₳${fromLovelace(this_event.datum.price)}` : 
-                    this_event.action==MARKET_TYPE.DELIST ? `${this_asset.details.onchainMetadata.name} has been removed from the marketplace` : 
-                    this_event.action==MARKET_TYPE.PRICE_UPDATE ? `${this_asset.details.onchainMetadata.name} listing price updated to ₳${fromLovelace(this_event.datum.price)}` : 
-                    this_event.action==MARKET_TYPE.PURCHASE ? `${this_asset.details.onchainMetadata.name} purchased from the marketplace for ₳${fromLovelace(this_event.datum.price)}` : 
+                    this_event.action===MARKET_TYPE.NEW_LISTING ? `${this_asset.details.onchainMetadata.name} has been listed for ₳${fromLovelace(this_event.datum.price)}` : 
+                    this_event.action==="offer" ? `Someone has offered ${this_asset.details.onchainMetadata.name} for ₳${fromLovelace(this_event.datum.price)}` : 
+                    this_event.action===MARKET_TYPE.DELIST ? `${this_asset.details.onchainMetadata.name} has been removed from the marketplace` : 
+                    this_event.action===MARKET_TYPE.PRICE_UPDATE ? `${this_asset.details.onchainMetadata.name} listing price updated to ₳${fromLovelace(this_event.datum.price)}` : 
+                    this_event.action===MARKET_TYPE.PURCHASE ? `${this_asset.details.onchainMetadata.name} purchased from the marketplace for ₳${fromLovelace(this_event.datum.price)}` : 
                     ""
                   }
                 </td>

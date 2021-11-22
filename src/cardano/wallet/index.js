@@ -23,7 +23,7 @@ export const getOwnedAssets = async () => {
     .filter(
       (txOut) =>
         txOut.amount().multiasset() !== undefined &&
-        txOut.address().to_bech32() === usedAddress.to_bech32()
+        txOut.address().to_bech32() === usedAddress
     )
     .map((txOut) => valueToAssets(txOut.amount()))
     .flatMap((assets) =>
@@ -31,13 +31,15 @@ export const getOwnedAssets = async () => {
         .filter((asset) => asset.unit !== "lovelace")
         .map((asset) => asset.unit)
     );
-  
+
   return [...new Set(ownedAssets)];
 };
 
 export const getUsedAddress = async () => {
   const usedAddresses = await window.cardano.getUsedAddresses();
-  return Cardano.Instance.Address.from_bytes(fromHex(usedAddresses[0]));
+  return Cardano.Instance.Address.from_bytes(
+    fromHex(usedAddresses[0])
+  ).to_bech32();
 };
 
 export const getUtxos = async () => {
@@ -50,9 +52,4 @@ export const signTx = async (tx, partialSign = true) => {
 
 export const submitTx = async (tx) => {
   return await window.cardano.submitTx(tx);
-};
-
-export const getWalletAddress = async () => {
-  const usedAddresses = await window.cardano.getUsedAddresses();
-  return Cardano.Instance.Address.from_bytes(fromHex(usedAddresses[0])).to_bech32();
 };

@@ -34,66 +34,66 @@ export const getWallet = async (address) => {
 
 export const addWalletAsset = async (wallet, newAsset) => {
   if (wallet && newAsset) {
-    let update_wallet = {
+    const updatedWallet = {
       ...wallet,
       assets: {
         ...wallet.assets,
-        [newAsset.asset]: newAsset
+        [newAsset.asset]: newAsset,
       },
     };
-    await saveWallet(update_wallet);
-    return update_wallet;
+    await saveWallet(updatedWallet);
+    return updatedWallet;
   }
   return wallet;
 };
 
 export const addWalletEvent = async (wallet, newEvent) => {
   if (wallet && newEvent) {
-    let update_wallet = {
+    const updatedWallet = {
       ...wallet,
       events: [...wallet.events, newEvent],
     };
-    await saveWallet(update_wallet);
-    return update_wallet;
+    await saveWallet(updatedWallet);
+    return updatedWallet;
   }
   return wallet;
 };
 
 export const addWalletOffer = async (wallet, newOffer) => {
   if (wallet && newOffer) {
-    let updated_wallet = {
+    const updatedWallet = {
       ...wallet,
       offers: [...wallet.offers, newOffer],
     };
-    await saveWallet(updated_wallet);
-    return updated_wallet;
+    await saveWallet(updatedWallet);
+    return updatedWallet;
   }
   return wallet;
 };
 
 export const setWalletAssets = async (wallet, assets) => {
   if (wallet && assets) {
-    let updated_wallet = { ...wallet, assets: assets };
-    await saveWallet(updated_wallet);
-    return updated_wallet;
+    const updatedWallet = { ...wallet, assets: assets };
+    await saveWallet(updatedWallet);
+    return updatedWallet;
   }
   return wallet;
 };
 
 export const setWalletEvents = async (wallet, events) => {
   if (wallet && events) {
-    let updated_wallet = { ...wallet, events }
-    await saveWallet(updated_wallet);
-    return updated_wallet;
+    const updatedWallet = { ...wallet, events };
+    await saveWallet(updatedWallet);
+    return updatedWallet;
   }
   return wallet;
 };
 
 export const setWalletOffers = async (wallet, offers) => {
   if (wallet && offers) {
-    let updated_wallet = { ...wallet, offers };
-    await saveWallet(updated_wallet);
-    return updated_wallet;
+    const updatedWallet = { ...wallet, offers };
+    await saveWallet(updatedWallet);
+    return updatedWallet;
   }
   return wallet;
 };

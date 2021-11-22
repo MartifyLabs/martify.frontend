@@ -19,13 +19,28 @@ const app = initializeApp(firebaseOptions);
 
 const db = getFirestore(app);
 
+export const addAssetEvent = async (asset, newEvent) => {
+  if (asset && newEvent) {
+    const assetUpdated = {
+      ...asset,
+      events: [...(asset.events || []), newEvent],
+    };
+    await saveAsset(assetUpdated);
+    return assetUpdated;
+  }
+  return asset;
+};
+
 export const addAssetOffer = async (asset, newOffer) => {
   if (asset && newOffer) {
-    await saveAsset({
+    const assetUpdated = {
       ...asset,
-      offers: [...asset.offers, newOffer],
-    });
+      offers: [...(asset.offers || []), newOffer],
+    };
+    await saveAsset(assetUpdated);
+    return assetUpdated;
   }
+  return asset;
 };
 
 export const getAsset = async (assetId) => {
@@ -43,6 +58,7 @@ export const getAsset = async (assetId) => {
         if (assetDetails) {
           const asset = {
             details: assetDetails,
+            events: [],
             offers: [],
             status: { locked: false },
           };
@@ -64,11 +80,9 @@ export const getAssets = async (assetIds) => {
   try {
     if (assetIds) {
       const assets = await Promise.all(
-        assetIds
-          .map(async (assetId) => await getAsset(assetId))
-          .filter((asset) => asset !== undefined)
+        assetIds.map(async (assetId) => await getAsset(assetId))
       );
-      return assets;
+      return assets.filter((asset) => asset !== undefined);
     }
   } catch (error) {
     console.error(`Unexpected error in getAssets. [Message: ${error.message}]`);
@@ -103,7 +117,7 @@ export const lockAsset = async (
   { datum, datumHash, txHash, address }
 ) => {
   if (asset && datum && datumHash && txHash && address) {
-    let asset_updated = {
+    const assetUpdated = {
       ...asset,
       status: {
         datum,
@@ -113,9 +127,9 @@ export const lockAsset = async (
         submittedBy: address,
         submittedOn: new Date().getTime(),
       },
-    }
-    await saveAsset(asset_updated);
-    return asset_updated;
+    };
+    await saveAsset(assetUpdated);
+    return assetUpdated;
   }
   return asset;
 };
@@ -125,7 +139,7 @@ export const lockAsset = async (
  */
 export const unlockAsset = async (asset, { txHash, address }) => {
   if (asset && txHash && address) {
-    let asset_updated = {
+    const assetUpdated = {
       ...asset,
       status: {
         locked: false,
@@ -134,8 +148,8 @@ export const unlockAsset = async (asset, { txHash, address }) => {
         submittedOn: new Date().getTime(),
       },
     };
-    await saveAsset(asset_updated);
-    return asset_updated;
+    await saveAsset(assetUpdated);
+    return assetUpdated;
   }
   return asset;
 };
@@ -147,7 +161,7 @@ export const saveAsset = async (asset) => {
       await setDoc(reference, asset, { merge: true });
     }
   } catch (error) {
-    console.error(`Unexpected error in saveAsset1. [Message: ${error.message}]`);
+    console.error(`Unexpected error in saveAsset. [Message: ${error.message}]`);
   }
 };
 
@@ -169,19 +183,9 @@ export const saveAssets = async (assets) => {
 
 export const setAssetOffers = async (asset, offers) => {
   if (asset && offers) {
-    await saveAsset({ ...asset, offers });
-  }
-};
-
-export const addAssetEvent = async (asset, event) => {
-  if (asset && event) {
-    let asset_updated = {
-      ...asset
-    }
-    if(!("events" in asset_updated)) asset_updated.events = [];
-    asset_updated.events.push(event);
-    await saveAsset(asset_updated);
-    return asset_updated;
+    const assetUpdated = { ...asset, offers };
+    await saveAsset(assetUpdated);
+    return assetUpdated;
   }
   return asset;
 };

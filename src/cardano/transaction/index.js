@@ -1,10 +1,8 @@
 import Cardano from "../serialization-lib";
-import { getCollateral, signTx, submitTx } from "../wallet";
-import { getProtocolParameters } from "../blockfrost-api";
 import CoinSelection from "./coinSelection";
 import { languageViews } from "./languageViews";
+import { getCollateral, signTx, submitTx } from "../wallet";
 import { fromHex, toHex } from "../../utils";
-import { contractAddress } from "../market-contract/validator";
 
 export const assetsToValue = (assets) => {
   const multiAsset = Cardano.Instance.MultiAsset.new();
@@ -41,9 +39,10 @@ export const assetsToValue = (assets) => {
   return value;
 };
 
-export const initializeTx = async () => {
+export const initializeTx = () => {
   const metadata = {};
-  const Parameters = await getProtocolParameters();
+
+  const Parameters = getProtocolParameters();
 
   const txBuilder = Cardano.Instance.TransactionBuilder.new(
     Cardano.Instance.LinearFee.new(
@@ -78,7 +77,7 @@ export const finalizeTx = async ({
   action,
   plutusScripts,
 }) => {
-  const Parameters = await getProtocolParameters();
+  const Parameters = getProtocolParameters();
   const transactionWitnessSet = Cardano.Instance.TransactionWitnessSet.new();
 
   CoinSelection.setProtocolParameters(
@@ -239,17 +238,16 @@ export const finalizeTx = async ({
   return txHash;
 };
 
-export const createTxOutput = async (
+export const createTxOutput = (
   address,
   value,
-  { datum, index, tradeOwnerAddress, metadata } = {}
+  { datum, metadata } = {}
 ) => {
-  const Parameters = await getProtocolParameters();
   const v = value;
 
   const minAda = Cardano.Instance.min_ada_required(
     v,
-    Cardano.Instance.BigNum.from_str(Parameters.minUtxo),
+    Cardano.Instance.BigNum.from_str(getProtocolParameters().minUtxo),
     datum && Cardano.Instance.hash_plutus_data(datum)
   );
 
@@ -259,18 +257,12 @@ export const createTxOutput = async (
 
   if (datum) {
     output.set_data_hash(Cardano.Instance.hash_plutus_data(datum));
-    //metadata[DATUM_LABEL][index] = "0x" + toHex(datum.to_bytes());
   }
-
-  /*if (tradeOwnerAddress) {
-    metadata[ADDRESS_LABEL].address =
-      "0x" + toHex(tradeOwnerAddress.to_address().to_bytes());
-  }*/
 
   return output;
 };
 
-export const createTxUnspentOutput = (utxo) => {
+export const createTxUnspentOutput = (address, utxo) => {
   try {
     return Cardano.Instance.TransactionUnspentOutput.new(
       Cardano.Instance.TransactionInput.new(
@@ -278,7 +270,7 @@ export const createTxUnspentOutput = (utxo) => {
         utxo.output_index
       ),
       Cardano.Instance.TransactionOutput.new(
-        contractAddress(),
+        address,
         assetsToValue(utxo.amount)
       )
     );
@@ -341,6 +333,22 @@ export const valueToAssets = (value) => {
     }
   }
   return assets;
+};
+
+const getProtocolParameters = () => {
+  return {
+    linearFee: {
+      minFeeA: "44",
+      minFeeB: "155381",
+    },
+    minUtxo: "34482",
+    poolDeposit: "500000000",
+    keyDeposit: "2000000",
+    maxValSize: 5000,
+    maxTxSize: 16384,
+    priceMem: 0.0577,
+    priceStep: 0.0000721,
+  };
 };
 
 const setCollateral = (txBuilder, utxos) => {

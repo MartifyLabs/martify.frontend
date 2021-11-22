@@ -15,7 +15,7 @@ export const listAsset = async (
   datum,
   seller: { address: BaseAddress, utxos: [] }
 ) => {
-  const { txBuilder, datums, outputs } = await initializeTx();
+  const { txBuilder, datums, outputs } = initializeTx();
 
   const utxos = seller.utxos.map((utxo) =>
     Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
@@ -25,7 +25,7 @@ export const listAsset = async (
   datums.add(lockAssetDatum);
 
   outputs.add(
-    await createTxOutput(
+    createTxOutput(
       contractAddress(),
       assetsToValue([
         {
@@ -62,7 +62,7 @@ export const updateListing = async (
   seller: { address: BaseAddress, utxos: [] },
   assetUtxo
 ) => {
-  const { txBuilder, datums, outputs } = await initializeTx();
+  const { txBuilder, datums, outputs } = initializeTx();
 
   const utxos = seller.utxos.map((utxo) =>
     Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
@@ -75,9 +75,9 @@ export const updateListing = async (
   datums.add(newListingDatum);
 
   outputs.add(
-    await createTxOutput(
+    createTxOutput(
       contractAddress(),
-      createTxUnspentOutput(assetUtxo).output().amount(),
+      createTxUnspentOutput(contractAddress(), assetUtxo).output().amount(),
       { datum: newListingDatum }
     )
   );
@@ -96,7 +96,7 @@ export const updateListing = async (
     utxos,
     outputs,
     changeAddress: seller.address,
-    scriptUtxo: createTxUnspentOutput(assetUtxo),
+    scriptUtxo: createTxUnspentOutput(contractAddress(), assetUtxo),
     plutusScripts: contractScripts(),
     action: UPDATE,
   });
@@ -112,7 +112,7 @@ export const cancelListing = async (
   seller: { address: BaseAddress, utxos: [] },
   assetUtxo
 ) => {
-  const { txBuilder, datums, outputs } = await initializeTx();
+  const { txBuilder, datums, outputs } = initializeTx();
 
   const utxos = seller.utxos.map((utxo) =>
     Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
@@ -122,9 +122,9 @@ export const cancelListing = async (
   datums.add(cancelListingDatum);
 
   outputs.add(
-    await createTxOutput(
+    createTxOutput(
       seller.address.to_address(),
-      createTxUnspentOutput(assetUtxo).output().amount()
+      createTxUnspentOutput(contractAddress(), assetUtxo).output().amount()
     )
   );
 
@@ -138,7 +138,7 @@ export const cancelListing = async (
     utxos,
     outputs,
     changeAddress: seller.address,
-    scriptUtxo: createTxUnspentOutput(assetUtxo),
+    scriptUtxo: createTxUnspentOutput(contractAddress(), assetUtxo),
     plutusScripts: contractScripts(),
     action: CANCEL,
   });
@@ -156,7 +156,7 @@ export const purchaseAsset = async (
   },
   assetUtxo
 ) => {
-  const { txBuilder, datums, outputs } = await initializeTx();
+  const { txBuilder, datums, outputs } = initializeTx();
 
   const utxos = buyer.utxos.map((utxo) =>
     Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
@@ -166,16 +166,14 @@ export const purchaseAsset = async (
   datums.add(purchaseAssetDatum);
 
   outputs.add(
-    await createTxOutput(
+    createTxOutput(
       buyer.address.to_address(),
-      createTxUnspentOutput(assetUtxo).output().amount()
+      createTxUnspentOutput(contractAddress(), assetUtxo).output().amount()
     )
   );
 
-  await splitAmount(
-    beneficiaries.seller,
-    beneficiaries.artist,
-    beneficiaries.market,
+  splitAmount(
+    beneficiaries,
     {
       price: datum.price,
       royalties: datum.rp,
@@ -193,7 +191,7 @@ export const purchaseAsset = async (
     outputs,
     datums,
     changeAddress: buyer.address,
-    scriptUtxo: createTxUnspentOutput(assetUtxo),
+    scriptUtxo: createTxUnspentOutput(contractAddress(), assetUtxo),
     plutusScripts: contractScripts(),
     action: BUY,
   });
@@ -201,10 +199,8 @@ export const purchaseAsset = async (
   return txHash;
 };
 
-const splitAmount = async (
-  seller,
-  artist,
-  market,
+const splitAmount = (
+  { seller, artist, market },
   { price, royalties },
   outputs
 ) => {
@@ -214,7 +210,7 @@ const splitAmount = async (
 
   const royaltyFees = Math.max(royaltyFeePercentage * price, minimumAmount);
   outputs.add(
-    await createTxOutput(
+    createTxOutput(
       artist.to_address(),
       assetsToValue([{ unit: "lovelace", quantity: `${royaltyFees}` }])
     )
@@ -222,7 +218,7 @@ const splitAmount = async (
 
   const marketFees = Math.max(marketFeePercentage * price, minimumAmount);
   outputs.add(
-    await createTxOutput(
+    createTxOutput(
       market.to_address(),
       assetsToValue([{ unit: "lovelace", quantity: `${marketFees}` }])
     )
@@ -231,7 +227,7 @@ const splitAmount = async (
   const netPrice =
     price - royaltyFeePercentage * price - marketFeePercentage * price;
   outputs.add(
-    await createTxOutput(
+    createTxOutput(
       seller.to_address(),
       assetsToValue([
         { unit: "lovelace", quantity: `${Math.max(netPrice, minimumAmount)}` },

@@ -8,7 +8,6 @@ import {
   signTx,
   getUsedAddress,
   getCollateral,
-  getWalletAddress,
 } from "../../cardano/wallet";
 
 import { getAssets, saveAssets } from "../../database/assets";
@@ -91,7 +90,7 @@ export const connectWallet = (current_wallet, is_silent, callback) => async (dis
           };
           connected_wallet.nami.network = network;
 
-          let wallet_address = await getWalletAddress();
+          let wallet_address = await getUsedAddress();
 
           let this_wallet = await getWallet(wallet_address);
           connected_wallet.data = this_wallet;
@@ -270,7 +269,7 @@ export const get_wallet_assets = (callback) => async (dispatch) => {
     assets[asset.details.asset] = asset;
   }
 
-  let wallet_address = await getWalletAddress();
+  let wallet_address = await getUsedAddress();
   let wallet = await getWallet(wallet_address);
 
   let updated_wallet = await setWalletAssets(wallet, assets);

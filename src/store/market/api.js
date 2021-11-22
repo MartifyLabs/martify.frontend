@@ -9,7 +9,12 @@ import { contractAddress } from "../../cardano/market-contract/validator";
 import { getLockedUtxosByAsset } from "../../cardano/blockfrost-api";
 
 import { getWallet, addWalletEvent } from "../../database/wallets";
-import { getAsset, lockAsset, unlockAsset, addAssetEvent } from "../../database/assets";
+import {
+  getAsset,
+  lockAsset,
+  unlockAsset,
+  addAssetEvent,
+} from "../../database/assets";
 
 import { collections_add_tokens } from "../collection/collectionActions";
 import { setWalletLoading } from "../wallet/walletActions";
@@ -23,7 +28,7 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
     const assetOld = await getAsset(asset.details.asset);
-    const walletAddress = (await getUsedAddress()).to_bech32();
+    const walletAddress = await getUsedAddress();
     const walletUtxos = await getUtxos();
     // TODO: Fetch royalties from collection
     const royaltiesAddress = walletAddress;
@@ -90,7 +95,7 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
     const assetOld = await getAsset(asset.details.asset);
-    const walletAddress = (await getUsedAddress()).to_bech32();
+    const walletAddress = await getUsedAddress();
     const walletUtxos = await getUtxos();
     // TODO: Fetch royalties from collection
     const royaltiesAddress = walletAddress;
@@ -175,7 +180,7 @@ export const delistToken = (asset, callback) => async (dispatch) => {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
     const assetOld = await getAsset(asset.details.asset);
-    const walletAddress = (await getUsedAddress()).to_bech32();
+    const walletAddress = await getUsedAddress();
     const walletUtxos = await getUtxos();
 
     const assetUtxo = (
@@ -246,7 +251,7 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
     const assetOld = await getAsset(asset.details.asset);
-    const walletAddress = (await getUsedAddress()).to_bech32();
+    const walletAddress = await getUsedAddress();
     const walletUtxos = await getUtxos();
 
     const assetUtxo = (
@@ -267,7 +272,9 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
           seller: fromBech32(assetOld.status.submittedBy),
           // TODO: Fetch royalties and market address
           artist: fromBech32(assetOld.status.submittedBy),
-          market: fromBech32("addr_test1qp6pykcc0kgaqj27z3jg4sjt7768p375qr8q4z3f4xdmf38skpyf2kgu5wqpnm54y5rqgee4uwyksg6eyd364qhmpwqsv2jjt3"),
+          market: fromBech32(
+            "addr_test1qp6pykcc0kgaqj27z3jg4sjt7768p375qr8q4z3f4xdmf38skpyf2kgu5wqpnm54y5rqgee4uwyksg6eyd364qhmpwqsv2jjt3"
+          ),
           // ----------------------------------------
         },
         assetUtxo
@@ -285,12 +292,12 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
 
         await addWalletEvent(walletObj, event);
 
-        let assetNew = await unlockAsset(assetOld, {
+        const unlockedAsset = await unlockAsset(assetOld, {
           txHash: txHash,
           address: walletAddress,
         });
 
-        assetNew = await addAssetEvent(assetNew, event);
+        const assetNew = await addAssetEvent(unlockedAsset, event);
 
         const output = {
           policy_id: asset.details.policyId,

@@ -229,7 +229,9 @@ const CoinSelection = {
     const _minUTxOValue =
       BigInt(outputs.len()) * BigInt(protocolParameters.minUTxO);
 
-    let amount = Cardano.Instance.Value.new(Cardano.Instance.BigNum.from_str("0"));
+    let amount = Cardano.Instance.Value.new(
+      Cardano.Instance.BigNum.from_str("0")
+    );
 
     for (let i = 0; i < preset.length; i++) {
       amount = addAmounts(preset[i].output().amount(), amount);
@@ -785,7 +787,8 @@ const cloneUTxOList = (utxoList) =>
  * @param {Value} value
  * @return {Value} Cone - Deep copy
  */
-const cloneValue = (value) => Cardano.Instance.Value.from_bytes(value.to_bytes());
+const cloneValue = (value) =>
+  Cardano.Instance.Value.from_bytes(value.to_bytes());
 
 // Helper
 function abs(big) {

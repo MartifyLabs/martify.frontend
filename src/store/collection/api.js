@@ -157,7 +157,7 @@ export const get_listed_assets = (callback) => async (dispatch) => {
 export const asset_add_offer = (asset_id, price, callback) => async (dispatch) => {
   let asset = await getAsset(asset_id);
 
-  let wallet_address = (await getUsedAddress()).to_bech32();
+  let wallet_address = await getUsedAddress();
 
   if(!("offers" in asset)){
     asset.offers = {};
