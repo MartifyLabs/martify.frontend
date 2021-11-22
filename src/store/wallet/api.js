@@ -1,16 +1,14 @@
 import cbor from "cbor";
 import Cardano from "../../cardano/serialization-lib";
 import {
-  getBalance,
   getNetworkId,
   getOwnedAssets,
-  getUtxos,
   signTx,
   getUsedAddress,
   getCollateral,
 } from "../../cardano/wallet";
 
-import { getAssets, saveAssets } from "../../database/assets";
+import { getAssets } from "../../database/assets";
 import { getWallet, setWalletAssets } from "../../database/wallets";
 import { WALLET_STATE } from "./walletTypes";
 
@@ -258,7 +256,7 @@ export const get_wallet_assets = (callback) => async (dispatch) => {
 
   let wallet_assets = await getAssets(await getOwnedAssets());
   wallet_assets = wallet_assets.filter((asset) => {
-    return asset!=undefined
+    return asset!==undefined
   })
   .map((asset) => asset);
   // console.log("gotten wallet_assets", wallet_assets);

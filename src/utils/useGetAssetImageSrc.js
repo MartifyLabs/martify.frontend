@@ -15,7 +15,7 @@ export default function useGetAssetImageSrc(asset) {
       var i = "https://infura-ipfs.io/ipfs/" + image.split("ipfs://")[1];
       return i;
     }
-    else if(image.length==46){
+    else if(image.length===46){
       return "https://infura-ipfs.io/ipfs/" + image;
     }
     else{

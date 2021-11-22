@@ -63,7 +63,7 @@ const Search = ({state_collection, size, placeholder}) => {
 
   const onSuggestionSelected = (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) => {
     // console.log(suggestion, suggestionValue, suggestionIndex, sectionIndex, method)
-    if(method=="click" || method=="enter"){
+    if(method==="click" || method==="enter"){
       history.push("/collection/"+suggestion.value);
     }
   };
@@ -145,8 +145,8 @@ const Search = ({state_collection, size, placeholder}) => {
           />
         </div>
       </div>
-      <span className={"icon is-left"} style={size ? size=="is-large" ? {height:"60px",width:"60px"} : {} : {}}>
-        <i className="fa fa-search" style={size ? size=="is-large" ? {fontSize:"25px"} : {} : {}}></i>
+      <span className={"icon is-left"} style={size ? size==="is-large" ? {height:"60px",width:"60px"} : {} : {}}>
+        <i className="fa fa-search" style={size ? size==="is-large" ? {fontSize:"25px"} : {} : {}}></i>
       </span>
     </div>
   );

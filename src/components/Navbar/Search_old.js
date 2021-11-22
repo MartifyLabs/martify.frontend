@@ -28,7 +28,7 @@ const Search = ({state_collection, size, placeholder}) => {
       case 13: // Enter key
         if (state.matches.length) {
           // have selected from the suggestion
-          if(state.activeIndex!=undefined){
+          if(state.activeIndex!==undefined){
             setState({
               activeIndex: 0,
               matches: [],
@@ -41,9 +41,9 @@ const Search = ({state_collection, size, placeholder}) => {
           else{
             for(var policy_id in state_collection.policies_collections){
               let this_is_the_one = false;
-              if(state.query==policy_id){
+              if(state.query===policy_id){
                 this_is_the_one = true;
-              }else if(state.query.toLowerCase()==state_collection.policies_collections[policy_id].meta.name){
+              }else if(state.query.toLowerCase()===state_collection.policies_collections[policy_id].meta.name){
                 this_is_the_one = true;
               }
               history.push("/collection/"+state_collection.policies_collections[policy_id].id);
@@ -60,7 +60,7 @@ const Search = ({state_collection, size, placeholder}) => {
         setState({
           ...state,
           activeIndex: 
-            state.activeIndex==undefined ? state.matches.length - 1 : 
+            state.activeIndex===undefined ? state.matches.length - 1 : 
             state.activeIndex >= 1 ? state.activeIndex - 1 : 0
         });
         break;
@@ -68,7 +68,7 @@ const Search = ({state_collection, size, placeholder}) => {
         setState({
           ...state,
           activeIndex:
-            state.activeIndex==undefined ? 0 : 
+            state.activeIndex===undefined ? 0 : 
             state.activeIndex < state.matches.length - 1
               ? state.activeIndex + 1
               : state.matches.length - 1
@@ -124,7 +124,7 @@ const Search = ({state_collection, size, placeholder}) => {
 
   function blurTxbox(b){
     console.log(b, inputFocus)
-    if(inputFocus && state.query.length==0){
+    if(inputFocus && state.query.length===0){
       setInputFocus(b);
     }
   }
@@ -163,8 +163,8 @@ const Search = ({state_collection, size, placeholder}) => {
           )}
         </div>
       </div>
-      <span className={"icon is-left"} style={size ? size=="is-large" ? {height:"60px",width:"60px"} : {} : {}}>
-        <i className="fa fa-search" style={size ? size=="is-large" ? {fontSize:"25px"} : {} : {}}></i>
+      <span className={"icon is-left"} style={size ? size==="is-large" ? {height:"60px",width:"60px"} : {} : {}}>
+        <i className="fa fa-search" style={size ? size==="is-large" ? {fontSize:"25px"} : {} : {}}></i>
       </span>
     </div>
   );

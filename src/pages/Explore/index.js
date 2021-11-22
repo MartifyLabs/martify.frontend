@@ -75,7 +75,7 @@ const Filter = ({collections, listings, setListings}) => {
               .map((this_collection, i) => {
                 return (
                   <div className="field" key={i}>
-                    <input className="is-checkradio" id={this_collection.label} type="checkbox" checked="checked" />
+                    <input className="is-checkradio" id={this_collection.label} type="checkbox" defaultChecked />
                     <label htmlFor={this_collection.label}>{this_collection.label}</label>
                   </div>
                 )

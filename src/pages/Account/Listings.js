@@ -96,15 +96,15 @@ const Listings = ({state_wallet, state_collection, get_wallet_assets}) => {
   .filter((asset) => {
     let allow_project = false;
 
-    if(filterProject=="all") allow_project = true;
-    else allow_project = filterProject == asset.details.policyId;
+    if(filterProject==="all") allow_project = true;
+    else allow_project = filterProject === asset.details.policyId;
 
     if(allow_project){
-      if(filterAsset=="all"){
+      if(filterAsset==="all"){
         return true;
-      }else if(filterAsset=="listed" && asset.listing.is_listed){
+      }else if(filterAsset==="listed" && asset.listing.is_listed){
         return true;
-      }else if(filterAsset=="offered"){
+      }else if(filterAsset==="offered"){
         if(asset.offers){
           if(Object.keys(asset.offers).length){
             return true;
@@ -207,7 +207,7 @@ const NoAssetFound = ({state_wallet}) => {
                   Connect your wallet
                 </p>
                 <p className="subtitle">
-                  Do not have Nami Wallet? <a href="https://namiwallet.io/" target="_blank">Download</a> now!
+                  Do not have Nami Wallet? <a href="https://namiwallet.io/" target="_blank" rel="noreferrer">Download</a> now!
                 </p>
               </>
             ) : <></>

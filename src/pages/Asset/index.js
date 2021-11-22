@@ -176,7 +176,7 @@ const Listing = ({asset, state_wallet, list_token, update_token, delist_token, p
   }
   if(asset.status && state_wallet.connected){
     if(asset.status.locked){
-      if(asset.status.submittedBy == state_wallet.data.address){
+      if(asset.status.submittedBy === state_wallet.data.address){
         is_owner = true;
       }
     }
@@ -325,7 +325,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
               <div className="control has-icons-left is-expanded">
                 <input className="input" type="number" placeholder="Offer price"
                 value={userInputAmount} onChange={(event) => input_price_changed(event)} 
-                disabled={state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE || !state_wallet.connected}
+                disabled={state_wallet.loading===WALLET_STATE.AWAITING_SIGNATURE || !state_wallet.connected}
                 />
                 <span className="icon is-medium is-left">₳</span>
                 { !state_wallet.connected ? 
@@ -334,7 +334,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
               </div>
               <div className="control">
                 <button className="button is-info" onClick={() => list_this_token(userInputAmount)}
-                disabled={state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE || userInputAmount < 5 || !state_wallet.connected}
+                disabled={state_wallet.loading===WALLET_STATE.AWAITING_SIGNATURE || userInputAmount < 5 || !state_wallet.connected}
                 >
                   {
                     userInputAmount ? `Offer for ₳${userInputAmount}` : "Offer a price"
@@ -357,8 +357,8 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
                 </span>
                 <p className="is-size-4">
                   {
-                    showModal == MARKET_TYPE.PURCHASE_SUCCESS ? <span>Purchased <b>{asset.details.onchainMetadata.name}</b>!</span> : 
-                    showModal == "offer-success" ? <span>You made an offer for <b>{asset.details.onchainMetadata.name}</b>!</span> : 
+                    showModal === MARKET_TYPE.PURCHASE_SUCCESS ? <span>Purchased <b>{asset.details.onchainMetadata.name}</b>!</span> : 
+                    showModal === "offer-success" ? <span>You made an offer for <b>{asset.details.onchainMetadata.name}</b>!</span> : 
                     ""
                   }
                 </p>
@@ -463,7 +463,7 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
 
   useEffect(() => {
     if(state_wallet.loading){
-      if(state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE){
+      if(state_wallet.loading===WALLET_STATE.AWAITING_SIGNATURE){
         setShowNotification("Awaiting signature...");
       }
     }else{
@@ -522,8 +522,8 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
                 </div>
               </div>
               <div className="level-item has-text-centered">
-                <button className={"button is-rounded is-info" + (state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE ? " is-loading" : "")} 
-                  disabled={state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE} onClick={() => delist_this_token()}>
+                <button className={"button is-rounded is-info" + (state_wallet.loading===WALLET_STATE.AWAITING_SIGNATURE ? " is-loading" : "")} 
+                  disabled={state_wallet.loading===WALLET_STATE.AWAITING_SIGNATURE} onClick={() => delist_this_token()}>
                   <span>Cancel listing</span>
                 </button>
               </div>
@@ -536,7 +536,7 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
           <div className="control has-icons-left is-expanded">
             <input className="input" type="number" placeholder={asset.status.locked ? "Update listing price" : "Input listing price"}
             value={userInputAmount} onChange={(event) => input_price_changed(event)} 
-            disabled={state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE}
+            disabled={state_wallet.loading===WALLET_STATE.AWAITING_SIGNATURE}
             />
             <span className="icon is-medium is-left">₳</span>
             { state_wallet.nami.collateral.length===0 ? 
@@ -544,9 +544,9 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
             }
           </div>
           <div className="control">
-            <button className={"button is-info " + (state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE?"is-loading":"")}
+            <button className={"button is-info " + (state_wallet.loading===WALLET_STATE.AWAITING_SIGNATURE?"is-loading":"")}
               onClick={() => asset.status.locked ? update_this_listing(userInputAmount) : list_this_token(userInputAmount)}
-              disabled={state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE || userInputAmount < 5}
+              disabled={state_wallet.loading===WALLET_STATE.AWAITING_SIGNATURE || userInputAmount < 5}
             >
               {
                 userInputAmount ? `List for ₳${userInputAmount}!` : "List this!"
@@ -579,9 +579,9 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
                 </span>
                 <p className="is-size-4">
                   {
-                    showModal == MARKET_TYPE.NEW_LISTING_SUCCESS ? <span>Listed <b>{asset.details.onchainMetadata.name}</b> successfully!</span> : 
-                    showModal == MARKET_TYPE.PRICE_UPDATE_SUCCESS ? <span>Listing price for <b>{asset.details.onchainMetadata.name}</b> updated!</span> : 
-                    showModal == MARKET_TYPE.DELIST_SUCCESS ? <span><b>{asset.details.onchainMetadata.name}</b> removed from the marketplace.</span> : 
+                    showModal === MARKET_TYPE.NEW_LISTING_SUCCESS ? <span>Listed <b>{asset.details.onchainMetadata.name}</b> successfully!</span> : 
+                    showModal === MARKET_TYPE.PRICE_UPDATE_SUCCESS ? <span>Listing price for <b>{asset.details.onchainMetadata.name}</b> updated!</span> : 
+                    showModal === MARKET_TYPE.DELIST_SUCCESS ? <span><b>{asset.details.onchainMetadata.name}</b> removed from the marketplace.</span> : 
                     ""
                   }
                 </p>
@@ -830,7 +830,7 @@ const Transactions = ({asset, opencnft_get_asset_tx}) => {
 
     if(asset.events){
       let asset_purchase_events = asset.events.filter((tx) => {
-        if(tx.action=="PURCHASE") return true;
+        if(tx.action==="PURCHASE") return true;
         return false;
       })
       .map((tx, i) => {

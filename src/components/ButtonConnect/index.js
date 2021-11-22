@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 
 import { connectWallet, get_wallet_assets } from "../../store/wallet/api";
 import { WALLET_STATE } from "../../store/wallet/walletTypes";
-import { func } from "assert-plus";
 
 const ButtonConnect = ({state_wallet, connectWallet, get_wallet_assets}) => {
 
@@ -93,7 +92,7 @@ const ButtonConnect = ({state_wallet, connectWallet, get_wallet_assets}) => {
         )
       }
       {
-        showNotification || showNotificationMessage != false? (
+        showNotification || showNotificationMessage !== false? (
           <div className="notification-window notification is-info">
             <button className="delete" onClick={() => clear_notification()}></button>
             {
@@ -118,7 +117,7 @@ const ButtonConnect = ({state_wallet, connectWallet, get_wallet_assets}) => {
                 <p>
                   Getting assets in your wallet...
                 </p>
-              ) : showNotificationMessage != false ? (
+              ) : showNotificationMessage !== false ? (
                 <p>
                   {showNotificationMessage}
                 </p>

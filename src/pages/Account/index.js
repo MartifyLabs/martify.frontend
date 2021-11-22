@@ -43,7 +43,7 @@ const Connected = ({state_wallet, state_collection}) => {
           {
             Object.keys(TABS).map((key, i)=>{
               return (
-                <li className={displayTab==key?"is-active":""} onClick={() => setDisplayTab(key)} key={i}>
+                <li className={displayTab===key?"is-active":""} onClick={() => setDisplayTab(key)} key={i}>
                   <a>
                     <span className="icon is-small"><i className={TABS[key].icon} aria-hidden="true"></i></span>
                     <span>{TABS[key].label}</span>
@@ -55,8 +55,8 @@ const Connected = ({state_wallet, state_collection}) => {
         </ul>
       </div>
 
-      { displayTab == "LISTINGS" ? <Listings state_wallet={state_wallet} state_collection={state_collection} /> : <></> }
-      { displayTab == "EVENTS" ? <Events state_wallet={state_wallet} state_collection={state_collection} /> : <></> }
+      { displayTab === "LISTINGS" ? <Listings state_wallet={state_wallet} state_collection={state_collection} /> : <></> }
+      { displayTab === "EVENTS" ? <Events state_wallet={state_wallet} state_collection={state_collection} /> : <></> }
 
     </section>
   )
@@ -76,7 +76,7 @@ const NotConnected = () => {
             Connect your wallet
           </p>
           <p className="subtitle">
-            Do not have Nami Wallet? <a href="https://namiwallet.io/" target="_blank">Download</a> now!
+            Do not have Nami Wallet? <a href="https://namiwallet.io/" target="_blank" rel="noreferrer">Download</a> now!
           </p>
         </div>
       </div>

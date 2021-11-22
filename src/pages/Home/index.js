@@ -203,7 +203,7 @@ const TopProjects = ({opencnft_get_top_projects, listProjects, setListProjects})
   }
 
   useEffect(() => {
-    if(listProjects.length==0) onchange_window("7d");
+    if(listProjects.length===0) onchange_window("7d");
   }, []);
   
   function decimal(num){
@@ -250,7 +250,7 @@ const TopProjects = ({opencnft_get_top_projects, listProjects, setListProjects})
         </div>
 
         {
-          topProjectData.length > 0 && showLimit == show_num_projects_initial ? (
+          topProjectData.length > 0 && showLimit === show_num_projects_initial ? (
             <>
               <div className="columns is-multiline">
                 {
@@ -269,8 +269,8 @@ const TopProjects = ({opencnft_get_top_projects, listProjects, setListProjects})
                                 <div className="media-content">
                                   <p className="title is-6 top-project-title">{project.name}</p>
                                   <p className="subtitle is-6" data-tooltip="Trading volume in ₳">₳{numFormatter(project.volume)} (
-                                    <span data-tooltip={`Change in volume in past ${window=="7d"?"7 days":"1 day"}`} className={parseFloat(decimal(project[ window=="7d"?"7dChange":"1dChange" ]))>=0?"has-text-success":"has-text-danger"}>
-                                      {parseFloat(decimal(project[ window=="7d"?"7dChange":"1dChange" ]))}%
+                                    <span data-tooltip={`Change in volume in past ${window==="7d"?"7 days":"1 day"}`} className={parseFloat(decimal(project[ window==="7d"?"7dChange":"1dChange" ]))>=0?"has-text-success":"has-text-danger"}>
+                                      {parseFloat(decimal(project[ window==="7d"?"7dChange":"1dChange" ]))}%
                                     </span>)
                                   </p>
                                 </div>

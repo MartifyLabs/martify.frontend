@@ -18,7 +18,7 @@ const ListingDisplayListing = ({listings}) => {
     return x => {
       let return_this = false;
 
-      if(x.details.onchainMetadata==null){
+      if(x.details.onchainMetadata===null){
         return false
       }
 
@@ -49,8 +49,8 @@ const ListingDisplayListing = ({listings}) => {
     return false;
   })
   .sort((a, b) => {
-    let a_price = a.status.datum.price!=undefined ? a.status.datum.price : 999999;
-    let b_price = b.status.datum.price!=undefined ? b.status.datum.price : 999999;
+    let a_price = a.status.datum.price!==undefined ? a.status.datum.price : 999999;
+    let b_price = b.status.datum.price!==undefined ? b.status.datum.price : 999999;
 
     if(sortby==='lowtohigh'){
       return a_price - b_price;
@@ -104,11 +104,11 @@ const ListingDisplayListing = ({listings}) => {
     {
       (matchedtokens.length/pageSize) > 1 ? (
         <nav className="pagination is-rounded" role="navigation" aria-label="pagination">
-          <button className="pagination-previous" onClick={() => setCurrentPage(currentPage-1)} disabled={currentPage==1}>Previous</button>
-          <button className="pagination-next" onClick={() => setCurrentPage(currentPage+1)} disabled={currentPage==(matchedtokens.length/pageSize)}>Next page</button>
+          <button className="pagination-previous" onClick={() => setCurrentPage(currentPage-1)} disabled={currentPage===1}>Previous</button>
+          <button className="pagination-next" onClick={() => setCurrentPage(currentPage+1)} disabled={currentPage===(matchedtokens.length/pageSize)}>Next page</button>
           <ul className="pagination-list">
             {
-              currentPage!=1?(
+              currentPage!==1?(
                 <li><a className="pagination-link" aria-label="Goto page 1" onClick={() => setCurrentPage(1)}>1</a></li>
               ) : <></>
             }

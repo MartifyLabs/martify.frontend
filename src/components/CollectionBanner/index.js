@@ -12,14 +12,14 @@ const CollectionBanner = ({thisCollection, size, asset}) => {
   const [assetColors, setAssetColors] = useState({});
 
   useEffect(() => {
-    if(asset && currentId!=thisCollection.id){
+    if(asset && currentId!==thisCollection.id){
       let imgsrc = get_asset_image_source(asset.details.onchainMetadata.image);
       setAssetImgSrc(imgsrc);
     }
   }, [asset]);
 
   useEffect(() => {
-    if(asset==undefined && ("opencnft" in thisCollection) && currentId!=thisCollection.id){
+    if(asset===undefined && ("opencnft" in thisCollection) && currentId!==thisCollection.id){
       setCurrentId(thisCollection.id);
       if(thisCollection.opencnft.length>0){
         if(thisCollection.opencnft[0].thumbnail){
@@ -31,7 +31,7 @@ const CollectionBanner = ({thisCollection, size, asset}) => {
   }, [thisCollection]);
 
   const { data, loading, error } = usePalette(assetImgSrc?assetImgSrc:"");
-  if(assetImgSrc && !loading && Object.keys(data).length>0 && Object.keys(assetColors).length==0){
+  if(assetImgSrc && !loading && Object.keys(data).length>0 && Object.keys(assetColors).length===0){
     setAssetColors(data)
   }
   // {
@@ -45,7 +45,7 @@ const CollectionBanner = ({thisCollection, size, asset}) => {
   
 
   return (
-    <section className={"hero collection_name " + (size!=undefined ? size : "is-medium")} 
+    <section className={"hero collection_name " + (size!==undefined ? size : "is-medium")} 
     style={
       thisCollection.style ? 
         thisCollection.style.banner_path ? 
