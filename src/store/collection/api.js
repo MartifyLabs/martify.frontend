@@ -2,6 +2,7 @@ import {
   collections_loaded,
   collections_add_tokens,
   collections_loading,
+  collections_add_assets,
 } from "./collectionActions";
 
 import data_collections from "../../data/collections.json";
@@ -71,6 +72,29 @@ export const get_listings = (policy_id, callback) => async (dispatch) => {
   if(output.policy_id && output.listing){
     dispatch(collections_add_tokens(output));
   }
+
+  callback(true);
+}
+
+export const get_assets = (assetIds, callback) => async (dispatch) => {
+
+  dispatch(collections_loading(true));
+
+  let output = { // this is so to match wallet schema
+    "assets": {}
+  };
+  let assets = await getAssets(assetIds);
+
+  for(var i in assets){
+    let asset = assets[i];
+    if(asset){
+      if(asset.details){
+        output.assets[asset.details.asset] = asset;
+      }
+    }
+  }
+  
+  dispatch(collections_add_assets(output));
 
   callback(true);
 }

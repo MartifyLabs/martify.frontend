@@ -51,3 +51,8 @@ export const signTx = async (tx, partialSign = true) => {
 export const submitTx = async (tx) => {
   return await window.cardano.submitTx(tx);
 };
+
+export const getWalletAddress = async () => {
+  const usedAddresses = await window.cardano.getUsedAddresses();
+  return Cardano.Instance.Address.from_bytes(fromHex(usedAddresses[0])).to_bech32();
+};

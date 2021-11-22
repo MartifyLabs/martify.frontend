@@ -8,21 +8,17 @@ import {
   signTx,
   getUsedAddress,
   getCollateral,
+  getWalletAddress,
 } from "../../cardano/wallet";
 
 import { getAssets, saveAssets } from "../../database/assets";
-
+import { getWallet, setWalletAssets } from "../../database/wallets";
 import { WALLET_STATE } from "./walletTypes";
 
 import {
   walletConnected,
-  // setWalletNetwork,
-  // setWalletUsedAddr,
-  // setWalletRewardAddr,
-  // setWalletBalance,
-  // setWalletUtxos,
   setWalletLoading,
-  setWalletAssets,
+  setWalletData,
 } from "./walletActions";
 
 import { api_host, nami_network } from "../../config";
@@ -75,85 +71,106 @@ function receive_txn_for_user_sign(res, callback) {
 
 export const connectWallet = (current_wallet, is_silent, callback) => async (dispatch) => {
   try {
-    // console.log(current_wallet);
     if(!is_silent) dispatch(setWalletLoading(WALLET_STATE.CONNECTING));
 
     window.cardano
       .enable()
-      .then((res) => {
+      .then(async (res) => {
+
         Cardano.load().then(() => {
           console.log("cardano-serialization-lib Loaded.");
         });
 
-        getNetworkId().then((network) => {
-          let connected_wallet = {};
+        let network = await getNetworkId();
+          
+        if(nami_network === network){
 
-          connected_wallet.network = network;
+          let connected_wallet = {
+            nami: {},
+            data: {}
+          };
+          connected_wallet.nami.network = network;
 
-          if(nami_network === network){
-            getUtxos().then((res_utxos) => {
-              connected_wallet.utxos = res_utxos;
+          let wallet_address = await getWalletAddress();
 
-              // console.log(current_wallet.data.utxos)
-              // if(current_wallet.data.utxos){
-              //   if(connected_wallet.utxos.sort().join(',')=== current_wallet.data.utxos.sort().join(',')){
-              //     console.log("SAME!!!");
-              //   }else{
-              //     console.log("NOT SAME do something");
-              //   }
-              // }else{
-              //   console.log("NOT SAME do something 2");
-              // }
-  
-              window.cardano.getUsedAddresses().then((res) => {
-                let used_address = res[0];
-                connected_wallet.used_addr = used_address;
-  
-                getCollateral().then((resCollateral) => {
-                  connected_wallet.collateral = resCollateral;
-  
-                  getUsedAddress().then((res_walletaddr) => {
-                    connected_wallet.wallet_address = res_walletaddr.to_bech32();
-  
-                    getBalance().then((res) => {
-                      const balance = cbor.decode(res);
-  
-                      let wallet_balance = 0;
-                      if (Number.isInteger(balance)) {
-                        wallet_balance = balance;
-                      } else {
-                        for (let i in balance) {
-                          if (Number.isInteger(balance[i])) {
-                            wallet_balance = balance[i];
-                            break;
-                          }
-                        }
-                      }
-  
-                      connected_wallet.wallet_balance = wallet_balance;
-  
-                      dispatch(walletConnected(connected_wallet));
-  
-                      callback({
-                        success: true,
-                        data: connected_wallet,
-                      });
+          let this_wallet = await getWallet(wallet_address);
+          connected_wallet.data = this_wallet;
 
-                    });
-                  });
-                });
-              });
-            });
-          }
-          // if network not correct
-          else{
-            dispatch(setWalletLoading(false));
-            callback({
-              success: false,
-              msg: "Switch your Nami Wallet network."
-            });
-          }
-        });
+          connected_wallet.nami.collateral = await getCollateral();
+    
+          dispatch(walletConnected(connected_wallet));
+
+          callback({
+            success: true,
+            data: connected_wallet,
+          });
+
+          // getUtxos().then((res_utxos) => {
+          //   connected_wallet.utxos = res_utxos;
+
+          //   // console.log(current_wallet.data.utxos)
+          //   // if(current_wallet.data.utxos){
+          //   //   if(connected_wallet.utxos.sort().join(',')=== current_wallet.data.utxos.sort().join(',')){
+          //   //     console.log("SAME!!!");
+          //   //   }else{
+          //   //     console.log("NOT SAME do something");
+          //   //   }
+          //   // }else{
+          //   //   console.log("NOT SAME do something 2");
+          //   // }
+
+          //   window.cardano.getUsedAddresses().then((res) => {
+          //     let used_address = res[0];
+          //     connected_wallet.used_addr = used_address;
+
+          //     getCollateral().then((resCollateral) => {
+          //       connected_wallet.collateral = resCollateral;
+
+          //       getUsedAddress().then((res_walletaddr) => {
+          //         connected_wallet.wallet_address = res_walletaddr.to_bech32();
+
+          //         getBalance().then(async (res) => {
+          //           const balance = cbor.decode(res);
+
+          //           let wallet_balance = 0;
+          //           if (Number.isInteger(balance)) {
+          //             wallet_balance = balance;
+          //           } else {
+          //             for (let i in balance) {
+          //               if (Number.isInteger(balance[i])) {
+          //                 wallet_balance = balance[i];
+          //                 break;
+          //               }
+          //             }
+          //           }
+
+          //           connected_wallet.wallet_balance = wallet_balance;
+
+          //           let this_wallet = await getWallet(connected_wallet.wallet_address);
+          //           connected_wallet.database = this_wallet;
+
+          //           dispatch(walletConnected(connected_wallet));
+
+          //           callback({
+          //             success: true,
+          //             data: connected_wallet,
+          //           });
+
+          //         });
+          //       });
+          //     });
+          //   });
+          // });
+        }
+        // if network not correct
+        else{
+          dispatch(setWalletLoading(false));
+          callback({
+            success: false,
+            msg: "Switch your Nami Wallet network."
+          });
+        }
+        
 
         // window.cardano.getUnusedAddresses().then((res) => {
         // })
@@ -237,11 +254,28 @@ export const create_txn = (send_addr, amount, callback) => async (dispatch) => {
 };
 
 export const get_wallet_assets = (callback) => async (dispatch) => {
-  console.log("getting wallet assets", WALLET_STATE.GETTING_ASSETS);
+  // console.log("getting wallet assets", WALLET_STATE.GETTING_ASSETS);
   dispatch(setWalletLoading(WALLET_STATE.GETTING_ASSETS));
 
-  const wallet_assets = await getAssets(await getOwnedAssets());
-  console.log("gotten wallet_assets", wallet_assets);
+  let wallet_assets = await getAssets(await getOwnedAssets());
+  wallet_assets = wallet_assets.filter((asset) => {
+    return asset!=undefined
+  })
+  .map((asset) => asset);
+  // console.log("gotten wallet_assets", wallet_assets);
+
+  let assets = {};
+  for(var i in wallet_assets){
+    let asset = wallet_assets[i];
+    assets[asset.details.asset] = asset;
+  }
+
+  let wallet_address = await getWalletAddress();
+  let wallet = await getWallet(wallet_address);
+
+  let updated_wallet = await setWalletAssets(wallet, assets);
+  // console.log("updated_wallet", updated_wallet);
+  dispatch(setWalletData(updated_wallet));
 
   // var list_assets = Object.keys(wallet_assets).map(function (key) {
   //   if(wallet_assets[key]){
@@ -250,16 +284,17 @@ export const get_wallet_assets = (callback) => async (dispatch) => {
   //   return false;
   // });
 
-  let wallet_assets_dictionary = {};
-  for(var i in wallet_assets){
-    var this_asset = wallet_assets[i];
-    if(this_asset){
-      wallet_assets_dictionary[this_asset.details.asset] = this_asset;
-    }
-  }
+  // let wallet_assets_dictionary = {};
+  // for(var i in wallet_assets){
+  //   var this_asset = wallet_assets[i];
+  //   if(this_asset){
+  //     wallet_assets_dictionary[this_asset.details.asset] = this_asset;
+  //   }
+  // }
   
   // await saveAssets(list_assets);
 
-  dispatch(setWalletAssets(wallet_assets_dictionary));
-  callback({ success: true, assets: wallet_assets_dictionary });
+  // dispatch(setWalletAssets(wallet_assets_dictionary));
+  // callback({ success: true, assets: wallet_assets_dictionary });
+  callback({ success: true });
 };

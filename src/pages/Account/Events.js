@@ -5,62 +5,26 @@ import Moment from 'react-moment';
 import { Link } from "react-router-dom";
 import { urls } from "../../config";
 import { MARKET_TYPE } from "../../store/market/marketTypes";
+import { fromLovelace } from "../../utils";
+import { get_assets } from "../../store/collection/api";
 
-const Events = ({state_wallet, state_collection}) => {
-
+const Events = ({state_wallet, state_collection, get_assets}) => {
   const [events, setEvents] = useState([]);
 
-  function load_events(){
-
-    let events = [];
-    for(var asset_id in state_wallet.assets){
-      let policy_id = state_wallet.assets[asset_id].policy_id;
-      let this_asset = state_collection.policies_assets[policy_id][asset_id];
-
-      // if("listing" in this_asset){
-      //   if(this_asset.listing.is_listed){
-      //     var this_event = {
-      //       type: "listed",
-      //       time: parseInt(this_asset.listing.on),
-      //       price: this_asset.listing.price,
-      //       asset_id: asset_id,
-      //       policy_id: policy_id,
-      //     }
-      //     events.push(this_event);
-      //   }
-      // }
-
-      if("history" in this_asset){
-        for(var i in this_asset.history){
-          var this_event = {
-            ...this_asset.history[i],
-            asset_id: asset_id,
-            policy_id: policy_id,
-          };
-          events.push(this_event);
-        }
-      }
-
-      if("offers" in this_asset){
-        for(var wallet_address in this_asset.offers){
-          var this_event = {
-            type: "offer",
-            time: parseInt(this_asset.offers[wallet_address].t),
-            price: this_asset.offers[wallet_address].p,
-            asset_id: asset_id,
-            policy_id: policy_id,
-          }
-          events.push(this_event);
-        }
-      }
-      
+  useEffect(() => {
+    setEvents([]);
+    var list_events = [];
+    var assetIds = [];
+    for(var i in state_wallet.data.events){
+      let this_event = state_wallet.data.events[i];
+      list_events.push(this_event);
+      assetIds.push(this_event.datum.cs+this_event.datum.tn);
     }
 
-    setEvents(events);
-  }
-
-  useEffect(() => {
-    load_events();
+    assetIds = Array.from( new Set(assetIds) );
+    get_assets(assetIds, (res) => {
+      setEvents(list_events);
+    });
   }, []);
 
   return (
@@ -77,35 +41,35 @@ const Events = ({state_wallet, state_collection}) => {
       <tbody>
         {
           events.sort((a, b) => {
-            return b.on - a.on;
+            return b.submittedOn - a.submittedOn;
           })
           .map((this_event, i) => {
-            let this_asset = state_collection.policies_assets[this_event.policy_id][this_event.asset_id];
+            let this_asset = state_collection.policies_assets[this_event.datum.cs][this_event.datum.cs+this_event.datum.tn];
             return(
               <tr key={i}>
                 <td>
                   <Moment format="MMM DD YYYY HH:mm">
-                    {this_event.on}
+                    {this_event.submittedOn}
                   </Moment>
                 </td>
-                <td style={{"textTransform": "capitalize"}}>{this_event.type}</td>
+                <td style={{"textTransform": "capitalize"}}>{this_event.action.replace('_', ' ')}</td>
                 <td>
-                  <Link to={`/assets/${this_event.policy_id}/${this_event.asset_id}`}>
+                  <Link to={`/assets/${this_event.datum.cs}/${this_event.datum.cs+this_event.datum.tn}`}>
                     {this_asset.details.onchainMetadata.name}
                   </Link>
                 </td>
                 <td>
                   {
-                    this_event.type==MARKET_TYPE.NEW_LISTING ? `${this_asset.details.onchainMetadata.name} has been listed for ₳${this_event.price}` : 
-                    this_event.type=="offer" ? `Someone has offered ${this_asset.details.onchainMetadata.name} for ₳${this_event.price}` : 
-                    this_event.type==MARKET_TYPE.DELIST ? `${this_asset.details.onchainMetadata.name} has been removed from the marketplace` : 
-                    this_event.type==MARKET_TYPE.PRICE_UPDATE ? `${this_asset.details.onchainMetadata.name} listing price updated to ₳${this_event.price}` : 
-                    this_event.type==MARKET_TYPE.PURCHASE ? `${this_asset.details.onchainMetadata.name} purchased from the marketplace for ₳${this_event.price}` : 
+                    this_event.action==MARKET_TYPE.NEW_LISTING ? `${this_asset.details.onchainMetadata.name} has been listed for ₳${fromLovelace(this_event.datum.price)}` : 
+                    this_event.action=="offer" ? `Someone has offered ${this_asset.details.onchainMetadata.name} for ₳${fromLovelace(this_event.datum.price)}` : 
+                    this_event.action==MARKET_TYPE.DELIST ? `${this_asset.details.onchainMetadata.name} has been removed from the marketplace` : 
+                    this_event.action==MARKET_TYPE.PRICE_UPDATE ? `${this_asset.details.onchainMetadata.name} listing price updated to ₳${fromLovelace(this_event.datum.price)}` : 
+                    this_event.action==MARKET_TYPE.PURCHASE ? `${this_asset.details.onchainMetadata.name} purchased from the marketplace for ₳${fromLovelace(this_event.datum.price)}` : 
                     ""
                   }
                 </td>
                 <td>
-                  <a href={urls.cardanoscan+"transaction/"+this_event.tx} target="_blank" rel="noreferrer">{this_event.tx}</a>
+                  <a href={urls.cardanoscan+"transaction/"+this_event.txHash} target="_blank" rel="noreferrer">{this_event.txHash}</a>
                 </td>
               </tr>
             )
@@ -116,4 +80,18 @@ const Events = ({state_wallet, state_collection}) => {
   )
 }
 
-export default Events;
+
+function mapStateToProps(state, props) {
+  return {
+    state_collection: state.collection,
+    state_wallet: state.wallet
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    get_assets: (assetIds, callback) => dispatch(get_assets(assetIds, callback)),
+  };
+}
+
+export default compose(connect(mapStateToProps, mapDispatchToProps))(Events);

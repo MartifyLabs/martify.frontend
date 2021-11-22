@@ -13,21 +13,17 @@ export const getWallet = async (address) => {
   try {
     if (address) {
       const reference = doc(db, "wallets", address);
-
       const snapshot = await getDoc(reference);
-
       if (snapshot.exists()) {
         return snapshot.data();
       } else {
         const wallet = {
           address,
-          assets: [],
+          assets: {},
           events: [],
           offers: [],
         };
-
         saveWallet(wallet, address);
-
         return wallet;
       }
     }
@@ -38,54 +34,74 @@ export const getWallet = async (address) => {
 
 export const addWalletAsset = async (wallet, newAsset) => {
   if (wallet && newAsset) {
-    await saveWallet({
+    let update_wallet = {
       ...wallet,
-      assets: [...wallet.assets, newAsset],
-    });
+      assets: {
+        ...wallet.assets,
+        [newAsset.asset]: newAsset
+      },
+    };
+    await saveWallet(update_wallet);
+    return update_wallet;
   }
+  return wallet;
 };
 
 export const addWalletEvent = async (wallet, newEvent) => {
   if (wallet && newEvent) {
-    await saveWallet({
+    let update_wallet = {
       ...wallet,
       events: [...wallet.events, newEvent],
-    });
+    };
+    await saveWallet(update_wallet);
+    return update_wallet;
   }
+  return wallet;
 };
 
 export const addWalletOffer = async (wallet, newOffer) => {
   if (wallet && newOffer) {
-    await saveWallet({
+    let updated_wallet = {
       ...wallet,
       offers: [...wallet.offers, newOffer],
-    });
+    };
+    await saveWallet(updated_wallet);
+    return updated_wallet;
   }
+  return wallet;
 };
 
 export const setWalletAssets = async (wallet, assets) => {
   if (wallet && assets) {
-    await saveWallet({ ...wallet, assets });
+    let updated_wallet = { ...wallet, assets: assets };
+    await saveWallet(updated_wallet);
+    return updated_wallet;
   }
+  return wallet;
 };
 
 export const setWalletEvents = async (wallet, events) => {
   if (wallet && events) {
-    await saveWallet({ ...wallet, events });
+    let updated_wallet = { ...wallet, events }
+    await saveWallet(updated_wallet);
+    return updated_wallet;
   }
+  return wallet;
 };
 
 export const setWalletOffers = async (wallet, offers) => {
   if (wallet && offers) {
-    await saveWallet({ ...wallet, offers });
+    let updated_wallet = { ...wallet, offers };
+    await saveWallet(updated_wallet);
+    return updated_wallet;
   }
+  return wallet;
 };
 
 export const saveWallet = async (wallet) => {
   try {
     if (wallet) {
       const reference = doc(db, "wallets", wallet.address);
-
       await setDoc(reference, wallet, { merge: true });
     }
   } catch (error) {

@@ -2,7 +2,6 @@ import React from "react";
 import { get_asset_image_source } from "../../utils";
 
 const AssetImageFigure = ({asset, setShow, show_trigger, width, no_figure, className}) => {
-
   return (
     <>
     {

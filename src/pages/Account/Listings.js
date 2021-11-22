@@ -3,8 +3,9 @@ import { compose } from "redux";
 import { connect } from "react-redux";
 
 import AssetCard from "../../components/AssetCard";
+import { get_wallet_assets } from "../../store/wallet/api";
 
-const Listings = ({state_wallet, state_collection}) => {
+const Listings = ({state_wallet, state_collection, get_wallet_assets}) => {
 
   const [listings, setListings] = useState([]);
   const [searchText, setSearchText] = useState("");
@@ -24,18 +25,34 @@ const Listings = ({state_wallet, state_collection}) => {
       let list_projects = [...default_list_projects];
       let dict_projects = {};
 
-      for(var asset_id in state_wallet.assets){
-        let this_asset_ids = state_wallet.assets[asset_id];
-        let this_asset = state_collection.policies_assets[this_asset_ids.policy_id][this_asset_ids.asset_id];
-        list_nfts.push(this_asset);
+      // for(var asset_id in state_wallet.assets){
+      //   let this_asset_ids = state_wallet.assets[asset_id];
+      //   let this_asset = state_collection.policies_assets[this_asset_ids.policy_id][this_asset_ids.asset_id];
+      //   list_nfts.push(this_asset);
 
-        if(this_asset_ids.policy_id in state_collection.policies_collections){
-          dict_projects[this_asset_ids.policy_id] = state_collection.policies_collections[this_asset_ids.policy_id].meta.name;
-        }else{
-          dict_projects[this_asset_ids.policy_id] = this_asset_ids.policy_id;
+      //   if(this_asset_ids.policy_id in state_collection.policies_collections){
+      //     dict_projects[this_asset_ids.policy_id] = state_collection.policies_collections[this_asset_ids.policy_id].meta.name;
+      //   }else{
+      //     dict_projects[this_asset_ids.policy_id] = this_asset_ids.policy_id;
+      //   }
+      // }
+
+      for(var i in state_wallet.data.assets){
+        let this_asset = state_wallet.data.assets[i];
+        if(this_asset){
+          let this_asset_ids = this_asset.details.asset;
+          list_nfts.push(this_asset);
+
+          let policy_id = this_asset.details.policyId;
+
+          if(policy_id in state_collection.policies_collections){
+            dict_projects[policy_id] = state_collection.policies_collections[policy_id].meta.name;
+          }else{
+            dict_projects[policy_id] = policy_id;
+          }
+          
         }
       }
-
       setListings(list_nfts);
 
       for(var policy_id in dict_projects){
@@ -47,11 +64,13 @@ const Listings = ({state_wallet, state_collection}) => {
   }
 
   useEffect(() => {
-    load()
+    load();
   }, [state_wallet]);
 
   useEffect(() => {
-    load()
+    get_wallet_assets((res) => {
+      load();
+    });
   }, []);
 
   const searchingFor = searchText => {
@@ -130,6 +149,20 @@ return (
 
           <div className="control">
             <span className="select">
+              <select value={filterProject} onChange={(event) => setFilterProject(event.target.value)}>
+                {
+                  listProjectsFilter.map((option, i) => {
+                    return(
+                      <option value={option.value} key={i}>{option.label}</option>
+                    )
+                  })
+                }
+              </select>
+            </span>
+          </div>
+
+          <div className="control">
+            <span className="select">
               <select value={filterAsset} onChange={(event) => setFilterAsset(event.target.value)}>
                 {
                   filters_assets.map((option, i) => {
@@ -142,20 +175,6 @@ return (
             </span>
           </div>
 
-          <div className="control">
-            <span className="select">
-              <select value={filterProject} onChange={(event) => setFilterProject(event.target.value)}>
-                {
-                  listProjectsFilter.map((option, i) => {
-                    return(
-                      <option value={option.value} key={i}>{option.label}</option>
-                    )
-                  })
-                }
-              </select>
-            </span>
-          </div>
-          
         </div>
 
         <div className="columns is-multiline">
@@ -176,7 +195,6 @@ const NoAssetFound = ({state_wallet}) => {
     <section className="hero is-large">
       <div className="hero-body">
         <div className="container has-text-centered">
-          
           {
             !state_wallet.connected ? (
               <>
@@ -194,7 +212,6 @@ const NoAssetFound = ({state_wallet}) => {
               </>
             ) : <></>
           }
-
           {
             state_wallet.connected && state_wallet.loading ? (
               <>
@@ -212,7 +229,6 @@ const NoAssetFound = ({state_wallet}) => {
               </>
             ) : <></>
           }
-
           {
             state_wallet.connected && !state_wallet.loading && state_wallet.loaded_assets ? (
               <>
@@ -236,7 +252,6 @@ const NoAssetFound = ({state_wallet}) => {
   )
 }
 
-
 function mapStateToProps(state, props) {
   return {
     state_collection: state.collection,
@@ -246,6 +261,7 @@ function mapStateToProps(state, props) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    get_wallet_assets: (callback) => dispatch(get_wallet_assets(callback)),
   };
 }
 

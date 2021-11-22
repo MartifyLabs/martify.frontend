@@ -49,8 +49,8 @@ const ListingDisplayListing = ({listings}) => {
     return false;
   })
   .sort((a, b) => {
-    let a_price = a.listing.price!=undefined ? a.listing.price : 999999;
-    let b_price = b.listing.price!=undefined ? b.listing.price : 999999;
+    let a_price = a.status.datum.price!=undefined ? a.status.datum.price : 999999;
+    let b_price = b.status.datum.price!=undefined ? b.status.datum.price : 999999;
 
     if(sortby==='lowtohigh'){
       return a_price - b_price;

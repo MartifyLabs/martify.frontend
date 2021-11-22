@@ -25,3 +25,10 @@ export function collections_top_projects(payload) {
     payload: payload,
   };
 }
+
+export function collections_add_assets(payload) {
+  return {
+    type: types.COLLECTIONS_ADD_ASSETS,
+    payload: payload,
+  };
+}

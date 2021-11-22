@@ -64,10 +64,11 @@ export const getAssets = async (assetIds) => {
   try {
     if (assetIds) {
       const assets = await Promise.all(
-        assetIds.map(async (assetId) => await getAsset(assetId))
+        assetIds
+          .map(async (assetId) => await getAsset(assetId))
+          .filter((asset) => asset !== undefined)
       );
-
-      return assets.filter((asset) => asset !== undefined);
+      return assets;
     }
   } catch (error) {
     console.error(`Unexpected error in getAssets. [Message: ${error.message}]`);
@@ -102,7 +103,7 @@ export const lockAsset = async (
   { datum, datumHash, txHash, address }
 ) => {
   if (asset && datum && datumHash && txHash && address) {
-    const assetUpdated = {
+    let asset_updated = {
       ...asset,
       status: {
         datum,
@@ -112,9 +113,9 @@ export const lockAsset = async (
         submittedBy: address,
         submittedOn: new Date().getTime(),
       },
-    };
-    await saveAsset(assetUpdated);
-    return assetUpdated;
+    }
+    await saveAsset(asset_updated);
+    return asset_updated;
   }
   return asset;
 };
@@ -124,7 +125,7 @@ export const lockAsset = async (
  */
 export const unlockAsset = async (asset, { txHash, address }) => {
   if (asset && txHash && address) {
-    const assetUpdated = {
+    let asset_updated = {
       ...asset,
       status: {
         locked: false,
@@ -133,8 +134,8 @@ export const unlockAsset = async (asset, { txHash, address }) => {
         submittedOn: new Date().getTime(),
       },
     };
-    await saveAsset(assetUpdated);
-    return assetUpdated;
+    await saveAsset(asset_updated);
+    return asset_updated;
   }
   return asset;
 };
@@ -146,9 +147,7 @@ export const saveAsset = async (asset) => {
       await setDoc(reference, asset, { merge: true });
     }
   } catch (error) {
-    console.error(
-      `Unexpected error in saveAsset1. [Message: ${error.message}]`
-    );
+    console.error(`Unexpected error in saveAsset1. [Message: ${error.message}]`);
   }
 };
 
@@ -172,4 +171,17 @@ export const setAssetOffers = async (asset, offers) => {
   if (asset && offers) {
     await saveAsset({ ...asset, offers });
   }
+};
+
+export const addAssetEvent = async (asset, event) => {
+  if (asset && event) {
+    let asset_updated = {
+      ...asset
+    }
+    if(!("events" in asset_updated)) asset_updated.events = [];
+    asset_updated.events.push(event);
+    await saveAsset(asset_updated);
+    return asset_updated;
+  }
+  return asset;
 };

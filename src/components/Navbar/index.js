@@ -30,19 +30,17 @@ const Navbar = ({state_wallet}) => {
           <Link className="navbar-item" to="/explore">Explore</Link>
           {/* <Link className="navbar-item" to="faq">FAQ</Link> */}
           
-          <div className="navbar-item has-dropdown is-hoverable">
+          {/* <div className="navbar-item has-dropdown is-hoverable">
             <a className="navbar-link">
               How To...
             </a>
             <div className="navbar-dropdown is-boxed">
               <Link className="navbar-item" to="/how-get-started">Get Started</Link>
-              <Link className="navbar-item" to="/how-get-started">Get Started</Link>
-              <Link className="navbar-item" to="/how-get-started">Get Started</Link>
               <hr className="navbar-divider"/>
               <Link className="navbar-item" to="/how-get-started">Get Started</Link>
-              <Link className="navbar-item" to="/how-get-started">Get Started</Link>
             </div>
-          </div>
+          </div> */}
+          
         </div>
 
         <div className="navbar-end">

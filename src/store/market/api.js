@@ -9,7 +9,7 @@ import { contractAddress } from "../../cardano/market-contract/validator";
 import { getLockedUtxosByAsset } from "../../cardano/blockfrost-api";
 
 import { getWallet, addWalletEvent } from "../../database/wallets";
-import { getAsset, lockAsset, unlockAsset } from "../../database/assets";
+import { getAsset, lockAsset, unlockAsset, addAssetEvent } from "../../database/assets";
 
 import { collections_add_tokens } from "../collection/collectionActions";
 import { setWalletLoading } from "../wallet/walletActions";
@@ -104,7 +104,6 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
     ).find((utxo) => utxo.data_hash === assetOld.status.datumHash);
 
     if (assetUtxo) {
-      console.log("assetOld: ", assetOld);
       const datumNew = createDatum(
         assetOld.status.datum.tn,
         assetOld.status.datum.cs,
@@ -206,7 +205,7 @@ export const delistToken = (asset, callback) => async (dispatch) => {
 
         const event = createEvent(
           MARKET_TYPE.DELIST,
-          {},
+          assetOld.status.datum,
           txHash,
           walletAddress
         );
@@ -279,17 +278,19 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
 
         const event = createEvent(
           MARKET_TYPE.PURCHASE,
-          {},
+          assetOld.status.datum,
           txHash,
           walletAddress
         );
 
         await addWalletEvent(walletObj, event);
 
-        const assetNew = await unlockAsset(assetOld, {
+        let assetNew = await unlockAsset(assetOld, {
           txHash: txHash,
           address: walletAddress,
         });
+
+        assetNew = await addAssetEvent(assetNew, event);
 
         const output = {
           policy_id: asset.details.policyId,

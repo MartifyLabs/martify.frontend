@@ -171,12 +171,12 @@ const SocialLinks = ({asset}) => {
 const Listing = ({asset, state_wallet, list_token, update_token, delist_token, purchase_token, asset_add_offer}) => {
   
   let is_owner = false;
-  if(asset.details.asset in state_wallet.assets){
+  if(asset.details.asset in state_wallet.data.assets){
     is_owner = true;
   }
   if(asset.status && state_wallet.connected){
     if(asset.status.locked){
-      if(asset.status.submittedBy == state_wallet.data.wallet_address){
+      if(asset.status.submittedBy == state_wallet.data.address){
         is_owner = true;
       }
     }
@@ -276,7 +276,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
                   <ButtonBuy state_wallet={state_wallet} purchase_this_token={purchase_this_token} />
                 </div>
               </nav>
-              { state_wallet.connected ? state_wallet.data.collateral.length===0 ? 
+              { state_wallet.connected ? state_wallet.nami.collateral.length===0 ? 
                 <p className="help">Fund the wallet and add collateral (option in Nami).</p> : <></> : <></>
               }
             </>
@@ -302,12 +302,12 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
                 </div>
               </div>
               {
-                state_wallet.connected ? state_wallet.data.wallet_address in asset.offers ? (
+                state_wallet.connected ? state_wallet.data.address in asset.offers ? (
                   <div className="level-item has-text-centered">
                     <div>
                       <p className="heading">Your offer</p>
                       <p className="title">
-                        {asset.offers[state_wallet.data.wallet_address].p}
+                        {asset.offers[state_wallet.data.address].p}
                         <span className="ada_symbol">₳</span>
                       </p>
                     </div>
@@ -357,7 +357,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
                 </span>
                 <p className="is-size-4">
                   {
-                    showModal == "purchase-success" ? <span>Purchased <b>{asset.details.onchainMetadata.name}</b>!</span> : 
+                    showModal == MARKET_TYPE.PURCHASE_SUCCESS ? <span>Purchased <b>{asset.details.onchainMetadata.name}</b>!</span> : 
                     showModal == "offer-success" ? <span>You made an offer for <b>{asset.details.onchainMetadata.name}</b>!</span> : 
                     ""
                   }
@@ -388,7 +388,7 @@ const ButtonBuy = ({state_wallet, purchase_this_token}) => {
   return (
     <>
       <button className={"button is-rounded is-info" + (state_wallet.loading ? " is-loading" : "")} 
-        disabled={state_wallet.loading || !state_wallet.connected || state_wallet.data.collateral.length===0} 
+        disabled={state_wallet.loading || !state_wallet.connected || state_wallet.nami.collateral.length===0} 
         onClick={() => begin_buy_process()}>
         <span>Buy Now</span>
       </button>
@@ -479,7 +479,7 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
       return () => clearTimeout(timer);
     }
   }, [showModal]);
-  console.log(11, asset)
+  
   return (
     <div className="card">
       <header className="card-header">
@@ -539,7 +539,7 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
             disabled={state_wallet.loading==WALLET_STATE.AWAITING_SIGNATURE}
             />
             <span className="icon is-medium is-left">₳</span>
-            { state_wallet.data.collateral.length===0 ? 
+            { state_wallet.nami.collateral.length===0 ? 
               <p className="help">Fund the wallet and add collateral (option in Nami).</p> : <></>
             }
           </div>
@@ -826,38 +826,48 @@ const Transactions = ({asset, opencnft_get_asset_tx}) => {
   const [fetching, setFetching] = useState(false);
   const [transactions, setTransactions] = useState(false);
 
-  function feteh_update(){
-    setFetching(true);
-    setTransactions(false);
-    setTransactions([]);
-    let tmp_transactions = [];
-    console.log(asset.history)
+  function get_txn_martify(list_transactions){
 
-    if(asset.history){
-      let asset_purchase_history = asset.history.filter((tx) => {
-        if(tx.type=="purchase") return true;
+    if(asset.events){
+      let asset_purchase_events = asset.events.filter((tx) => {
+        if(tx.action=="PURCHASE") return true;
         return false;
       })
       .map((tx, i) => {
         return {
           sold_at: tx.on,
           marketplace: "Martify",
-          price: tx.price*1000000
+          price: tx.datum.price
         }
       });
-      tmp_transactions.push.apply(tmp_transactions, asset_purchase_history);
+      list_transactions.push.apply(list_transactions, asset_purchase_events);
     }
+    setTransactions(list_transactions);
+    setFirstLoad(true);
+    return list_transactions;
+  }
+
+  function feteh_update(){
+    setFetching(true);
+    setTransactions(false);
+    let list_transactions = [];
+
+    list_transactions = get_txn_martify(list_transactions);
     
     opencnft_get_asset_tx(asset.details.asset, (res) => {
       setFirstLoad(true);
       if(res.data.items){
-        tmp_transactions.push.apply(tmp_transactions, res.data.items);
+        list_transactions.push.apply(list_transactions, res.data.items);
       }
-      setTransactions(tmp_transactions);
+      setTransactions(list_transactions);
       setFetching(false);
     });
     
   }
+
+  useEffect(() => {
+    get_txn_martify([]);
+  }, []);
   
   return (
     <div className="block">
@@ -878,6 +888,13 @@ const Transactions = ({asset, opencnft_get_asset_tx}) => {
               {
                 transactions ? transactions.length>0 ? (
                   <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Transacted on</th>
+                        <th>Price</th>
+                        <th>Marketplace</th>
+                      </tr>
+                    </thead>
                     <tbody>
                       {
                         transactions

@@ -44,11 +44,17 @@ export function setWalletLoading(payload) {
   };
 }
 
-export function setWalletAssets(payload) {
+// export function setWalletAssets(payload) {
+//   return {
+//     type: types.SET_WALLET_ASSETS,
+//     payload: payload,
+//   };
+// }
+
+export function setWalletData(payload) {
   return {
-    type: types.SET_WALLET_ASSETS,
+    type: types.SET_WALLET_DATA,
     payload: payload,
   };
 }
-
 

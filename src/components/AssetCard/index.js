@@ -1,9 +1,18 @@
 import React from "react";
+import { compose } from "redux";
+import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import "./style.css";
 import AssetImageFigure from "../AssetImageFigure";
+import { fromLovelace } from "../../utils";
 
-const AssetCard = ({asset, column_className, show_offer}) => {
+const AssetCard = ({state_collection, asset, column_className, show_offer}) => {
+
+  let collection = false;
+  if(asset){
+    collection = state_collection.policies_collections[asset.details.policyId]
+  }
+  
   return (
     <>
     {
@@ -19,9 +28,9 @@ const AssetCard = ({asset, column_className, show_offer}) => {
                   </div>
                   <div className="card-content">
                     {
-                      asset.listing.is_listed ? 
+                      asset.status.locked ? 
                       <span className="tag is-link is-medium is-rounded price_tag">
-                        <p className="" data-tooltip={`Buy now for ₳${asset.listing.datum.price}`}><span className="ada_symbol">₳</span>{asset.listing.price}</p>
+                        <p className="" data-tooltip={`Buy now for ₳${fromLovelace(asset.status.datum.price)}`}><span className="ada_symbol">₳</span>{fromLovelace(asset.status.datum.price)}</p>
                       </span> : <></>
                     }
                     {
@@ -42,9 +51,9 @@ const AssetCard = ({asset, column_className, show_offer}) => {
                     <div className="media is-clipped">
                       <div className="media-content clipped">
                         <p className="subtitle is-size-7 clipped">
-                          {asset.collection.is_martify_verified ? asset.collection.meta.name : 
-                          asset.collection.is_cnft_verified ? asset.collection.is_cnft_verified :
-                          asset.details.policyId
+                          {collection ? collection.is_martify_verified ? collection.meta.name : 
+                          collection.is_cnft_verified ? collection.is_cnft_verified :
+                          asset.details.policyId : asset.details.policyId
                           }
                         </p>
                         <p className="title is-size-5 clipped">
@@ -66,4 +75,15 @@ const AssetCard = ({asset, column_className, show_offer}) => {
   )
 };
 
-export default AssetCard;
+function mapStateToProps(state, props) {
+  return {
+    state_collection: state.collection,
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+  };
+}
+
+export default compose(connect(mapStateToProps, mapDispatchToProps))(AssetCard);

@@ -17,3 +17,7 @@
 .asset .asset_name_block h1{
   margin-bottom: 0px;
 }
+
+.asset .image img{
+  object-fit: contain;
+}

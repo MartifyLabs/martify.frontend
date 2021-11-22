@@ -23,6 +23,29 @@ function update_tokens(token, policy_id, state_policies_collections){
   return token;
 }
 
+function add_assets(state, payload){
+  var tmp_policies_assets = {...state.policies_assets};
+
+  for(var asset_id in payload.assets){
+    var this_asset = payload.assets[asset_id];
+    var policy_id = this_asset.details.policyId;
+
+    var tmp_policies_assets_policy = {};
+    if(policy_id in tmp_policies_assets){
+      tmp_policies_assets_policy = {...tmp_policies_assets[policy_id]};
+    }
+
+    this_asset = update_tokens(this_asset, policy_id, state.policies_collections);
+    tmp_policies_assets_policy[asset_id] = this_asset;
+    tmp_policies_assets[policy_id] = tmp_policies_assets_policy;
+  }
+
+  return {
+    ...state,
+    policies_assets: tmp_policies_assets,
+  };
+}
+
 export default function collectionReducer(state = collectionobj, { type, payload }) {
   switch (type) {
 
@@ -87,45 +110,38 @@ export default function collectionReducer(state = collectionobj, { type, payload
         policies_assets: tmp
       };
 
-    case walletTypes.SET_WALLET_ASSETS:
-      var tmp_policies_assets = {...state.policies_assets};
+    // case walletTypes.SET_WALLET_ASSETS:
+    //   var tmp_policies_assets = {...state.policies_assets};
 
-      for(var asset_id in payload){
-        if(asset_id!='lovelace'){
-          var this_asset = payload[asset_id];
-          if(this_asset){
-            var policy_id = this_asset.details.policyId;
+    //   for(var asset_id in payload){
+    //     if(asset_id!='lovelace'){
+    //       var this_asset = payload[asset_id];
+    //       if(this_asset){
+    //         var policy_id = this_asset.details.policyId;
 
-            var tmp_policies_assets_policy = {};
-            if(policy_id in tmp_policies_assets){
-              tmp_policies_assets_policy = {...tmp_policies_assets[policy_id]};
-            }
+    //         var tmp_policies_assets_policy = {};
+    //         if(policy_id in tmp_policies_assets){
+    //           tmp_policies_assets_policy = {...tmp_policies_assets[policy_id]};
+    //         }
   
-            this_asset = update_tokens(this_asset, policy_id, state.policies_collections);
-            tmp_policies_assets_policy[asset_id] = this_asset;
-            tmp_policies_assets[policy_id] = tmp_policies_assets_policy;
-          }
-        }
-      }
+    //         this_asset = update_tokens(this_asset, policy_id, state.policies_collections);
+    //         tmp_policies_assets_policy[asset_id] = this_asset;
+    //         tmp_policies_assets[policy_id] = tmp_policies_assets_policy;
+    //       }
+    //     }
+    //   }
 
-      // for(var policy_id in payload){
-      //   var tmp_policies_assets_policy = {};
-      //   if(policy_id in tmp_policies_assets){
-      //     tmp_policies_assets_policy = {...tmp_policies_assets[policy_id]};
-      //   }
+    //   return {
+    //     ...state,
+    //     policies_assets: tmp_policies_assets,
+    //   };
 
-      //   for(var asset_id in payload[policy_id]){
-      //     tmp_policies_assets_policy[asset_id] = payload[policy_id][asset_id];
-      //   }
-        
-      //   tmp_policies_assets[policy_id] = tmp_policies_assets_policy;
-      // }
-      
-      return {
-        ...state,
-        policies_assets: tmp_policies_assets,
-      };
+    case walletTypes.SET_WALLET_DATA:
+      return add_assets(state, payload)
     
+    case types.COLLECTIONS_ADD_ASSETS:
+      return add_assets(state, payload)
+
     default:
       return state;
   }

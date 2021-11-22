@@ -1,5 +1,5 @@
-.asset_card .card .card-image img{
-  object-fit: cover;
+.asset_card .card-image img{
+  object-fit: contain;
 }
 
 .clipped{
