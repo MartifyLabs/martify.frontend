@@ -8,7 +8,13 @@ import { getUsedAddress, getUtxos } from "../../cardano/wallet";
 import { contractAddress } from "../../cardano/market-contract/validator";
 import { getLockedUtxosByAsset } from "../../cardano/blockfrost-api";
 
-import { getWallet, addWalletEvent, addWalletAsset } from "../../database/wallets";
+import {
+  getWallet,
+  addWalletEvent,
+  listWalletAsset,
+  delistWalletAsset,
+  relistWalletAsset,
+} from "../../database/wallets";
 import {
   getAsset,
   lockAsset,
@@ -50,17 +56,6 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
     });
 
     if (listObj && listObj.datumHash && listObj.txHash) {
-      let walletObj = await getWallet(walletAddress);
-
-      const event = createEvent(
-        MARKET_TYPE.NEW_LISTING,
-        datum,
-        listObj.txHash,
-        walletAddress
-      );
-      console.log("listing event", event)
-      walletObj = await addWalletEvent(walletObj, event);
-
       const assetNew = await lockAsset(assetOld, {
         datum: datum,
         datumHash: listObj.datumHash,
@@ -68,7 +63,16 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
         address: walletAddress,
       });
 
-      walletObj = await addWalletAsset(walletObj, assetNew);
+      const walletObj = await getWallet(walletAddress);
+
+      const event = createEvent(
+        MARKET_TYPE.NEW_LISTING,
+        datum,
+        listObj.txHash,
+        walletAddress
+      );
+
+      await listWalletAsset(walletObj, assetNew, event);
 
       const output = {
         policy_id: assetNew.details.policyId,
@@ -130,7 +134,14 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
       );
 
       if (updateObj) {
-        let walletObj = await getWallet(walletAddress);
+        const assetNew = await lockAsset(assetOld, {
+          datum: datumNew,
+          datumHash: updateObj.datumHash,
+          txHash: updateObj.txHash,
+          address: walletAddress,
+        });
+
+        const walletObj = await getWallet(walletAddress);
 
         const event = createEvent(
           MARKET_TYPE.PRICE_UPDATE,
@@ -139,16 +150,7 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
           walletAddress
         );
 
-        walletObj = await addWalletEvent(walletObj, event);
-
-        const assetNew = await lockAsset(assetOld, {
-          datum: datumNew,
-          datumHash: updateObj.datumHash,
-          txHash: updateObj.txHash,
-          address: walletAddress,
-        });
-
-        walletObj = await addWalletAsset(walletObj, assetNew);
+        await relistWalletAsset(walletObj, assetNew, event);
 
         const output = {
           policy_id: asset.details.policyId,
@@ -210,7 +212,7 @@ export const delistToken = (asset, callback) => async (dispatch) => {
           address: walletAddress,
         });
 
-        let walletObj = await getWallet(walletAddress);
+        const walletObj = await getWallet(walletAddress);
 
         const event = createEvent(
           MARKET_TYPE.DELIST,
@@ -219,8 +221,7 @@ export const delistToken = (asset, callback) => async (dispatch) => {
           walletAddress
         );
 
-        walletObj = await addWalletEvent(walletObj, event);
-        walletObj = await addWalletAsset(walletObj, assetNew);
+        delistWalletAsset(walletObj, assetNew, event);
 
         const output = {
           policy_id: assetNew.details.policyId,
@@ -286,25 +287,35 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
       );
 
       if (txHash) {
-        let walletObj = await getWallet(walletAddress);
-        
+        const unlockedAsset = await unlockAsset(assetOld, {
+          txHash: txHash,
+          address: walletAddress,
+        });
+
+        const buyerWalletObj = await getWallet(walletAddress);
+
         const event = createEvent(
           MARKET_TYPE.PURCHASE,
           assetOld.status.datum,
           txHash,
           walletAddress
         );
-        console.log("event", event)
-        walletObj = await addWalletEvent(walletObj, event);
 
-        const unlockedAsset = await unlockAsset(assetOld, {
-          txHash: txHash,
-          address: walletAddress,
-        });
+        await addWalletEvent(buyerWalletObj, event);
 
-        let assetNew = await addAssetEvent(unlockedAsset, event);
+        const assetNew = await addAssetEvent(unlockedAsset, event);
 
-        walletObj = await addWalletAsset(walletObj, assetNew);
+        // Update the seller's wallet
+        const sellerWalletObj = await getWallet(assetOld.status.submittedBy);
+
+        const soldEvent = createEvent(
+          MARKET_TYPE.SOLD,
+          assetOld.status.datum,
+          txHash,
+          walletAddress
+        );
+
+        await delistWalletAsset(sellerWalletObj, assetNew, soldEvent);
 
         const output = {
           policy_id: asset.details.policyId,
@@ -312,18 +323,6 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
             [assetNew.details.asset]: assetNew,
           },
         };
-
-        // seller
-
-        let sellerWalletObj = await getWallet(assetOld.status.submittedBy);
-        const event_seller = createEvent(
-          MARKET_TYPE.SOLD,
-          assetOld.status.datum,
-          txHash,
-          walletAddress
-        );
-        sellerWalletObj = await addWalletEvent(sellerWalletObj, event_seller);
-        sellerWalletObj = await addWalletAsset(sellerWalletObj, assetNew);
 
         dispatch(setWalletLoading(false));
         dispatch(collections_add_tokens(output));

@@ -21,6 +21,7 @@ export const getWallet = async (address) => {
           address,
           assets: {},
           events: [],
+          market: [],
           offers: [],
         };
         saveWallet(wallet, address);
@@ -92,6 +93,50 @@ export const setWalletEvents = async (wallet, events) => {
 export const setWalletOffers = async (wallet, offers) => {
   if (wallet && offers) {
     const updatedWallet = { ...wallet, offers };
+    await saveWallet(updatedWallet);
+    return updatedWallet;
+  }
+  return wallet;
+};
+
+export const listWalletAsset = async (wallet, asset, newEvent) => {
+  if (wallet && asset && newEvent) {
+    const updatedWallet = {
+      ...wallet,
+      events: [...wallet.events, newEvent],
+      market: [...(wallet.market || []), asset],
+    };
+    await saveWallet(updatedWallet);
+    return updatedWallet;
+  }
+  return wallet;
+};
+
+export const delistWalletAsset = async (wallet, asset, newEvent) => {
+  if (wallet && wallet.market && newEvent) {
+    const updatedWallet = {
+      ...wallet,
+      events: [...wallet.events, newEvent],
+      market: wallet.market.filter(
+        (a) => a.details.asset !== asset.details.asset
+      ),
+    };
+    await saveWallet(updatedWallet);
+    return updatedWallet;
+  }
+  return wallet;
+};
+
+export const relistWalletAsset = async (wallet, asset, newEvent) => {
+  if (wallet && wallet.market && newEvent) {
+    const updatedWallet = {
+      ...wallet,
+      events: [...wallet.events, newEvent],
+      market: [
+        ...wallet.market.filter((a) => a.details.asset !== asset.details.asset),
+        asset,
+      ],
+    };
     await saveWallet(updatedWallet);
     return updatedWallet;
   }
