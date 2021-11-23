@@ -38,7 +38,7 @@ export const addWalletAsset = async (wallet, newAsset) => {
       ...wallet,
       assets: {
         ...wallet.assets,
-        [newAsset.asset]: newAsset,
+        [newAsset.details.asset]: newAsset,
       },
     };
     await saveWallet(updatedWallet);

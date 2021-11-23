@@ -269,7 +269,14 @@ export const get_wallet_assets = (callback) => async (dispatch) => {
 
   let wallet_address = await getUsedAddress();
   let wallet = await getWallet(wallet_address);
-
+  // console.log("wallet", wallet)
+  for(var asset in wallet.assets){
+    let this_asset = wallet.assets[asset];
+    if(this_asset.status.locked){
+      assets[asset] = this_asset;
+    }
+  }
+  // console.log("assets", assets)
   let updated_wallet = await setWalletAssets(wallet, assets);
   // console.log("updated_wallet", updated_wallet);
   dispatch(setWalletData(updated_wallet));

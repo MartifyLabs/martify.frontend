@@ -357,7 +357,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
                 </span>
                 <p className="is-size-4">
                   {
-                    showModal === MARKET_TYPE.PURCHASE_SUCCESS ? <span>Purchased <b>{asset.details.onchainMetadata.name}</b>!</span> : 
+                    showModal === MARKET_TYPE.PURCHASE ? <span>Purchased <b>{asset.details.onchainMetadata.name}</b>!</span> : 
                     showModal === "offer-success" ? <span>You made an offer for <b>{asset.details.onchainMetadata.name}</b>!</span> : 
                     ""
                   }
@@ -579,9 +579,9 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
                 </span>
                 <p className="is-size-4">
                   {
-                    showModal === MARKET_TYPE.NEW_LISTING_SUCCESS ? <span>Listed <b>{asset.details.onchainMetadata.name}</b> successfully!</span> : 
-                    showModal === MARKET_TYPE.PRICE_UPDATE_SUCCESS ? <span>Listing price for <b>{asset.details.onchainMetadata.name}</b> updated!</span> : 
-                    showModal === MARKET_TYPE.DELIST_SUCCESS ? <span><b>{asset.details.onchainMetadata.name}</b> removed from the marketplace.</span> : 
+                    showModal === MARKET_TYPE.NEW_LISTING ? <span>Listed <b>{asset.details.onchainMetadata.name}</b> successfully!</span> : 
+                    showModal === MARKET_TYPE.PRICE_UPDATE ? <span>Listing price for <b>{asset.details.onchainMetadata.name}</b> updated!</span> : 
+                    showModal === MARKET_TYPE.DELIST ? <span><b>{asset.details.onchainMetadata.name}</b> removed from the marketplace.</span> : 
                     ""
                   }
                 </p>
@@ -827,7 +827,6 @@ const Transactions = ({asset, opencnft_get_asset_tx}) => {
   const [transactions, setTransactions] = useState(false);
 
   function get_txn_martify(list_transactions){
-
     if(asset.events){
       let asset_purchase_events = asset.events.filter((tx) => {
         if(tx.action==="PURCHASE") return true;
@@ -842,8 +841,10 @@ const Transactions = ({asset, opencnft_get_asset_tx}) => {
       });
       list_transactions.push.apply(list_transactions, asset_purchase_events);
     }
-    setTransactions(list_transactions);
-    setFirstLoad(true);
+    if(list_transactions.length){
+      setTransactions(list_transactions);
+      setFirstLoad(true);
+    }
     return list_transactions;
   }
 

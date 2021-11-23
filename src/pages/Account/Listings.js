@@ -102,7 +102,7 @@ const Listings = ({state_wallet, state_collection, get_wallet_assets}) => {
     if(allow_project){
       if(filterAsset==="all"){
         return true;
-      }else if(filterAsset==="listed" && asset.listing.is_listed){
+      }else if(filterAsset==="listed" && asset.status.locked){
         return true;
       }else if(filterAsset==="offered"){
         if(asset.offers){

@@ -8,7 +8,7 @@ import { getUsedAddress, getUtxos } from "../../cardano/wallet";
 import { contractAddress } from "../../cardano/market-contract/validator";
 import { getLockedUtxosByAsset } from "../../cardano/blockfrost-api";
 
-import { getWallet, addWalletEvent } from "../../database/wallets";
+import { getWallet, addWalletEvent, addWalletAsset } from "../../database/wallets";
 import {
   getAsset,
   lockAsset,
@@ -50,7 +50,7 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
     });
 
     if (listObj && listObj.datumHash && listObj.txHash) {
-      const walletObj = await getWallet(walletAddress);
+      let walletObj = await getWallet(walletAddress);
 
       const event = createEvent(
         MARKET_TYPE.NEW_LISTING,
@@ -58,8 +58,8 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
         listObj.txHash,
         walletAddress
       );
-
-      await addWalletEvent(walletObj, event);
+      console.log("listing event", event)
+      walletObj = await addWalletEvent(walletObj, event);
 
       const assetNew = await lockAsset(assetOld, {
         datum: datum,
@@ -67,6 +67,8 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
         txHash: listObj.txHash,
         address: walletAddress,
       });
+
+      walletObj = await addWalletAsset(walletObj, assetNew);
 
       const output = {
         policy_id: assetNew.details.policyId,
@@ -77,7 +79,7 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
 
       dispatch(setWalletLoading(false));
       dispatch(collections_add_tokens(output));
-      callback({ success: true, type: MARKET_TYPE.NEW_LISTING_SUCCESS });
+      callback({ success: true, type: MARKET_TYPE.NEW_LISTING });
     } else {
       console.error("List Failed...");
       dispatch(setWalletLoading(false));
@@ -128,7 +130,7 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
       );
 
       if (updateObj) {
-        const walletObj = await getWallet(walletAddress);
+        let walletObj = await getWallet(walletAddress);
 
         const event = createEvent(
           MARKET_TYPE.PRICE_UPDATE,
@@ -137,7 +139,7 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
           walletAddress
         );
 
-        await addWalletEvent(walletObj, event);
+        walletObj = await addWalletEvent(walletObj, event);
 
         const assetNew = await lockAsset(assetOld, {
           datum: datumNew,
@@ -145,6 +147,8 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
           txHash: updateObj.txHash,
           address: walletAddress,
         });
+
+        walletObj = await addWalletAsset(walletObj, assetNew);
 
         const output = {
           policy_id: asset.details.policyId,
@@ -155,7 +159,7 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
 
         dispatch(setWalletLoading(false));
         dispatch(collections_add_tokens(output));
-        callback({ success: true, type: MARKET_TYPE.PRICE_UPDATE_SUCCESS });
+        callback({ success: true, type: MARKET_TYPE.PRICE_UPDATE });
       } else {
         console.error("Update Failed...");
         dispatch(setWalletLoading(false));
@@ -206,7 +210,7 @@ export const delistToken = (asset, callback) => async (dispatch) => {
           address: walletAddress,
         });
 
-        const walletObj = await getWallet(walletAddress);
+        let walletObj = await getWallet(walletAddress);
 
         const event = createEvent(
           MARKET_TYPE.DELIST,
@@ -215,7 +219,8 @@ export const delistToken = (asset, callback) => async (dispatch) => {
           walletAddress
         );
 
-        await addWalletEvent(walletObj, event);
+        walletObj = await addWalletEvent(walletObj, event);
+        walletObj = await addWalletAsset(walletObj, assetNew);
 
         const output = {
           policy_id: assetNew.details.policyId,
@@ -226,7 +231,7 @@ export const delistToken = (asset, callback) => async (dispatch) => {
 
         dispatch(setWalletLoading(false));
         dispatch(collections_add_tokens(output));
-        callback({ success: true, type: MARKET_TYPE.DELIST_SUCCESS });
+        callback({ success: true, type: MARKET_TYPE.DELIST });
       } else {
         console.error("Cancel Failed...");
         dispatch(setWalletLoading(false));
@@ -281,23 +286,25 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
       );
 
       if (txHash) {
-        const walletObj = await getWallet(walletAddress);
-
+        let walletObj = await getWallet(walletAddress);
+        
         const event = createEvent(
           MARKET_TYPE.PURCHASE,
           assetOld.status.datum,
           txHash,
           walletAddress
         );
-
-        await addWalletEvent(walletObj, event);
+        console.log("event", event)
+        walletObj = await addWalletEvent(walletObj, event);
 
         const unlockedAsset = await unlockAsset(assetOld, {
           txHash: txHash,
           address: walletAddress,
         });
 
-        const assetNew = await addAssetEvent(unlockedAsset, event);
+        let assetNew = await addAssetEvent(unlockedAsset, event);
+
+        walletObj = await addWalletAsset(walletObj, assetNew);
 
         const output = {
           policy_id: asset.details.policyId,
@@ -306,9 +313,21 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
           },
         };
 
+        // seller
+
+        let sellerWalletObj = await getWallet(assetOld.status.submittedBy);
+        const event_seller = createEvent(
+          MARKET_TYPE.SOLD,
+          assetOld.status.datum,
+          txHash,
+          walletAddress
+        );
+        sellerWalletObj = await addWalletEvent(sellerWalletObj, event_seller);
+        sellerWalletObj = await addWalletAsset(sellerWalletObj, assetNew);
+
         dispatch(setWalletLoading(false));
         dispatch(collections_add_tokens(output));
-        callback({ success: true, type: MARKET_TYPE.PURCHASE_SUCCESS });
+        callback({ success: true, type: MARKET_TYPE.PURCHASE });
       } else {
         console.error("Purchase Failed...");
         dispatch(setWalletLoading(false));
