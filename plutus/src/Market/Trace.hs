@@ -21,7 +21,7 @@ import           Data.Default (def)
 
 import Utility         (wallet, mp)
 import Market.Offchain (endpoints)
-import Market.Onchain  (buyValidatorHash)
+import Market.Onchain2 (buyValidatorHash)
 import Market.Types    (StartParams(..), BuyParams(..), MarketParams(updateCs, updateTn))
 
 nftEx1 :: StartParams
@@ -58,15 +58,16 @@ test = do
                                       <> Value.singleton (updateCs mp) (updateTn mp) 1)
                             , (wallet 2, Ada.lovelaceValueOf 10_000_000)
                             , (wallet 3, Ada.lovelaceValueOf 10_000_000
-                                      <> Value.singleton (sCs nftEx2) (sTn nftEx2) 1)
-                            , (wallet 4, Ada.lovelaceValueOf 10_000_000
+                                      <> Value.singleton (sCs nftEx2) (sTn nftEx2) 1
                                       <> Value.singleton (sCs nftEx1) (sTn nftEx1) 1)
+                            , (wallet 4, Ada.lovelaceValueOf 10_000_000)
                             , (wallet 5, Ada.lovelaceValueOf 10_000_000)
                             , (wallet 6, Ada.lovelaceValueOf 10_000_000)
                             ]
         emCfg = EmulatorConfig (Left dist) def def
     runEmulatorTraceIO' def emCfg $ do
         h1 <- activateContractWallet (wallet 1) endpoints
+        h2 <- activateContractWallet (wallet 2) endpoints
         h3 <- activateContractWallet (wallet 3) endpoints
         h4 <- activateContractWallet (wallet 4) endpoints
         void $ Emulator.waitNSlots 1
@@ -74,7 +75,7 @@ test = do
         void $ Emulator.waitNSlots 1
         callEndpoint @"start" h3 nftEx2
         void $ Emulator.waitNSlots 1
-        callEndpoint @"start" h4 nftEx1
+        callEndpoint @"start" h3 nftEx1
         void $ Emulator.waitNSlots 1
         callEndpoint @"updateContract" h1 (buyValidatorHash mp)
         void $ Emulator.waitNSlots 1

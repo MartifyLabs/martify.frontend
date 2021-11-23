@@ -7,8 +7,7 @@
 {-# LANGUAGE TypeOperators         #-}
 
 module Market.Types
-    ( MartDatum (..)
-    , SaleAction (..)
+    ( SaleAction (..)
     , SaleSchema
     , StartParams (..)
     , BuyParams (..)
@@ -30,10 +29,10 @@ import           Ledger                    ( TokenName, CurrencySymbol, PubKeyHa
 import           Plutus.Contract           ( Endpoint, type (.\/) )
 
 data MarketParams = MarketParams
-    { feeAddr  :: PubKeyHash
-    , updateTn :: TokenName
-    , updateCs :: CurrencySymbol
-    } deriving (Pr.Eq, Pr.Ord, Show, Generic, ToJSON, FromJSON, ToSchema)
+    { feeAddr  :: !PubKeyHash
+    , updateTn :: !TokenName
+    , updateCs :: !CurrencySymbol
+    } deriving (Generic, ToJSON, FromJSON)
 
 PlutusTx.makeIsDataIndexed ''MarketParams [('MarketParams, 0)]
 PlutusTx.makeLift ''MarketParams
@@ -45,7 +44,7 @@ data NFTSale = NFTSale
     , nToken     :: !TokenName
     , nRoyAddr   :: !PubKeyHash
     , nRoyPrct   :: !Plutus.Integer
-    } deriving (Pr.Eq, Pr.Ord, Show, Generic, ToJSON, FromJSON, ToSchema)
+    } deriving (Generic, ToJSON, FromJSON)
 
 instance Eq NFTSale where
     {-# INLINABLE (==) #-}
@@ -62,7 +61,7 @@ PlutusTx.makeLift ''NFTSale
 
 newtype UpdateVHash = UpdateVHash
     { vhash :: ValidatorHash
-    } deriving (Pr.Eq, Pr.Ord, Show, Generic, ToJSON, FromJSON, ToSchema)
+    } deriving (Generic, ToJSON, FromJSON)
 
 instance Eq UpdateVHash where
     {-# INLINABLE (==) #-}
@@ -70,13 +69,6 @@ instance Eq UpdateVHash where
 
 PlutusTx.makeIsDataIndexed ''UpdateVHash [('UpdateVHash, 0)]
 PlutusTx.makeLift ''UpdateVHash
-
-
-data MartDatum = UpdateToken UpdateVHash | SaleData NFTSale
-    deriving (Show)
-
-PlutusTx.makeIsDataIndexed ''MartDatum [('UpdateToken, 0), ('SaleData, 1)]
-PlutusTx.makeLift ''MartDatum
 
 data SaleAction = Buy | Update | Close | UpdateC
     deriving Show
@@ -109,6 +101,8 @@ data StartParams = StartParams
 type SaleSchema = Endpoint "close" BuyParams
                   .\/
                   Endpoint "buy" BuyParams
+                  .\/
+                  Endpoint "buy'" (BuyParams, BuyParams)
                   .\/
                   Endpoint "update" (BuyParams, Integer)
                   .\/

@@ -13,7 +13,7 @@ import Cardano.Api
 import Cardano.Api.Shelley ( fromPlutusData )
 import qualified PlutusTx
 
-import Market.Types (UpdateVHash(..), MartDatum(UpdateToken))
+import Market.Types (UpdateVHash(..))
 import Data.String (IsString(fromString))
 
 
@@ -23,7 +23,7 @@ main = do
   [vh'] <- getArgs
   let vh = fromString vh'
       uvh = UpdateVHash vh
-  writeData ("update-datum-" ++ vh' ++ ".json") (UpdateToken uvh)
+  writeData ("update-datum-" ++ vh' ++ ".json") uvh
   putStrLn "Done"
 
 writeData :: PlutusTx.ToData a => FilePath -> a -> IO ()

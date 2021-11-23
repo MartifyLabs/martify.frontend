@@ -16,7 +16,7 @@ import qualified Data.ByteString.Short as SBS
 
 import Market.Onchain  as O1 (apiBuyScript, buyScriptAsShortBs)
 import Market.Onchain2 as O2 (apiBuyScript, buyScriptAsShortBs)
-import Utility        (mpReal, companyPkhReal)
+import Utility         (mpReal)
 
 
 main :: IO ()
@@ -26,7 +26,7 @@ main = do
     let scriptnum = if nargs > 0 then read (head args) else 42
     let scriptname = if nargs > 1 then args!!1 else  "market.plutus"
     putStrLn $ "Writing output to: " ++ scriptname
-    writePlutusScript scriptnum scriptname (O2.apiBuyScript companyPkhReal) (O2.buyScriptAsShortBs companyPkhReal)
+    writePlutusScript scriptnum scriptname (O2.apiBuyScript mpReal) (O2.buyScriptAsShortBs mpReal)
 
 
 writePlutusScript :: Integer -> FilePath -> PlutusScript PlutusScriptV1 -> SBS.ShortByteString -> IO ()

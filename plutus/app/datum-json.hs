@@ -14,7 +14,7 @@ import Cardano.Api
 import Cardano.Api.Shelley ( fromPlutusData )
 import qualified PlutusTx
 
-import Market.Types (NFTSale(..), MartDatum(..))
+import Market.Types (NFTSale(..))
 
 -- This module is here to convert Haskell Data Types to JSON files, particularly used for NFTSale custom Datum Type.
 -- To use this enter `cabal run datum-json <price> <seller> <tn> <cs>`.
@@ -32,8 +32,7 @@ main = do
       raddr  = fromString raddr'
       rprct  = read rprct'
       nfts   = NFTSale seller price cs tn raddr rprct
-      dat    = SaleData nfts
-  writeData ("datum-" ++ show cs ++ "-" ++ tn' ++ ".json") dat
+  writeData ("datum-" ++ show cs ++ "-" ++ tn' ++ ".json") nfts
   putStrLn "Done"
 -- Datum also needs to be passed when sending the token to the script (aka putting for sale)
 -- When doing this, the datum needs to be hashed, see Alonzo-purple exercise-solutions on how to hash a datum

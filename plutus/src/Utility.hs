@@ -36,10 +36,10 @@ mp :: MarketParams
 mp = MarketParams companyPkh uTn uCs
 
 companyPkhReal :: PubKeyHash
-companyPkhReal = "a75c75fa79bc7d53ef715d64745a7a01c2c1f7653b2ae962413ac521"
+companyPkhReal = "74125b187d91d0495e14648ac24bf7b470c7d400ce0a8a29a99bb4c4"
 
 uCsReal :: CurrencySymbol
-uCsReal = "5401349896e3b61af27237b2d739cdd142b76fb984174529fc9c3f5e"
+uCsReal = "1bee72f6551a6f0cccc67d05c4b8652755160f2d35a5f6d64f3c75b8"
 
 uTnReal :: TokenName
 uTnReal = "UpdateToken"
