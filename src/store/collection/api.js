@@ -178,7 +178,7 @@ export const asset_add_offer = (asset_id, price, callback) => async (dispatch) =
 }
 
 export const opencnft_get_top_projects = (time, callback) => async (dispatch) => {
-  fetch('https://api.opencnft.io/1/rank?window='+time, {
+  fetch('https://cors-anywhere.herokuapp.com/https://api.opencnft.io/1/rank?window='+time, {
     method: 'GET',
     // headers: {
     //   'Accept': 'application/json',
@@ -192,7 +192,7 @@ export const opencnft_get_top_projects = (time, callback) => async (dispatch) =>
 }
 
 export const opencnft_get_policy = (policy_id, callback) => async (dispatch) => {
-  fetch(`https://api.opencnft.io/1/policy/${policy_id}`, {
+  fetch(`https://cors-anywhere.herokuapp.com/https://api.opencnft.io/1/policy/${policy_id}`, {
     method: 'GET',
     // headers: {
     //   'Accept': 'application/json',
@@ -206,7 +206,7 @@ export const opencnft_get_policy = (policy_id, callback) => async (dispatch) => 
 }
 
 export const opencnft_get_asset_tx = (asset_id, callback) => async (dispatch) => {
-  fetch(`https://api.opencnft.io/1/asset/${asset_id}/tx`, {
+  fetch(`https://cors-anywhere.herokuapp.com/https://api.opencnft.io/1/asset/${asset_id}/tx`, {
     method: 'GET',
     // headers: {
     //   'Accept': 'application/json',
