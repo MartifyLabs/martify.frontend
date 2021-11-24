@@ -1,10 +1,8 @@
-import { initializeApp } from "firebase/app";
 import {
   collection,
   doc,
   getDoc,
   getDocs,
-  getFirestore,
   limit,
   orderBy,
   query,
@@ -13,11 +11,7 @@ import {
   where,
 } from "firebase/firestore";
 import { getAssetDetails } from "../cardano/blockfrost-api";
-import { firebaseOptions } from "../config";
-
-const app = initializeApp(firebaseOptions);
-
-const db = getFirestore(app);
+import { firestore } from "../firebase";
 
 export const addAssetEvent = async (asset, newEvent) => {
   if (asset && newEvent) {
@@ -46,7 +40,7 @@ export const addAssetOffer = async (asset, newOffer) => {
 export const getAsset = async (assetId) => {
   try {
     if (assetId) {
-      const reference = doc(db, "assets", assetId);
+      const reference = doc(firestore, "assets", assetId);
 
       const snapshot = await getDoc(reference);
 
@@ -92,7 +86,7 @@ export const getAssets = async (assetIds) => {
 export const getLockedAssets = async (page = 1, count = 100) => {
   try {
     const reference = await query(
-      collection(db, "assets"),
+      collection(firestore, "assets"),
       where("status.locked", "==", true),
       orderBy("status.submittedOn"),
       startAfter((page - 1) * count),
@@ -157,7 +151,7 @@ export const unlockAsset = async (asset, { txHash, address }) => {
 export const saveAsset = async (asset) => {
   try {
     if (asset) {
-      const reference = doc(db, "assets", asset.details.asset);
+      const reference = doc(firestore, "assets", asset.details.asset);
       await setDoc(reference, asset, { merge: true });
     }
   } catch (error) {

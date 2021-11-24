@@ -1,16 +1,11 @@
-import { initializeApp } from "firebase/app";
-import { doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { getMintedAssets } from "../cardano/blockfrost-api";
-import { firebaseOptions } from "../config";
-
-const app = initializeApp(firebaseOptions);
-
-const db = getFirestore(app);
+import { firestore } from "../firebase";
 
 export const getCollection = async (policyId) => {
   try {
     if (policyId) {
-      const reference = doc(db, "collections", policyId);
+      const reference = doc(firestore, "collections", policyId);
 
       const snapshot = await getDoc(reference);
 
@@ -36,7 +31,7 @@ export const getCollection = async (policyId) => {
 export const saveCollection = async (collection, policyId) => {
   try {
     if (collection) {
-      const reference = doc(db, "collections", policyId);
+      const reference = doc(firestore, "collections", policyId);
 
       await setDoc(reference, collection, { merge: true });
     }

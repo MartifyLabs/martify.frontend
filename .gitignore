@@ -16,9 +16,13 @@
 
 # misc
 .DS_Store
+.env
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
+.env.production
 .env.production.local
 
 yarn-debug.log*
