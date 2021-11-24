@@ -2,6 +2,8 @@ import React, { useEffect, useState} from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
 
+import AllAssets from "./AllAssets";
+import Holdings from "./Holdings";
 import Listings from "./Listings";
 import Events from "./Events";
 
@@ -25,8 +27,16 @@ const Account = ({state_wallet, state_collection}) => {
 const Connected = ({state_wallet, state_collection}) => {
 
   const TABS = {
+    ALL_ASSETS: {
+      label: "All Assets",
+      icon: "far fa-images",
+    },
+    HOLDINGS: {
+      label: "Holdings",
+      icon: "far fa-images",
+    },
     LISTINGS: {
-      label: "Your Assets",
+      label: "Listings",
       icon: "far fa-images",
     },
     EVENTS: {
@@ -34,7 +44,7 @@ const Connected = ({state_wallet, state_collection}) => {
       icon: "far fa-envelope",
     },
   }
-  const [displayTab, setDisplayTab] = useState("LISTINGS");
+  const [displayTab, setDisplayTab] = useState("ALL_ASSETS");
 
   return (
     <section className="section">
@@ -55,6 +65,8 @@ const Connected = ({state_wallet, state_collection}) => {
         </ul>
       </div>
 
+      { displayTab === "ALL_ASSETS" ? <AllAssets state_wallet={state_wallet} state_collection={state_collection} /> : <></> }
+      { displayTab === "HOLDINGS" ? <Holdings state_wallet={state_wallet} state_collection={state_collection} /> : <></> }
       { displayTab === "LISTINGS" ? <Listings state_wallet={state_wallet} state_collection={state_collection} /> : <></> }
       { displayTab === "EVENTS" ? <Events state_wallet={state_wallet} state_collection={state_collection} /> : <></> }
 
