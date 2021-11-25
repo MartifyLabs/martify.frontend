@@ -16,7 +16,7 @@ export const getWallet = async (address) => {
           address,
           assets: {},
           events: [],
-          market: [],
+          market: {},
           offers: [],
         };
         saveWallet(wallet, address);
@@ -94,12 +94,15 @@ export const setWalletOffers = async (wallet, offers) => {
   return wallet;
 };
 
-export const listWalletAsset = async (wallet, asset, newEvent) => {
-  if (wallet && asset && newEvent) {
+export const listWalletAsset = async (wallet, newAsset, newEvent) => {
+  if (wallet && newAsset && newEvent) {
     const updatedWallet = {
       ...wallet,
       events: [...wallet.events, newEvent],
-      market: [...(wallet.market || []), asset],
+      market: {
+        ...wallet.market,
+        [newAsset.details.asset]: newAsset,
+      },
     };
     await saveWallet(updatedWallet);
     return updatedWallet;
@@ -107,14 +110,13 @@ export const listWalletAsset = async (wallet, asset, newEvent) => {
   return wallet;
 };
 
-export const delistWalletAsset = async (wallet, asset, newEvent) => {
-  if (wallet && wallet.market && newEvent) {
+export const delistWalletAsset = async (wallet, listedAsset, newEvent) => {
+  if (wallet && wallet.market && listedAsset && newEvent) {
+    const { [listedAsset.details.asset]: _, ...updatedMarket } = wallet.market;
     const updatedWallet = {
       ...wallet,
       events: [...wallet.events, newEvent],
-      market: wallet.market.filter(
-        (a) => a.details.asset !== asset.details.asset
-      ),
+      market: updatedMarket,
     };
     await saveWallet(updatedWallet);
     return updatedWallet;
@@ -122,15 +124,16 @@ export const delistWalletAsset = async (wallet, asset, newEvent) => {
   return wallet;
 };
 
-export const relistWalletAsset = async (wallet, asset, newEvent) => {
-  if (wallet && wallet.market && newEvent) {
+export const relistWalletAsset = async (wallet, listedAsset, newEvent) => {
+  if (wallet && wallet.market && listedAsset && newEvent) {
+    const { [listedAsset.details.asset]: _, ...updatedMarket } = wallet.market;
     const updatedWallet = {
       ...wallet,
       events: [...wallet.events, newEvent],
-      market: [
-        ...wallet.market.filter((a) => a.details.asset !== asset.details.asset),
-        asset,
-      ],
+      market: {
+        ...updatedMarket,
+        [listedAsset.details.asset]: listedAsset,
+      },
     };
     await saveWallet(updatedWallet);
     return updatedWallet;
