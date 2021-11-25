@@ -61,6 +61,7 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
         datumHash: listObj.datumHash,
         txHash: listObj.txHash,
         address: walletAddress,
+        contractAddress: contractAddress().to_bech32(),
       });
 
       const walletObj = await getWallet(walletAddress);
@@ -133,12 +134,13 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
         assetUtxo
       );
 
-      if (updateObj) {
+      if (updateObj && updateObj.datumHash && updateObj.txHash) {
         const assetNew = await lockAsset(assetOld, {
           datum: datumNew,
           datumHash: updateObj.datumHash,
           txHash: updateObj.txHash,
           address: walletAddress,
+          contractAddress: contractAddress().to_bech32(),
         });
 
         const walletObj = await getWallet(walletAddress);

@@ -108,9 +108,9 @@ export const getLockedAssets = async (page = 1, count = 100) => {
  */
 export const lockAsset = async (
   asset,
-  { datum, datumHash, txHash, address }
+  { datum, datumHash, txHash, address, contractAddress }
 ) => {
-  if (asset && datum && datumHash && txHash && address) {
+  if (asset && datum && datumHash && txHash && address && contractAddress) {
     const assetUpdated = {
       ...asset,
       status: {
@@ -118,6 +118,7 @@ export const lockAsset = async (
         datumHash,
         locked: true,
         txHash,
+        contractAddress,
         submittedBy: address,
         submittedOn: new Date().getTime(),
       },
