@@ -9,6 +9,7 @@ import "./style.scss";
 import Search from "../../components/Navbar/Search";
 import { opencnft_get_top_projects } from "../../store/collection/api";
 import { get_asset_image_source, numFormatter } from "../../utils";
+import Image from "../../components/Image";
 
 const Home = ({opencnft_get_top_projects}) => {
   
@@ -35,7 +36,7 @@ const Splash = ({listProjects}) => {
                 <div className="card">
                   <div className="card-image">
                     <figure className="image is-square">
-                      <img src={project.image} />
+                      <img src={project.image} alt={project.name} />
                     </figure>
                   </div>
                 </div>
@@ -103,7 +104,8 @@ const TopProjects = ({opencnft_get_top_projects, listProjects, setListProjects})
               row.thumbnail ? (
                 <figure className="media-left">
                   <p className="image is-64x64" style={{overflow:"hidden"}}>
-                    <img className="is-rounded top-project-image" src={row.image}/>
+                    {/* <img className="is-rounded top-project-image" src={row.image}/> */}
+                    <Image className="is-rounded top-project-image" src={row.image}/>
                   </p>
                 </figure>
               ) : <></>
@@ -262,6 +264,7 @@ const TopProjects = ({opencnft_get_top_projects, listProjects, setListProjects})
                             <div className="card-image">
                               <figure className="image is-square">
                                 <img className="top-project-image" src={project.image} alt={project.name} />
+                                {/* <Image className="top-project-image" src={project.image} alt={project.name} /> */}
                               </figure>
                             </div>
                             <div className="card-content">

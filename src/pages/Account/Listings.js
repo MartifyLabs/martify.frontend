@@ -37,8 +37,8 @@ const Listings = ({state_wallet, state_collection, get_wallet_assets}) => {
       //   }
       // }
 
-      for(var i in state_wallet.data.assets){
-        let this_asset = state_wallet.data.assets[i];
+      for(var i in state_wallet.data.market){
+        let this_asset = state_wallet.data.market[i];
         if(this_asset){
           let this_asset_ids = this_asset.details.asset;
           list_nfts.push(this_asset);
@@ -241,7 +241,7 @@ const NoAssetFound = ({state_wallet}) => {
                   No assets
                 </p>
                 <p className="subtitle">
-                  Looks like your wallet is empty, <a href="/explore">start browsing</a>!
+                  You have not listed any assets.
                 </p>
               </>
             ) : <></>

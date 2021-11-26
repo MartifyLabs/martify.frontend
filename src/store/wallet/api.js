@@ -101,63 +101,6 @@ export const connectWallet = (current_wallet, is_silent, callback) => async (dis
             success: true,
             data: connected_wallet,
           });
-
-          // getUtxos().then((res_utxos) => {
-          //   connected_wallet.utxos = res_utxos;
-
-          //   // console.log(current_wallet.data.utxos)
-          //   // if(current_wallet.data.utxos){
-          //   //   if(connected_wallet.utxos.sort().join(',')=== current_wallet.data.utxos.sort().join(',')){
-          //   //     console.log("SAME!!!");
-          //   //   }else{
-          //   //     console.log("NOT SAME do something");
-          //   //   }
-          //   // }else{
-          //   //   console.log("NOT SAME do something 2");
-          //   // }
-
-          //   window.cardano.getUsedAddresses().then((res) => {
-          //     let used_address = res[0];
-          //     connected_wallet.used_addr = used_address;
-
-          //     getCollateral().then((resCollateral) => {
-          //       connected_wallet.collateral = resCollateral;
-
-          //       getUsedAddress().then((res_walletaddr) => {
-          //         connected_wallet.wallet_address = res_walletaddr.to_bech32();
-
-          //         getBalance().then(async (res) => {
-          //           const balance = cbor.decode(res);
-
-          //           let wallet_balance = 0;
-          //           if (Number.isInteger(balance)) {
-          //             wallet_balance = balance;
-          //           } else {
-          //             for (let i in balance) {
-          //               if (Number.isInteger(balance[i])) {
-          //                 wallet_balance = balance[i];
-          //                 break;
-          //               }
-          //             }
-          //           }
-
-          //           connected_wallet.wallet_balance = wallet_balance;
-
-          //           let this_wallet = await getWallet(connected_wallet.wallet_address);
-          //           connected_wallet.database = this_wallet;
-
-          //           dispatch(walletConnected(connected_wallet));
-
-          //           callback({
-          //             success: true,
-          //             data: connected_wallet,
-          //           });
-
-          //         });
-          //       });
-          //     });
-          //   });
-          // });
         }
         // if network not correct
         else{
@@ -270,15 +213,15 @@ export const get_wallet_assets = (callback) => async (dispatch) => {
   let wallet_address = await getUsedAddress();
   let wallet = await getWallet(wallet_address);
   // console.log("wallet", wallet)
-  for(var asset in wallet.assets){
-    let this_asset = wallet.assets[asset];
-    if(this_asset.status.locked){
-      assets[asset] = this_asset;
-    }
-  }
+  // for(var asset in wallet.assets){
+  //   let this_asset = wallet.assets[asset];
+  //   if(this_asset.status.locked){
+  //     assets[asset] = this_asset;
+  //   }
+  // }
   // console.log("assets", assets)
   let updated_wallet = await setWalletAssets(wallet, assets);
-  // console.log("updated_wallet", updated_wallet);
+  console.log("updated_wallet", updated_wallet);
   dispatch(setWalletData(updated_wallet));
 
   // var list_assets = Object.keys(wallet_assets).map(function (key) {

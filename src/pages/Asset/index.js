@@ -429,6 +429,7 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
       setShowModal(res.type);
     }else{
       console.log("fail", res);
+      setShowNotification("Previous transaction not validated.");
     }
   }
   function list_this_token(price){

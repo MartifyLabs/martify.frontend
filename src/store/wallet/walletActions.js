@@ -58,3 +58,9 @@ export function setWalletData(payload) {
   };
 }
 
+export function addWalletAsset(payload) {
+  return {
+    type: types.ADD_WALLET_ASSET,
+    payload: payload,
+  };
+}

@@ -71,20 +71,18 @@ export default function walletReducer(state = walletobj, { type, payload }) {
     //   };
 
     case types.SET_WALLET_DATA:
-      // let list_assets = [];
-      // for(var i in payload.assets){
-      //   let this_asset = payload.assets[i];
-      //   if(this_asset){
-      //     list_assets.push(this_asset);
-      //   }
-      // }
-      // payload.assets = list_assets;
-
       return {
         ...state,
         loading: false,
         data: payload,
         loaded_assets: true,
+      };
+    
+    case types.ADD_WALLET_ASSET:
+      console.log(1,payload)
+      console.log(2,state.data.assets)
+      return {
+        ...state,
       };
       
     default:

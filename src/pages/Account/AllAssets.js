@@ -19,40 +19,34 @@ const AllAssets = ({state_wallet, state_collection, get_wallet_assets}) => {
   ];
   const [filterAsset, setFilterAsset] = useState("all");
 
+  function add_asset(list_nfts, dict_projects, this_asset){
+    if(this_asset){
+      list_nfts.push(this_asset);
+      let policy_id = this_asset.details.policyId;
+      if(policy_id in state_collection.policies_collections){
+        dict_projects[policy_id] = state_collection.policies_collections[policy_id].meta.name;
+      }else{
+        dict_projects[policy_id] = policy_id;
+      }
+    }
+  }
+
   function load(){
     if(state_wallet.loaded_assets){
       let list_nfts = [];
       let list_projects = [...default_list_projects];
       let dict_projects = {};
 
-      // for(var asset_id in state_wallet.assets){
-      //   let this_asset_ids = state_wallet.assets[asset_id];
-      //   let this_asset = state_collection.policies_assets[this_asset_ids.policy_id][this_asset_ids.asset_id];
-      //   list_nfts.push(this_asset);
-
-      //   if(this_asset_ids.policy_id in state_collection.policies_collections){
-      //     dict_projects[this_asset_ids.policy_id] = state_collection.policies_collections[this_asset_ids.policy_id].meta.name;
-      //   }else{
-      //     dict_projects[this_asset_ids.policy_id] = this_asset_ids.policy_id;
-      //   }
-      // }
-
       for(var i in state_wallet.data.assets){
         let this_asset = state_wallet.data.assets[i];
-        if(this_asset){
-          let this_asset_ids = this_asset.details.asset;
-          list_nfts.push(this_asset);
-
-          let policy_id = this_asset.details.policyId;
-
-          if(policy_id in state_collection.policies_collections){
-            dict_projects[policy_id] = state_collection.policies_collections[policy_id].meta.name;
-          }else{
-            dict_projects[policy_id] = policy_id;
-          }
-          
-        }
+        add_asset(list_nfts, dict_projects, this_asset)
       }
+
+      for(var i in state_wallet.data.market){
+        let this_asset = state_wallet.data.market[i];
+        add_asset(list_nfts, dict_projects, this_asset)
+      }
+
       setListings(list_nfts);
 
       for(var policy_id in dict_projects){
