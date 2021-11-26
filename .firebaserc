@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "vendere-3f235"
-  }
+    "testnet": "vendere-3f235",
+    "mainnet": "martify-bc2f5"
+  },
+  "targets": {}
 }
