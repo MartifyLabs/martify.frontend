@@ -221,7 +221,7 @@ export const get_wallet_assets = (callback) => async (dispatch) => {
   // }
   // console.log("assets", assets)
   let updated_wallet = await setWalletAssets(wallet, assets);
-  console.log("updated_wallet", updated_wallet);
+  // console.log("updated_wallet", updated_wallet);
   dispatch(setWalletData(updated_wallet));
 
   // var list_assets = Object.keys(wallet_assets).map(function (key) {

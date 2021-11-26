@@ -835,7 +835,7 @@ const Transactions = ({asset, opencnft_get_asset_tx}) => {
       })
       .map((tx, i) => {
         return {
-          sold_at: tx.on,
+          sold_at: tx.submittedOn,
           marketplace: "Martify",
           price: tx.datum.price
         }
