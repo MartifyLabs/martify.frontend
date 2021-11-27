@@ -23,8 +23,6 @@ export const listAsset = async (
   const lockAssetDatum = serializeSale(datum);
   datums.add(lockAssetDatum);
 
-  
-
   outputs.add(
     createTxOutput(
       contractAddress(),

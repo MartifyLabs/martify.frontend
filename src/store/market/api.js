@@ -21,9 +21,7 @@ import {
   unlockAsset,
   addAssetEvent,
 } from "../../database/assets";
-import {
-  getCollection,
-} from "../../database/collections";
+import { getCollection } from "../../database/collections";
 
 import { collections_add_tokens } from "../collection/collectionActions";
 import { setWalletLoading } from "../wallet/walletActions";
@@ -43,7 +41,7 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
 
     let royaltiesAddress = walletAddress;
     let royaltiesPercentage = 0;
-    if("royalties" in collection){
+    if ("royalties" in collection) {
       royaltiesAddress = collection.royalties.address;
       royaltiesPercentage = collection.royalties.percentage;
       console.log("has royalties", royaltiesAddress, royaltiesPercentage);
@@ -69,6 +67,7 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
         datumHash: listObj.datumHash,
         txHash: listObj.txHash,
         address: walletAddress,
+        artistAddress: royaltiesAddress,
         contractAddress: contractAddress().to_bech32(),
       });
 
@@ -112,12 +111,6 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
     const assetOld = await getAsset(asset.details.asset);
     const walletAddress = await getUsedAddress();
     const walletUtxos = await getUtxos();
-    const collection = await getCollection(assetOld.details.policyId);
-
-    let royaltiesAddress = walletAddress;
-    if("royalties" in collection){
-      royaltiesAddress = collection.royalties.address;
-    }
 
     const assetUtxo = (
       await getLockedUtxosByAsset(
@@ -131,7 +124,7 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
         assetOld.status.datum.tn,
         assetOld.status.datum.cs,
         walletAddress,
-        royaltiesAddress,
+        assetOld.status.artistAddress,
         assetOld.status.datum.rp,
         newPrice
       );
@@ -151,6 +144,7 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
           datumHash: updateObj.datumHash,
           txHash: updateObj.txHash,
           address: walletAddress,
+          artistAddress: assetOld.status.artistAddress,
           contractAddress: contractAddress().to_bech32(),
         });
 
@@ -281,7 +275,6 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
     ).find((utxo) => utxo.data_hash === assetOld.status.datumHash);
 
     if (assetUtxo) {
-      console.log("assetOld", assetOld.status.datum.ra)
       const txHash = await purchaseAsset(
         assetOld.status.datum,
         {
@@ -290,8 +283,8 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
         },
         {
           seller: fromBech32(assetOld.status.submittedBy),
-          // TODO: Fetch royalties and market address
-          artist: fromBech32(assetOld.status.submittedBy), // TODO HERE assetOld.status.datum.ra,
+          artist: fromBech32(assetOld.status.artistAddress),
+          // TODO: Fetch market address
           market: fromBech32(
             "addr_test1qp6pykcc0kgaqj27z3jg4sjt7768p375qr8q4z3f4xdmf38skpyf2kgu5wqpnm54y5rqgee4uwyksg6eyd364qhmpwqsv2jjt3"
           ),

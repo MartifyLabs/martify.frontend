@@ -31,6 +31,7 @@ export const serializeSale = ({ tn, cs, sa, ra, rp, price }) => {
 
 export const deserializeSale = (datum) => {
   const details = datum.as_constr_plutus_data().data();
+
   return {
     tn: toHex(details.get(3).as_bytes()),
     cs: toHex(details.get(2).as_bytes()),

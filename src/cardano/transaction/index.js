@@ -137,10 +137,7 @@ export const finalizeTx = async ({
     const generalMetadata = Cardano.Instance.GeneralTransactionMetadata.new();
     generalMetadata.insert(
       Cardano.Instance.BigNum.from_str("001"),
-      Cardano.Instance.encode_json_str_to_metadatum(
-        JSON.stringify(metadata),
-        1
-      )
+      Cardano.Instance.encode_json_str_to_metadatum(JSON.stringify(metadata), 1)
     );
 
     aux_data.set_metadata(generalMetadata);
@@ -236,11 +233,7 @@ export const finalizeTx = async ({
   return txHash;
 };
 
-export const createTxOutput = (
-  address,
-  value,
-  { datum } = {}
-) => {
+export const createTxOutput = (address, value, { datum } = {}) => {
   const v = value;
 
   const minAda = Cardano.Instance.min_ada_required(
