@@ -1,5 +1,5 @@
 import Cardano from "../serialization-lib";
-import { serializeSale } from "./datums";
+import { serializeSale, deserializeSale } from "./datums";
 import { BUY, CANCEL, UPDATE } from "./redeemers";
 import { contractAddress, contractScripts } from "./validator";
 import {
@@ -16,13 +16,14 @@ export const listAsset = async (
   seller: { address: BaseAddress, utxos: [] }
 ) => {
   const { txBuilder, datums, outputs } = initializeTx();
-
   const utxos = seller.utxos.map((utxo) =>
     Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
   );
 
   const lockAssetDatum = serializeSale(datum);
   datums.add(lockAssetDatum);
+
+  
 
   outputs.add(
     createTxOutput(
@@ -41,15 +42,14 @@ export const listAsset = async (
   const datumHash = toHex(
     Cardano.Instance.hash_plutus_data(lockAssetDatum).to_bytes()
   );
-
   const txHash = await finalizeTx({
     txBuilder,
     datums,
     utxos,
     outputs,
     changeAddress: seller.address,
+    metadata: deserializeSale(lockAssetDatum),
   });
-
   return {
     datumHash,
     txHash,

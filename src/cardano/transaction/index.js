@@ -132,22 +132,20 @@ export const finalizeTx = async ({
 
   let aux_data;
 
-  /*if (metadata) {
+  if (metadata) {
     aux_data = Cardano.Instance.AuxiliaryData.new();
     const generalMetadata = Cardano.Instance.GeneralTransactionMetadata.new();
-    Object.keys(metadata).forEach((label) => {
-      Object.keys(metadata[label]).length > 0 &&
-        generalMetadata.insert(
-          Cardano.Instance.BigNum.from_str(label),
-          Cardano.Instance.encode_json_str_to_metadatum(
-            JSON.stringify(metadata[label]),
-            1
-          )
-        );
-    });
+    generalMetadata.insert(
+      Cardano.Instance.BigNum.from_str("001"),
+      Cardano.Instance.encode_json_str_to_metadatum(
+        JSON.stringify(metadata),
+        1
+      )
+    );
+
     aux_data.set_metadata(generalMetadata);
     txBuilder.set_auxiliary_data(aux_data);
-  }*/
+  }
 
   const changeMultiAssets = change.multiasset();
 
@@ -241,7 +239,7 @@ export const finalizeTx = async ({
 export const createTxOutput = (
   address,
   value,
-  { datum, metadata } = {}
+  { datum } = {}
 ) => {
   const v = value;
 
