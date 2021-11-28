@@ -1,6 +1,4 @@
 import React from "react";
-import { compose } from "redux";
-import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
 import "./style.css";
@@ -8,19 +6,14 @@ import "./style.css";
 import ButtonConnect from "../ButtonConnect";
 import Search from "./Search";
 
-const Navbar = ({state_wallet}) => {
+const Navbar = () => {
   return (
     <nav className="main-navbar navbar is-fixed-top is-transparent">
       <div className="the-blur"></div>
       <div className="navbar-brand">
-        <a className="navbar-item" href="/">
-          <img src="/images/martify-logo-black-yellow-small.png" alt="Market place" width="112" height="28"/>
-        </a>
-        {/* <div className="navbar-burger" data-target="navbarExampleTransparentExample">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div> */}
+        <Link className="navbar-item" to="/">
+          <img src="/images/martify2_small-logo.png" alt="Martify" width="112" height="28"/>
+        </Link>
       </div>
 
       <div className="navbar-menu">
@@ -63,16 +56,4 @@ const Navbar = ({state_wallet}) => {
   );
 };
 
-function mapStateToProps(state, props) {
-  return {
-    state_wallet: state.wallet
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    
-  };
-}
-
-export default compose(connect(mapStateToProps, mapDispatchToProps))(Navbar);
+export default Navbar; 

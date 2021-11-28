@@ -422,11 +422,12 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
   const [userInputAmount, setUserInputAmount] = useState("");
   const [showNotification, setShowNotification] = useState(false);
   const [showModal, setShowModal] = useState(false);
-
+  
   function successful_transaction(res){
     setUserInputAmount("");
     if(res.success){
       setShowModal(res.type);
+      setShowNotification(false);
     }else{
       console.log("fail", res);
       setShowNotification("Previous transaction not validated.");
@@ -467,9 +468,10 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
       if(state_wallet.loading===WALLET_STATE.AWAITING_SIGNATURE){
         setShowNotification("Awaiting signature...");
       }
-    }else{
-      setShowNotification(false);
     }
+    // else{
+    //   setShowNotification(false);
+    // }
   }, [state_wallet]);
 
   useEffect(() => {

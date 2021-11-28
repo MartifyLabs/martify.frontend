@@ -9,9 +9,15 @@
   width: 100%;
   min-height: 56px;
   
-  background-color: rgba(255, 255, 255, 0.6);
+  /* background-color: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(20px) saturate(160%) contrast(45%) brightness(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%) contrast(45%) brightness(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%) contrast(45%) brightness(140%); */
+
+  background: rgb(221,247,255);
+  background: -moz-linear-gradient(87deg, rgba(221,247,255,1) 0%, rgba(235,215,192,1) 60%, rgba(217,204,242,1) 100%);
+  background: -webkit-linear-gradient(87deg, rgba(221,247,255,1) 0%, rgba(235,215,192,1) 60%, rgba(217,204,242,1) 100%);
+  background: linear-gradient(87deg, rgba(221,247,255,1) 0%, rgba(235,215,192,1) 60%, rgba(217,204,242,1) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ddf7ff",endColorstr="#d9ccf2",GradientType=1);
 }
 
 .react-autosuggest__container {
