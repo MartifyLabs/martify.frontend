@@ -202,9 +202,9 @@ const splitAmount = (
   { price, royalties },
   outputs
 ) => {
-  const minimumAmount = 1600000;
-  const marketFeePercentage = 2 / 100;
-  const royaltyFeePercentage = royalties / 100;
+  const minimumAmount = 1000000;
+  const marketFeePercentage = 1 / 100;
+  const royaltyFeePercentage = royalties / 1000;
 
   const royaltyFees = Math.max(royaltyFeePercentage * price, minimumAmount);
   outputs.add(
