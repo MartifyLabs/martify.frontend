@@ -28,6 +28,7 @@ export const getAssetDetails = async (asset) => {
     console.error(
       `Unexpected error in getAssetDetails. [Message: ${error.message}]`
     );
+    throw error;
   }
 };
 
@@ -43,6 +44,7 @@ export const getAssetTransactions = async (
     console.error(
       `Unexpected error in getAssetTransactions. [Message: ${error.message}]`
     );
+    throw error;
   }
 };
 
@@ -61,6 +63,7 @@ export const getLockedUtxos = async (
     console.error(
       `Unexpected error in getLockedUtxos. [Message: ${error.message}]`
     );
+    throw error;
   }
 };
 
@@ -75,6 +78,7 @@ export const getLockedUtxosByAsset = async (address, asset) => {
     console.error(
       `Unexpected error in getLockedUtxosByAsset. [Message: ${error.message}]`
     );
+    throw error;
   }
 };
 
@@ -83,7 +87,6 @@ export const getMintedAssets = async (
   { page = 1, count = 100, order = "asc" }
 ) => {
   try {
-    console.log(888, policyId, page, count, order);
     const response = await cardano(
       `assets/policy/${policyId}?page=${page}&count=${count}&order=${order}`
     );
@@ -95,6 +98,7 @@ export const getMintedAssets = async (
     console.error(
       `Unexpected error in getMintedAssets. [Message: ${error.message}]`
     );
+    throw error;
   }
 };
 
@@ -105,6 +109,7 @@ export const getTxMetadata = async (hash) => {
     console.error(
       `Unexpected error in getTxMetadata. [Message: ${error.message}]`
     );
+    throw error;
   }
 };
 
@@ -121,6 +126,7 @@ export const getTxUtxos = async (hash) => {
     console.error(
       `Unexpected error in getTxUtxos. [Message: ${error.message}]`
     );
+    throw error;
   }
 };
 
@@ -145,6 +151,7 @@ export const getProtocolParameters = async () => {
     console.error(
       `Unexpected error in getProtocolParameters. [Message: ${error.message}]`
     );
+    throw error;
   }
 };
 
@@ -162,7 +169,7 @@ const request = async (base, endpoint, headers, body) => {
     body,
   }).then((response) => {
     if (!response.ok) {
-      throw response;
+      throw Error(response.statusText);
     }
     return response.json();
   });

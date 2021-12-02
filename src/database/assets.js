@@ -67,39 +67,16 @@ export const getAsset = async (assetId) => {
     }
   } catch (error) {
     console.error(`Unexpected error in getAsset. [Message: ${error.message}]`);
+    throw error;
   }
 };
 
 export const getAssets = async (assetIds) => {
-  try {
-    if (assetIds) {
-      const assets = await Promise.all(
-        assetIds.map(async (assetId) => await getAsset(assetId))
-      );
-      return assets.filter((asset) => asset !== undefined);
-    }
-  } catch (error) {
-    console.error(`Unexpected error in getAssets. [Message: ${error.message}]`);
-  }
-};
-
-export const getLockedAssets = async (page = 1, count = 100) => {
-  try {
-    const reference = await query(
-      collection(firestore, "assets"),
-      where("status.locked", "==", true),
-      orderBy("status.submittedOn"),
-      startAfter((page - 1) * count),
-      limit(count)
+  if (assetIds) {
+    const assets = await Promise.all(
+      assetIds.map(async (assetId) => await getAsset(assetId))
     );
-
-    const snapshot = await getDocs(reference);
-
-    return snapshot.docs.map((doc) => doc.data());
-  } catch (error) {
-    console.error(
-      `Unexpected error in getLockedAssets. [Message: ${error.message}]`
-    );
+    return assets.filter((asset) => asset !== undefined);
   }
 };
 
@@ -158,6 +135,27 @@ export const unlockAsset = async (asset, { txHash, address }) => {
   return asset;
 };
 
+export const getLockedAssets = async (page = 1, count = 100) => {
+  try {
+    const reference = await query(
+      collection(firestore, "assets"),
+      where("status.locked", "==", true),
+      orderBy("status.submittedOn"),
+      startAfter((page - 1) * count),
+      limit(count)
+    );
+
+    const snapshot = await getDocs(reference);
+
+    return snapshot.docs.map((doc) => doc.data());
+  } catch (error) {
+    console.error(
+      `Unexpected error in getLockedAssets. [Message: ${error.message}]`
+    );
+    throw error;
+  }
+};
+
 export const saveAsset = async (asset) => {
   try {
     if (asset) {
@@ -166,30 +164,16 @@ export const saveAsset = async (asset) => {
     }
   } catch (error) {
     console.error(`Unexpected error in saveAsset. [Message: ${error.message}]`);
+    throw error;
   }
 };
 
 export const saveAssets = async (assets) => {
-  try {
-    if (assets) {
-      await Promise.all(
-        assets.map(async (asset) => {
-          await saveAsset(asset);
-        })
-      );
-    }
-  } catch (error) {
-    console.error(
-      `Unexpected error in saveAssets. [Message: ${error.message}]`
+  if (assets) {
+    await Promise.all(
+      assets.map(async (asset) => {
+        await saveAsset(asset);
+      })
     );
   }
-};
-
-export const setAssetOffers = async (asset, offers) => {
-  if (asset && offers) {
-    const assetUpdated = { ...asset, offers };
-    await saveAsset(assetUpdated);
-    return assetUpdated;
-  }
-  return asset;
 };

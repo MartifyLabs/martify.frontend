@@ -25,6 +25,7 @@ export const getWallet = async (address) => {
     }
   } catch (error) {
     console.error(`Unexpected error in getWallet. [Message: ${error.message}]`);
+    throw error;
   }
 };
 
@@ -94,14 +95,16 @@ export const setWalletOffers = async (wallet, offers) => {
   return wallet;
 };
 
-export const listWalletAsset = async (wallet, newAsset, newEvent) => {
-  if (wallet && newAsset && newEvent) {
+export const listWalletAsset = async (wallet, walletAsset, newEvent) => {
+  if (wallet && walletAsset && newEvent) {
+    const { [walletAsset.details.asset]: _, ...updatedAssets } = wallet.assets;
     const updatedWallet = {
       ...wallet,
+      assets: updatedAssets,
       events: [...wallet.events, newEvent],
       market: {
         ...wallet.market,
-        [newAsset.details.asset]: newAsset,
+        [walletAsset.details.asset]: walletAsset,
       },
     };
     await saveWallet(updatedWallet);
@@ -115,6 +118,10 @@ export const delistWalletAsset = async (wallet, listedAsset, newEvent) => {
     const { [listedAsset.details.asset]: _, ...updatedMarket } = wallet.market;
     const updatedWallet = {
       ...wallet,
+      assets: {
+        ...wallet.assets,
+        [listedAsset.details.asset]: listedAsset,
+      },
       events: [...wallet.events, newEvent],
       market: updatedMarket,
     };
@@ -151,5 +158,6 @@ export const saveWallet = async (wallet) => {
     console.error(
       `Unexpected error in saveWallet. [Message: ${error.message}]`
     );
+    throw error;
   }
 };
