@@ -21,7 +21,7 @@ import {
   unlockAsset,
   addAssetEvent,
 } from "../../database/assets";
-import { getCollection } from "../../database/collections";
+import { getCollectionCreator } from "../../database/collections";
 
 import { collections_add_tokens } from "../collection/collectionActions";
 import { setWalletLoading } from "../wallet/walletActions";
@@ -37,14 +37,13 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
     const assetOld = await getAsset(asset.details.asset);
     const walletAddress = await getUsedAddress();
     const walletUtxos = await getUtxos();
-    const collection = await getCollection(assetOld.details.policyId);
+    const collectionCreator = await getCollectionCreator(assetOld.details.policyId);
 
     let royaltiesAddress = walletAddress;
     let royaltiesPercentage = 0;
-    if ("royalties" in collection) {
-      royaltiesAddress = collection.royalties.address;
-      royaltiesPercentage = collection.royalties.percentage;
-      console.log("has royalties", royaltiesAddress, royaltiesPercentage);
+    if (collectionCreator) {
+      royaltiesAddress = collectionCreator.address;
+      royaltiesPercentage = collectionCreator.percentage;
     }
 
     const datum = createDatum(

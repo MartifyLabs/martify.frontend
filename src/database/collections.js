@@ -25,6 +25,7 @@ export const getCollection = async (policyId) => {
     console.error(
       `Unexpected error in getCollection. [Message: ${error.message}]`
     );
+    throw error;
   }
 };
 
@@ -39,25 +40,57 @@ export const saveCollection = async (collection, policyId) => {
     console.error(
       `Unexpected error in saveCollection. [Message: ${error.message}]`
     );
+    throw error;
+  }
+};
+
+export const getCollectionCreator = async (policyId) => {
+  try {
+    if (policyId) {
+      const reference = doc(firestore, "collections", policyId);
+      const snapshot = await getDoc(reference);
+
+      if (snapshot.exists()) {
+        return snapshot.data().royalties;
+      }
+    }
+  } catch (error) {
+    console.error(
+      `Unexpected error in getCollectionCreator. [Message: ${error.message}]`
+    );
+    throw error;
+  }
+};
+
+export const getCollectionStatus = async (policyId) => {
+  try {
+    if (policyId) {
+      const reference = doc(firestore, "collections", policyId);
+      const snapshot = await getDoc(reference);
+
+      if (snapshot.exists()) {
+        return snapshot.data().verified;
+      }
+    }
+  } catch (error) {
+    console.error(
+      `Unexpected error in getCollectionStatus. [Message: ${error.message}]`
+    );
+    throw error;
   }
 };
 
 /**
  * @param {string} address - address needs to be in bech32 format.
  */
-export const setCollectionRoyalties = async (
-  collection,
-  { address, percentage }
-) => {
-  if (collection && address && percentage) {
-    await saveCollection({ ...collection, royalties: { address, percentage } });
+export const setCollectionCreator = async (address, percentage, policyId) => {
+  if (address && percentage) {
+    await saveCollection({ royalties: { address, percentage } }, policyId);
   }
 };
 
-export const setCollectionStatus = async (collection, verified: Boolean) => {
-  if (collection) {
-    await saveCollection({ ...collection, verified });
-  }
+export const setCollectionStatus = async (verified: Boolean, policyId) => {
+  await saveCollection({ verified }, policyId);
 };
 
 const fetchAllAssetsForCollection = async (policyId, page = 1) => {
@@ -68,6 +101,5 @@ const fetchAllAssetsForCollection = async (policyId, page = 1) => {
       ...(await fetchAllAssetsForCollection(policyId, ++page)),
     ];
   }
-
   return [];
 };
