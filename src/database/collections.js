@@ -62,7 +62,6 @@ export const setCollectionStatus = async (collection, verified: Boolean) => {
 
 const fetchAllAssetsForCollection = async (policyId, page = 1) => {
   const assets = await getMintedAssets(policyId, { page });
-
   if (assets.length) {
     return [
       ...assets,

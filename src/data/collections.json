@@ -2,7 +2,7 @@
   "thepixelheadsquad": {
     "id": "thepixelheadsquad",
     "policy_ids": [
-      "9236a326ec65243627d89f60921a42314d0cd407c002280499e1f88b"
+      "6c880f643a86d6f5b86871952b36999bbf7e9619ca54953abd2acf62"
     ],
     "meta": {
       "name": "The Pixel Head Squad",
@@ -18,6 +18,6 @@
       "twitter": "https://twitter.com/PixelHeadSquad",
       "website": "https://pixelhead.io/"
     },
-    "asset_attributes": ["creature name", "narrative", "description"]
+    "asset_attributes": ["Creature Name", "creature name", "Narrative", "narrative", "description", "States", "project"]
   }
 }

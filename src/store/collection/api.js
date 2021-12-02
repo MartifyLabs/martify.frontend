@@ -48,6 +48,10 @@ export const load_collection = (callback) => async (dispatch) => {
     }
   }
 
+  for (var collection_id in all_collections) {
+    all_collections[collection_id].policy_ids = [...new Set(all_collections[collection_id].policy_ids)];
+  }
+
   dispatch(collections_loaded(all_collections));
   callback({ all_collections });
 };
@@ -207,6 +211,7 @@ export const opencnft_get_asset_tx =
     })
       .then((res) => res.json())
       .then((res) => {
+        console.log(res)
         callback({ success: true, data: res });
       });
   };

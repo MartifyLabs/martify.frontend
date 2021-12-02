@@ -14,7 +14,8 @@ import CollectionAbout from "../../components/CollectionAbout";
 import CollectionBanner from "../../components/CollectionBanner";
 import AssetImageFigure from "../../components/AssetImageFigure";
 
-import { fromLovelace } from "../../utils";
+import { fromLovelace, get_asset_image_source } from "../../utils";
+
 import "./style.css";
 
 const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, list_token, update_token, delist_token, purchase_token, asset_add_offer, opencnft_get_asset_tx}) => {
@@ -197,11 +198,15 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
   const [showTab, setShowTab] = useState( asset.status ? asset.status.locked ? "buy" : "offer" : "offer");
   const [userInputAmount, setUserInputAmount] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
 
   function successful_transaction(res){
     setUserInputAmount("");
     if(res.success){
       setShowModal(res.type);
+      setShowNotification(false);
+    }else{
+      setShowNotification("Previous transaction not validated.");
     }
   }
 
@@ -237,6 +242,14 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
       return () => clearTimeout(timer);
     }
   }, [showModal]);
+
+  useEffect(() => {
+    if(state_wallet.loading){
+      if(state_wallet.loading===WALLET_STATE.AWAITING_SIGNATURE){
+        setShowNotification("Awaiting signature...");
+      }
+    }
+  }, [state_wallet]);
 
   return (
     <div className="card">
@@ -373,18 +386,26 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
         ) : <></>
       }
 
+      {
+        showNotification ? (
+          <div className="notification-window notification is-info">
+            <button className="delete" onClick={() => setShowNotification(false)}></button>
+            <p>
+              {showNotification}
+            </p>
+          </div>
+        ) : <></>
+      }
+
     </div>
   )
 }
 
 const ButtonBuy = ({state_wallet, purchase_this_token}) => {
-
   const [showNotification, setShowNotification] = useState(false);
-
   async function begin_buy_process() {
     purchase_this_token();
   }
-
   return (
     <>
       <button className={"button is-rounded is-info" + (state_wallet.loading ? " is-loading" : "")} 
@@ -761,7 +782,7 @@ const AssetImage = ({asset}) => {
               <>
               {
                 asset.details.onchainMetadata.files[0].mediaType==="text/html" ? (
-                  <iframe src={asset.details.onchainMetadata.files[0].src.join("")} style={{width:"600px",height:"600px"}}>
+                  <iframe src={get_asset_image_source(asset.details.onchainMetadata.files[0].src)} style={{width:"600px",height:"600px"}}>
                     <AssetImageFigure asset={asset} setShow={setShow}/>
                   </iframe>
                 ) : (
@@ -861,6 +882,10 @@ const Transactions = ({asset, opencnft_get_asset_tx}) => {
     opencnft_get_asset_tx(asset.details.asset, (res) => {
       setFirstLoad(true);
       if(res.data.items){
+        let opencnft_transactions = [...res.data.items];
+        for(var i in opencnft_transactions){
+          opencnft_transactions[i].sold_at = opencnft_transactions[i].sold_at*1000;
+        }
         list_transactions.push.apply(list_transactions, res.data.items);
       }
       setTransactions(list_transactions);

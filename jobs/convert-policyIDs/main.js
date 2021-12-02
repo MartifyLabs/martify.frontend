@@ -1,7 +1,7 @@
 var fs = require('fs');
 const path = require('path/posix');
 
-let folder_policy = "policyIDs-main";
+let folder_policy = "policyIDs-main/projects";
 // let folder_policy = "test";
 
 let filenames = [];
