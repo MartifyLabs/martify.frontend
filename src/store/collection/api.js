@@ -12,10 +12,9 @@ import {
   getAsset,
   getAssets,
   saveAsset,
+  getCollectionAssets,
   getLockedAssets,
 } from "../../database/assets";
-
-import { getCollection } from "../../database/collections";
 
 import { getUsedAddress } from "../../cardano/wallet";
 
@@ -64,7 +63,7 @@ export const get_listings = (policy_id, callback) => async (dispatch) => {
     listing: {},
   };
 
-  const collection = await getCollection(policy_id);
+  const collection = await getCollectionAssets(policy_id);
   if (collection?.assets) {
     let assets = await getAssets(collection.assets);
     for (var i in assets) {

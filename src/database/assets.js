@@ -10,7 +10,7 @@ import {
   startAfter,
   where,
 } from "firebase/firestore";
-import { getAssetDetails } from "../cardano/blockfrost-api";
+import { getAssetDetails, getMintedAssets } from "../cardano/blockfrost-api";
 import { firestore } from "../firebase";
 
 export const addAssetEvent = async (asset, newEvent) => {
@@ -77,6 +77,26 @@ export const getAssets = async (assetIds) => {
       assetIds.map(async (assetId) => await getAsset(assetId))
     );
     return assets.filter((asset) => asset !== undefined);
+  }
+};
+
+export const getCollectionAssets = async (policyId, page = 1, count = 100) => {
+  if (policyId) {
+    const reference = await query(
+      collection(firestore, "assets"),
+      where("details.policyId", "==", policyId),
+      startAfter((page - 1) * count),
+      limit(count)
+    );
+
+    const snapshot = await getDocs(reference);
+    
+    if (snapshot.exists()) {
+      return snapshot.docs.map((doc) => doc.data());
+    } else {
+      const assetIds = await getMintedAssets(policyId, { page, count });
+      return await getAssets(assetIds);
+    }
   }
 };
 
