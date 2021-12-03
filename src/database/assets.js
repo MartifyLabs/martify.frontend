@@ -85,17 +85,18 @@ export const getCollectionAssets = async (policyId, page = 1, count = 100) => {
     const reference = await query(
       collection(firestore, "assets"),
       where("details.policyId", "==", policyId),
+      orderBy("details.readableAssetName"),
       startAfter((page - 1) * count),
       limit(count)
     );
 
     const snapshot = await getDocs(reference);
-    
-    if (snapshot.exists()) {
-      return snapshot.docs.map((doc) => doc.data());
-    } else {
+
+    if (snapshot.empty) {
       const assetIds = await getMintedAssets(policyId, { page, count });
       return await getAssets(assetIds);
+    } else {
+      return snapshot.docs.map((doc) => doc.data());
     }
   }
 };

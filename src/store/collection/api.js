@@ -63,9 +63,8 @@ export const get_listings = (policy_id, callback) => async (dispatch) => {
     listing: {},
   };
 
-  const collection = await getCollectionAssets(policy_id);
-  if (collection?.assets) {
-    let assets = await getAssets(collection.assets);
+  const assets = await getCollectionAssets(policy_id);
+  if (assets) {
     for (var i in assets) {
       let asset = assets[i];
       if (asset) {
