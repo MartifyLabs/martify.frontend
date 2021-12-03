@@ -3,6 +3,7 @@ import { fromHex, toString } from "../../utils";
 
 /**
  * @param {string} asset - asset is a Concatenation of the policy_id and hex-encoded asset_name.
+ * @throws COULD_NOT_FETCH_ASSET_DETAILS
  */
 export const getAssetDetails = async (asset) => {
   try {
@@ -28,10 +29,13 @@ export const getAssetDetails = async (asset) => {
     console.error(
       `Unexpected error in getAssetDetails. [Message: ${error.message}]`
     );
-    throw error;
+    throw new Error("COULD_NOT_FETCH_ASSET_DETAILS");
   }
 };
 
+/**
+ * @throws COULD_NOT_FETCH_ASSET_TRANSACTIONS
+ */
 export const getAssetTransactions = async (
   asset,
   { page = 1, count = 100, order = "asc" }
@@ -44,12 +48,13 @@ export const getAssetTransactions = async (
     console.error(
       `Unexpected error in getAssetTransactions. [Message: ${error.message}]`
     );
-    throw error;
+    throw new Error("COULD_NOT_FETCH_ASSET_TRANSACTIONS");
   }
 };
 
 /**
  * @param {string} address - address must be in bech_32 format.
+ * @throws COULD_NOT_FETCH_ADDRESS_UTXOS
  */
 export const getLockedUtxos = async (
   address,
@@ -63,13 +68,14 @@ export const getLockedUtxos = async (
     console.error(
       `Unexpected error in getLockedUtxos. [Message: ${error.message}]`
     );
-    throw error;
+    throw new Error("COULD_NOT_FETCH_ADDRESS_UTXOS");
   }
 };
 
 /**
  * @param {string} address - address must be in bech_32 format.
  * @param {string} asset - asset is a Concatenation of the policy_id and hex-encoded asset_name.
+ * @throws COULD_NOT_FETCH_ASSET_UTXOS
  */
 export const getLockedUtxosByAsset = async (address, asset) => {
   try {
@@ -78,10 +84,13 @@ export const getLockedUtxosByAsset = async (address, asset) => {
     console.error(
       `Unexpected error in getLockedUtxosByAsset. [Message: ${error.message}]`
     );
-    throw error;
+    throw new Error("COULD_NOT_FETCH_ASSET_UTXOS");
   }
 };
 
+/**
+ * @throws COULD_NOT_FETCH_MINTED_ASSETS
+ */
 export const getMintedAssets = async (
   policyId,
   { page = 1, count = 100, order = "asc" }
@@ -98,10 +107,13 @@ export const getMintedAssets = async (
     console.error(
       `Unexpected error in getMintedAssets. [Message: ${error.message}]`
     );
-    throw error;
+    throw new Error("COULD_NOT_FETCH_MINTED_ASSETS");
   }
 };
 
+/**
+ * @throws COULD_NOT_FETCH_TRANSACTION_METADATA
+ */
 export const getTxMetadata = async (hash) => {
   try {
     return await cardano(`txs/${hash}/metadata`);
@@ -109,10 +121,13 @@ export const getTxMetadata = async (hash) => {
     console.error(
       `Unexpected error in getTxMetadata. [Message: ${error.message}]`
     );
-    throw error;
+    throw new Error("COULD_NOT_FETCH_TRANSACTION_METADATA");
   }
 };
 
+/**
+ * @throws COULD_NOT_FETCH_TRANSACTION_UTXOS
+ */
 export const getTxUtxos = async (hash) => {
   try {
     const response = await cardano(`txs/${hash}/utxos`);
@@ -126,10 +141,13 @@ export const getTxUtxos = async (hash) => {
     console.error(
       `Unexpected error in getTxUtxos. [Message: ${error.message}]`
     );
-    throw error;
+    throw new Error("COULD_NOT_FETCH_TRANSACTION_UTXOS");
   }
 };
 
+/**
+ * @throws COULD_NOT_FETCH_PROTOCOL_PARAMETERS
+ */
 export const getProtocolParameters = async () => {
   try {
     const response = await cardano(`epochs/latest/parameters`);
@@ -151,7 +169,7 @@ export const getProtocolParameters = async () => {
     console.error(
       `Unexpected error in getProtocolParameters. [Message: ${error.message}]`
     );
-    throw error;
+    throw new Error("COULD_NOT_FETCH_PROTOCOL_PARAMETERS");
   }
 };
 
@@ -169,7 +187,7 @@ const request = async (base, endpoint, headers, body) => {
     body,
   }).then((response) => {
     if (!response.ok) {
-      throw Error(response.statusText);
+      throw new Error(response.statusText);
     }
     return response.json();
   });

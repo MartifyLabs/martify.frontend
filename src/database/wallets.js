@@ -3,6 +3,7 @@ import { firestore } from "../firebase";
 
 /**
  * @param {string} address - address needs to be in bech32 format.
+ * @throws COULD_NOT_RETRIEVE_WALLET_FROM_DB
  */
 export const getWallet = async (address) => {
   try {
@@ -19,16 +20,19 @@ export const getWallet = async (address) => {
           market: {},
           offers: [],
         };
-        saveWallet(wallet, address);
+        await saveWallet(wallet, address);
         return wallet;
       }
     }
   } catch (error) {
     console.error(`Unexpected error in getWallet. [Message: ${error.message}]`);
-    throw error;
+    throw new Error("COULD_NOT_RETRIEVE_WALLET_FROM_DB");
   }
 };
 
+/**
+ * @throws COULD_NOT_SAVE_WALLET_TO_DB
+ */
 export const addWalletAsset = async (wallet, newAsset) => {
   if (wallet && newAsset) {
     const updatedWallet = {
@@ -44,6 +48,9 @@ export const addWalletAsset = async (wallet, newAsset) => {
   return wallet;
 };
 
+/**
+ * @throws COULD_NOT_SAVE_WALLET_TO_DB
+ */
 export const addWalletEvent = async (wallet, newEvent) => {
   if (wallet && newEvent) {
     const updatedWallet = {
@@ -56,6 +63,9 @@ export const addWalletEvent = async (wallet, newEvent) => {
   return wallet;
 };
 
+/**
+ * @throws COULD_NOT_SAVE_WALLET_TO_DB
+ */
 export const addWalletOffer = async (wallet, newOffer) => {
   if (wallet && newOffer) {
     const updatedWallet = {
@@ -68,6 +78,9 @@ export const addWalletOffer = async (wallet, newOffer) => {
   return wallet;
 };
 
+/**
+ * @throws COULD_NOT_SAVE_WALLET_TO_DB
+ */
 export const setWalletAssets = async (wallet, assets) => {
   if (wallet && assets) {
     const updatedWallet = { ...wallet, assets: assets };
@@ -77,6 +90,9 @@ export const setWalletAssets = async (wallet, assets) => {
   return wallet;
 };
 
+/**
+ * @throws COULD_NOT_SAVE_WALLET_TO_DB
+ */
 export const setWalletEvents = async (wallet, events) => {
   if (wallet && events) {
     const updatedWallet = { ...wallet, events };
@@ -86,6 +102,9 @@ export const setWalletEvents = async (wallet, events) => {
   return wallet;
 };
 
+/**
+ * @throws COULD_NOT_SAVE_WALLET_TO_DB
+ */
 export const setWalletOffers = async (wallet, offers) => {
   if (wallet && offers) {
     const updatedWallet = { ...wallet, offers };
@@ -95,6 +114,9 @@ export const setWalletOffers = async (wallet, offers) => {
   return wallet;
 };
 
+/**
+ * @throws COULD_NOT_SAVE_WALLET_TO_DB
+ */
 export const listWalletAsset = async (wallet, walletAsset, newEvent) => {
   if (wallet && walletAsset && newEvent) {
     const { [walletAsset.details.asset]: _, ...updatedAssets } = wallet.assets;
@@ -113,6 +135,9 @@ export const listWalletAsset = async (wallet, walletAsset, newEvent) => {
   return wallet;
 };
 
+/**
+ * @throws COULD_NOT_SAVE_WALLET_TO_DB
+ */
 export const delistWalletAsset = async (wallet, listedAsset, newEvent) => {
   if (wallet && wallet.market && listedAsset && newEvent) {
     const { [listedAsset.details.asset]: _, ...updatedMarket } = wallet.market;
@@ -131,6 +156,9 @@ export const delistWalletAsset = async (wallet, listedAsset, newEvent) => {
   return wallet;
 };
 
+/**
+ * @throws COULD_NOT_SAVE_WALLET_TO_DB
+ */
 export const relistWalletAsset = async (wallet, listedAsset, newEvent) => {
   if (wallet && wallet.market && listedAsset && newEvent) {
     const { [listedAsset.details.asset]: _, ...updatedMarket } = wallet.market;
@@ -148,6 +176,9 @@ export const relistWalletAsset = async (wallet, listedAsset, newEvent) => {
   return wallet;
 };
 
+/**
+ * @throws COULD_NOT_SAVE_WALLET_TO_DB
+ */
 export const saveWallet = async (wallet) => {
   try {
     if (wallet) {
@@ -158,6 +189,6 @@ export const saveWallet = async (wallet) => {
     console.error(
       `Unexpected error in saveWallet. [Message: ${error.message}]`
     );
-    throw error;
+    throw new Error("COULD_NOT_SAVE_WALLET_TO_DB");
   }
 };
