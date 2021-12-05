@@ -5,7 +5,6 @@ import { contractAddress, contractScripts } from "./validator";
 import {
   assetsToValue,
   createTxOutput,
-  createTxUnspentOutput,
   finalizeTx,
   initializeTx,
 } from "../transaction";
@@ -15,43 +14,47 @@ export const listAsset = async (
   datum,
   seller: { address: BaseAddress, utxos: [] }
 ) => {
-  const { txBuilder, datums, outputs } = initializeTx();
-  const utxos = seller.utxos.map((utxo) =>
-    Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
-  );
+  try {
+    const { txBuilder, datums, outputs } = initializeTx();
+    const utxos = seller.utxos.map((utxo) =>
+      Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
+    );
 
-  const lockAssetDatum = serializeSale(datum);
-  datums.add(lockAssetDatum);
+    const lockAssetDatum = serializeSale(datum);
+    datums.add(lockAssetDatum);
 
-  outputs.add(
-    createTxOutput(
-      contractAddress(),
-      assetsToValue([
-        {
-          unit: `${datum.cs}${datum.tn}`,
-          quantity: "1",
-        },
-        { unit: "lovelace", quantity: "2000000" },
-      ]),
-      { datum: lockAssetDatum }
-    )
-  );
+    outputs.add(
+      createTxOutput(
+        contractAddress(),
+        assetsToValue([
+          {
+            unit: `${datum.cs}${datum.tn}`,
+            quantity: "1",
+          },
+          { unit: "lovelace", quantity: "2000000" },
+        ]),
+        { datum: lockAssetDatum }
+      )
+    );
 
-  const datumHash = toHex(
-    Cardano.Instance.hash_plutus_data(lockAssetDatum).to_bytes()
-  );
-  const txHash = await finalizeTx({
-    txBuilder,
-    datums,
-    utxos,
-    outputs,
-    changeAddress: seller.address,
-    metadata: deserializeSale(lockAssetDatum),
-  });
-  return {
-    datumHash,
-    txHash,
-  };
+    const datumHash = toHex(
+      Cardano.Instance.hash_plutus_data(lockAssetDatum).to_bytes()
+    );
+    const txHash = await finalizeTx({
+      txBuilder,
+      datums,
+      utxos,
+      outputs,
+      changeAddress: seller.address,
+      metadata: deserializeSale(lockAssetDatum),
+    });
+    return {
+      datumHash,
+      txHash,
+    };
+  } catch (error) {
+    handleError(error, "listAsset");
+  }
 };
 
 export const updateListing = async (
@@ -60,49 +63,51 @@ export const updateListing = async (
   seller: { address: BaseAddress, utxos: [] },
   assetUtxo
 ) => {
-  const { txBuilder, datums, outputs } = initializeTx();
+  try {
+    const { txBuilder, datums, outputs } = initializeTx();
 
-  const utxos = seller.utxos.map((utxo) =>
-    Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
-  );
+    const utxos = seller.utxos.map((utxo) =>
+      Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
+    );
 
-  const currentListingDatum = serializeSale(currentDatum);
-  datums.add(currentListingDatum);
+    const currentListingDatum = serializeSale(currentDatum);
+    datums.add(currentListingDatum);
 
-  const newListingDatum = serializeSale(newDatum);
-  datums.add(newListingDatum);
+    const newListingDatum = serializeSale(newDatum);
+    datums.add(newListingDatum);
 
-  outputs.add(
-    createTxOutput(
-      contractAddress(),
-      createTxUnspentOutput(contractAddress(), assetUtxo).output().amount(),
-      { datum: newListingDatum }
-    )
-  );
+    outputs.add(
+      createTxOutput(contractAddress(), assetUtxo.output().amount(), {
+        datum: newListingDatum,
+      })
+    );
 
-  const requiredSigners = Cardano.Instance.Ed25519KeyHashes.new();
-  requiredSigners.add(seller.address.payment_cred().to_keyhash());
-  txBuilder.set_required_signers(requiredSigners);
+    const requiredSigners = Cardano.Instance.Ed25519KeyHashes.new();
+    requiredSigners.add(seller.address.payment_cred().to_keyhash());
+    txBuilder.set_required_signers(requiredSigners);
 
-  const datumHash = toHex(
-    Cardano.Instance.hash_plutus_data(newListingDatum).to_bytes()
-  );
+    const datumHash = toHex(
+      Cardano.Instance.hash_plutus_data(newListingDatum).to_bytes()
+    );
 
-  const txHash = await finalizeTx({
-    txBuilder,
-    datums,
-    utxos,
-    outputs,
-    changeAddress: seller.address,
-    scriptUtxo: createTxUnspentOutput(contractAddress(), assetUtxo),
-    plutusScripts: contractScripts(),
-    action: UPDATE,
-  });
+    const txHash = await finalizeTx({
+      txBuilder,
+      datums,
+      utxos,
+      outputs,
+      changeAddress: seller.address,
+      scriptUtxo: assetUtxo,
+      plutusScripts: contractScripts(),
+      action: UPDATE,
+    });
 
-  return {
-    datumHash,
-    txHash,
-  };
+    return {
+      datumHash,
+      txHash,
+    };
+  } catch (error) {
+    handleError(error, "updateListing");
+  }
 };
 
 export const cancelListing = async (
@@ -110,38 +115,39 @@ export const cancelListing = async (
   seller: { address: BaseAddress, utxos: [] },
   assetUtxo
 ) => {
-  const { txBuilder, datums, outputs } = initializeTx();
+  try {
+    const { txBuilder, datums, outputs } = initializeTx();
 
-  const utxos = seller.utxos.map((utxo) =>
-    Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
-  );
+    const utxos = seller.utxos.map((utxo) =>
+      Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
+    );
 
-  const cancelListingDatum = serializeSale(datum);
-  datums.add(cancelListingDatum);
+    const cancelListingDatum = serializeSale(datum);
+    datums.add(cancelListingDatum);
 
-  outputs.add(
-    createTxOutput(
-      seller.address.to_address(),
-      createTxUnspentOutput(contractAddress(), assetUtxo).output().amount()
-    )
-  );
+    outputs.add(
+      createTxOutput(seller.address.to_address(), assetUtxo.output().amount())
+    );
 
-  const requiredSigners = Cardano.Instance.Ed25519KeyHashes.new();
-  requiredSigners.add(seller.address.payment_cred().to_keyhash());
-  txBuilder.set_required_signers(requiredSigners);
+    const requiredSigners = Cardano.Instance.Ed25519KeyHashes.new();
+    requiredSigners.add(seller.address.payment_cred().to_keyhash());
+    txBuilder.set_required_signers(requiredSigners);
 
-  const txHash = await finalizeTx({
-    txBuilder,
-    datums,
-    utxos,
-    outputs,
-    changeAddress: seller.address,
-    scriptUtxo: createTxUnspentOutput(contractAddress(), assetUtxo),
-    plutusScripts: contractScripts(),
-    action: CANCEL,
-  });
+    const txHash = await finalizeTx({
+      txBuilder,
+      datums,
+      utxos,
+      outputs,
+      changeAddress: seller.address,
+      scriptUtxo: assetUtxo,
+      plutusScripts: contractScripts(),
+      action: CANCEL,
+    });
 
-  return txHash;
+    return txHash;
+  } catch (error) {
+    handleError(error, "cancelListing");
+  }
 };
 
 export const purchaseAsset = async (
@@ -154,47 +160,68 @@ export const purchaseAsset = async (
   },
   assetUtxo
 ) => {
-  const { txBuilder, datums, outputs } = initializeTx();
+  try {
+    const { txBuilder, datums, outputs } = initializeTx();
 
-  const utxos = buyer.utxos.map((utxo) =>
-    Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
-  );
+    const utxos = buyer.utxos.map((utxo) =>
+      Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
+    );
 
-  const purchaseAssetDatum = serializeSale(datum);
-  datums.add(purchaseAssetDatum);
+    const purchaseAssetDatum = serializeSale(datum);
+    datums.add(purchaseAssetDatum);
 
-  outputs.add(
-    createTxOutput(
-      buyer.address.to_address(),
-      createTxUnspentOutput(contractAddress(), assetUtxo).output().amount()
-    )
-  );
+    outputs.add(
+      createTxOutput(buyer.address.to_address(), assetUtxo.output().amount())
+    );
 
-  splitAmount(
-    beneficiaries,
-    {
-      price: datum.price,
-      royalties: datum.rp,
-    },
-    outputs
-  );
+    splitAmount(
+      beneficiaries,
+      {
+        price: datum.price,
+        royalties: datum.rp,
+      },
+      outputs
+    );
 
-  const requiredSigners = Cardano.Instance.Ed25519KeyHashes.new();
-  requiredSigners.add(buyer.address.payment_cred().to_keyhash());
-  txBuilder.set_required_signers(requiredSigners);
+    const requiredSigners = Cardano.Instance.Ed25519KeyHashes.new();
+    requiredSigners.add(buyer.address.payment_cred().to_keyhash());
+    txBuilder.set_required_signers(requiredSigners);
 
-  const txHash = await finalizeTx({
-    txBuilder,
-    utxos,
-    outputs,
-    datums,
-    changeAddress: buyer.address,
-    scriptUtxo: createTxUnspentOutput(contractAddress(), assetUtxo),
-    plutusScripts: contractScripts(),
-    action: BUY,
-  });
+    const txHash = await finalizeTx({
+      txBuilder,
+      utxos,
+      outputs,
+      datums,
+      changeAddress: buyer.address,
+      scriptUtxo: assetUtxo,
+      plutusScripts: contractScripts(),
+      action: BUY,
+    });
 
-  return txHash;
+    return txHash;
+  } catch (error) {
+    handleError(error, "purchaseAsset");
+  }
+};
+
+const handleError = (error, source) => {
+  console.error(`Unexpected error in ${source}. [Message: ${error.message}]`);
+
+  switch (error.message) {
+    case "INPUT_LIMIT_EXCEEDED":
+      throw new Error("TRANSACTION_FAILED_SO_MANY_UTXOS");
+    case "INPUTS_EXHAUSTED":
+      throw new Error("TRANSACTION_FAILED_NOT_ENOUGH_FUNDS");
+    case "MIN_UTXO_ERROR":
+      throw new Error("TRANSACTION_FAILED_CHANGE_TOO_SMALL");
+    case "MAX_SIZE_REACHED":
+      throw new Error("TRANSACTION_FAILED_MAX_TX_SIZE_REACHED");
+    default:
+      if (error.message.search("OutputTooSmallUTxO") !== -1) {
+        throw new Error("TRANSACTION_FAILED_ASSET_NOT_SPENDABLE");
+      }
+      throw error;
+  }
 };
 
 const splitAmount = (

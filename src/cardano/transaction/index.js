@@ -21,14 +21,12 @@ export const assetsToValue = (assets) => {
     const assetsValue = Cardano.Instance.Assets.new();
     policyAssets.forEach((asset) => {
       assetsValue.insert(
-        Cardano.Instance.AssetName.new(
-          Buffer.from(asset.unit.slice(56), "hex")
-        ),
+        Cardano.Instance.AssetName.new(fromHex(asset.unit.slice(56))),
         Cardano.Instance.BigNum.from_str(asset.quantity)
       );
     });
     multiAsset.insert(
-      Cardano.Instance.ScriptHash.from_bytes(Buffer.from(policy, "hex")),
+      Cardano.Instance.ScriptHash.from_bytes(fromHex(policy)),
       assetsValue
     );
   });
@@ -56,7 +54,7 @@ export const initializeTx = () => {
     Parameters.maxTxSize,
     Parameters.priceMem,
     Parameters.priceStep,
-    Cardano.Instance.LanguageViews.new(Buffer.from(languageViews, "hex"))
+    Cardano.Instance.LanguageViews.new(fromHex(languageViews))
   );
 
   const datums = Cardano.Instance.PlutusList.new();
@@ -136,7 +134,7 @@ export const finalizeTx = async ({
     aux_data = Cardano.Instance.AuxiliaryData.new();
     const generalMetadata = Cardano.Instance.GeneralTransactionMetadata.new();
     generalMetadata.insert(
-      Cardano.Instance.BigNum.from_str("001"),
+      Cardano.Instance.BigNum.from_str("100"),
       Cardano.Instance.encode_json_str_to_metadatum(JSON.stringify(metadata), 1)
     );
 
@@ -234,17 +232,15 @@ export const finalizeTx = async ({
 };
 
 export const createTxOutput = (address, value, { datum } = {}) => {
-  const v = value;
-
   const minAda = Cardano.Instance.min_ada_required(
-    v,
+    value,
     Cardano.Instance.BigNum.from_str(getProtocolParameters().minUtxo),
     datum && Cardano.Instance.hash_plutus_data(datum)
   );
 
-  if (minAda.compare(v.coin()) === 1) v.set_coin(minAda);
+  if (minAda.compare(value.coin()) === 1) value.set_coin(minAda);
 
-  const output = Cardano.Instance.TransactionOutput.new(address, v);
+  const output = Cardano.Instance.TransactionOutput.new(address, value);
 
   if (datum) {
     output.set_data_hash(Cardano.Instance.hash_plutus_data(datum));
@@ -253,6 +249,9 @@ export const createTxOutput = (address, value, { datum } = {}) => {
   return output;
 };
 
+/**
+ * @throws COULD_NOT_CREATE_TRANSACTION_UNSPENT_OUTPUT
+ */
 export const createTxUnspentOutput = (address, utxo) => {
   try {
     return Cardano.Instance.TransactionUnspentOutput.new(
@@ -269,9 +268,13 @@ export const createTxUnspentOutput = (address, utxo) => {
     console.error(
       `Unexpected error in createTxUnspentOutput. [Message: ${error.message}]`
     );
+    throw new Error("COULD_NOT_CREATE_TRANSACTION_UNSPENT_OUTPUT");
   }
 };
 
+/**
+ * @throws COULD_NOT_GET_TRANSACTION_UNSPENT_OUTPUT
+ */
 export const getTxUnspentOutput = (hexEncodedBytes) => {
   try {
     return Cardano.Instance.TransactionUnspentOutput.from_bytes(
@@ -281,23 +284,7 @@ export const getTxUnspentOutput = (hexEncodedBytes) => {
     console.error(
       `Unexpected error in getTxUnspentOutput. [Message: ${error.message}]`
     );
-  }
-};
-
-export const getTxUnspentOutputHash = async (hexEncodedBytes) => {
-  try {
-    return toHex(
-      Cardano.Instance.TransactionUnspentOutput.from_bytes(
-        fromHex(hexEncodedBytes)
-      )
-        .input()
-        .transaction_id()
-        .to_bytes()
-    );
-  } catch (error) {
-    console.error(
-      `Unexpected error in getTxUnspentOutputHash. [Message: ${error.message}]`
-    );
+    throw new Error("COULD_NOT_GET_TRANSACTION_UNSPENT_OUTPUT");
   }
 };
 
@@ -313,9 +300,7 @@ export const valueToAssets = (value) => {
       for (let k = 0; k < assetNames.len(); k++) {
         const policyAsset = assetNames.get(k);
         const quantity = policyAssets.get(policyAsset);
-        const asset =
-          Buffer.from(policy.to_bytes(), "hex").toString("hex") +
-          Buffer.from(policyAsset.name(), "hex").toString("hex");
+        const asset = toHex(policy.to_bytes()) + toHex(policyAsset.name());
         assets.push({
           unit: asset,
           quantity: quantity.to_str(),

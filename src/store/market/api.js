@@ -4,8 +4,9 @@ import {
   cancelListing,
   purchaseAsset,
 } from "../../cardano/market-contract/";
-import { getUsedAddress, getUtxos } from "../../cardano/wallet";
 import { contractAddress } from "../../cardano/market-contract/validator";
+import { createTxUnspentOutput } from "../../cardano/transaction";
+import { getUsedAddress, getUtxos } from "../../cardano/wallet";
 import { getLockedUtxosByAsset } from "../../cardano/blockfrost-api";
 
 import {
@@ -35,16 +36,12 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
     const assetOld = await getAsset(asset.details.asset);
+    const collectionDetails = await getCollection(assetOld.details.policyId);
     const walletAddress = await getUsedAddress();
     const walletUtxos = await getUtxos();
-    const collectionDetails = await getCollection(assetOld.details.policyId);
 
-    let royaltiesAddress = walletAddress;
-    let royaltiesPercentage = 0;
-    if (collectionDetails.royalties) {
-      royaltiesAddress = collectionDetails.royalties.address;
-      royaltiesPercentage = collectionDetails.royalties.percentage;
-    }
+    const royaltiesAddress = collectionDetails?.royalties?.address ?? walletAddress;
+    const royaltiesPercentage = collectionDetails?.royalties?.percentage ?? 0;
 
     const datum = createDatum(
       assetOld.details.assetName,
@@ -134,7 +131,7 @@ export const updateToken = (asset, newPrice, callback) => async (dispatch) => {
           address: fromBech32(walletAddress),
           utxos: walletUtxos,
         },
-        assetUtxo
+        createTxUnspentOutput(contractAddress(), assetUtxo)
       );
 
       if (updateObj && updateObj.datumHash && updateObj.txHash) {
@@ -209,7 +206,7 @@ export const delistToken = (asset, callback) => async (dispatch) => {
           address: fromBech32(walletAddress),
           utxos: walletUtxos,
         },
-        assetUtxo
+        createTxUnspentOutput(contractAddress(), assetUtxo)
       );
 
       if (txHash) {
@@ -289,7 +286,7 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
           ),
           // ----------------------------------------
         },
-        assetUtxo
+        createTxUnspentOutput(contractAddress(), assetUtxo)
       );
 
       if (txHash) {
