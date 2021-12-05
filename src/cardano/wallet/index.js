@@ -1,5 +1,5 @@
 import Cardano from "../serialization-lib";
-import { getTxUnspentOutput, valueToAssets } from "../transaction";
+import { serializeTxUnspentOutput, valueToAssets } from "../transaction";
 import { fromHex } from "../../utils";
 
 export const getBalance = async () => {
@@ -19,7 +19,7 @@ export const getOwnedAssets = async () => {
   const utxos = await getUtxos();
 
   const ownedAssets = utxos
-    .map((utxo) => getTxUnspentOutput(utxo).output())
+    .map((utxo) => serializeTxUnspentOutput(utxo).output())
     .filter(
       (txOut) =>
         txOut.amount().multiasset() !== undefined &&

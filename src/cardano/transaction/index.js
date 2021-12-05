@@ -1,5 +1,6 @@
 import Cardano from "../serialization-lib";
 import CoinSelection from "./coinSelection";
+import ErrorTypes from "./error.types";
 import { languageViews } from "./languageViews";
 import { getCollateral, signTx, submitTx } from "../wallet";
 import { fromHex, toHex } from "../../utils";
@@ -211,7 +212,7 @@ export const finalizeTx = async ({
   );
 
   const size = tx.to_bytes().length * 2;
-  if (size > Parameters.maxTxSize) throw new Error("MAX_SIZE_REACHED");
+  if (size > Parameters.maxTxSize) throw new Error(ErrorTypes.MAX_SIZE_REACHED);
 
   let txVkeyWitnesses = await signTx(toHex(tx.to_bytes()), true);
   txVkeyWitnesses = Cardano.Instance.TransactionWitnessSet.from_bytes(
@@ -268,23 +269,23 @@ export const createTxUnspentOutput = (address, utxo) => {
     console.error(
       `Unexpected error in createTxUnspentOutput. [Message: ${error.message}]`
     );
-    throw new Error("COULD_NOT_CREATE_TRANSACTION_UNSPENT_OUTPUT");
+    throw new Error(ErrorTypes.COULD_NOT_CREATE_TRANSACTION_UNSPENT_OUTPUT);
   }
 };
 
 /**
- * @throws COULD_NOT_GET_TRANSACTION_UNSPENT_OUTPUT
+ * @throws COULD_NOT_SERIALIZE_TRANSACTION_UNSPENT_OUTPUT
  */
-export const getTxUnspentOutput = (hexEncodedBytes) => {
+export const serializeTxUnspentOutput = (hexEncodedBytes) => {
   try {
     return Cardano.Instance.TransactionUnspentOutput.from_bytes(
       fromHex(hexEncodedBytes)
     );
   } catch (error) {
     console.error(
-      `Unexpected error in getTxUnspentOutput. [Message: ${error.message}]`
+      `Unexpected error in serializeTxUnspentOutput. [Message: ${error.message}]`
     );
-    throw new Error("COULD_NOT_GET_TRANSACTION_UNSPENT_OUTPUT");
+    throw new Error(ErrorTypes.COULD_NOT_SERIALIZE_TRANSACTION_UNSPENT_OUTPUT);
   }
 };
 

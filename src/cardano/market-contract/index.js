@@ -1,4 +1,5 @@
 import Cardano from "../serialization-lib";
+import ErrorTypes from "./error.types";
 import { serializeSale, deserializeSale } from "./datums";
 import { BUY, CANCEL, UPDATE } from "./redeemers";
 import { contractAddress, contractScripts } from "./validator";
@@ -209,16 +210,16 @@ const handleError = (error, source) => {
 
   switch (error.message) {
     case "INPUT_LIMIT_EXCEEDED":
-      throw new Error("TRANSACTION_FAILED_SO_MANY_UTXOS");
+      throw new Error(ErrorTypes.TRANSACTION_FAILED_SO_MANY_UTXOS);
     case "INPUTS_EXHAUSTED":
-      throw new Error("TRANSACTION_FAILED_NOT_ENOUGH_FUNDS");
+      throw new Error(ErrorTypes.TRANSACTION_FAILED_NOT_ENOUGH_FUNDS);
     case "MIN_UTXO_ERROR":
-      throw new Error("TRANSACTION_FAILED_CHANGE_TOO_SMALL");
+      throw new Error(ErrorTypes.TRANSACTION_FAILED_CHANGE_TOO_SMALL);
     case "MAX_SIZE_REACHED":
-      throw new Error("TRANSACTION_FAILED_MAX_TX_SIZE_REACHED");
+      throw new Error(ErrorTypes.TRANSACTION_FAILED_MAX_TX_SIZE_REACHED);
     default:
       if (error.message.search("OutputTooSmallUTxO") !== -1) {
-        throw new Error("TRANSACTION_FAILED_ASSET_NOT_SPENDABLE");
+        throw new Error(ErrorTypes.TRANSACTION_FAILED_ASSET_NOT_SPENDABLE);
       }
       throw error;
   }

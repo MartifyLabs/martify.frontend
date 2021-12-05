@@ -1,3 +1,4 @@
+import ErrorTypes from "./error.types";
 import { apiKey, cardanoUrl } from "../../config";
 import { fromHex, toString } from "../../utils";
 
@@ -29,7 +30,7 @@ export const getAssetDetails = async (asset) => {
     console.error(
       `Unexpected error in getAssetDetails. [Message: ${error.message}]`
     );
-    throw new Error("COULD_NOT_FETCH_ASSET_DETAILS");
+    throw new Error(ErrorTypes.COULD_NOT_FETCH_ASSET_DETAILS);
   }
 };
 
@@ -48,7 +49,7 @@ export const getAssetTransactions = async (
     console.error(
       `Unexpected error in getAssetTransactions. [Message: ${error.message}]`
     );
-    throw new Error("COULD_NOT_FETCH_ASSET_TRANSACTIONS");
+    throw new Error(ErrorTypes.COULD_NOT_FETCH_ASSET_TRANSACTIONS);
   }
 };
 
@@ -68,7 +69,7 @@ export const getLockedUtxos = async (
     console.error(
       `Unexpected error in getLockedUtxos. [Message: ${error.message}]`
     );
-    throw new Error("COULD_NOT_FETCH_ADDRESS_UTXOS");
+    throw new Error(ErrorTypes.COULD_NOT_FETCH_ADDRESS_UTXOS);
   }
 };
 
@@ -84,7 +85,7 @@ export const getLockedUtxosByAsset = async (address, asset) => {
     console.error(
       `Unexpected error in getLockedUtxosByAsset. [Message: ${error.message}]`
     );
-    throw new Error("COULD_NOT_FETCH_ASSET_UTXOS");
+    throw new Error(ErrorTypes.COULD_NOT_FETCH_ASSET_UTXOS);
   }
 };
 
@@ -107,7 +108,7 @@ export const getMintedAssets = async (
     console.error(
       `Unexpected error in getMintedAssets. [Message: ${error.message}]`
     );
-    throw new Error("COULD_NOT_FETCH_MINTED_ASSETS");
+    throw new Error(ErrorTypes.COULD_NOT_FETCH_MINTED_ASSETS);
   }
 };
 
@@ -121,7 +122,7 @@ export const getTxMetadata = async (hash) => {
     console.error(
       `Unexpected error in getTxMetadata. [Message: ${error.message}]`
     );
-    throw new Error("COULD_NOT_FETCH_TRANSACTION_METADATA");
+    throw new Error(ErrorTypes.COULD_NOT_FETCH_TRANSACTION_METADATA);
   }
 };
 
@@ -141,7 +142,7 @@ export const getTxUtxos = async (hash) => {
     console.error(
       `Unexpected error in getTxUtxos. [Message: ${error.message}]`
     );
-    throw new Error("COULD_NOT_FETCH_TRANSACTION_UTXOS");
+    throw new Error(ErrorTypes.COULD_NOT_FETCH_TRANSACTION_UTXOS);
   }
 };
 
@@ -169,7 +170,7 @@ export const getProtocolParameters = async () => {
     console.error(
       `Unexpected error in getProtocolParameters. [Message: ${error.message}]`
     );
-    throw new Error("COULD_NOT_FETCH_PROTOCOL_PARAMETERS");
+    throw new Error(ErrorTypes.COULD_NOT_FETCH_PROTOCOL_PARAMETERS);
   }
 };
 
