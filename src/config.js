@@ -1,5 +1,4 @@
 /* development */
-export const api_host = "http://localhost:4000";
 export const apiKey = process.env.REACT_APP_BLOCKFROST_API_KEY;
 export const cardanoUrl = process.env.REACT_APP_BLOCKFROST_API_URL;
 export const nami_network = parseInt(process.env.REACT_APP_CARDANO_NETWORK_ID);

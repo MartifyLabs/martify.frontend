@@ -1,9 +1,7 @@
-import cbor from "cbor";
 import Cardano from "../../cardano/serialization-lib";
 import {
   getNetworkId,
   getOwnedAssets,
-  signTx,
   getUsedAddress,
   getCollateral,
 } from "../../cardano/wallet";
@@ -18,53 +16,8 @@ import {
   setWalletData,
 } from "./walletActions";
 
-import { api_host, nami_network } from "../../config";
+import { nami_network } from "../../config";
 
-/////////
-
-const convertCbor = (txRaw) => {
-  const decoded = cbor.decode(txRaw);
-  decoded.splice(1, 1, new Map());
-  return Buffer.from(cbor.encode(decoded), "hex").toString("hex");
-};
-
-function buf2hex(buffer) {
-  return [...new Uint8Array(buffer)]
-    .map((x) => x.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-function receive_txn_for_user_sign(res, callback) {
-  let cbor_from_tx = res["txhash"];
-  // let address = res["address"];
-
-  var convertedcborHex = convertCbor(cbor_from_tx);
-
-  signTx(convertedcborHex)
-    .then((signedTx) => {
-      const decoded_complete = cbor.decode(convertedcborHex);
-      const decoded_signed = cbor.decode(signedTx);
-      decoded_complete.splice(1, 1, decoded_signed);
-      const encoded_final = cbor.encode(decoded_complete);
-      const submitTx = buf2hex(encoded_final);
-
-      submitTx(submitTx)
-        .then((txn) => {
-          // TODO: after successful payment, do what?
-          callback({ success: true, txn: txn });
-        })
-        .catch((error) => {
-          console.log(error);
-          callback({ success: false, error: error });
-        });
-    })
-    .catch((error) => {
-      console.log(error);
-      callback({ success: false, error: error });
-    });
-}
-
-/////////
 
 export const connectWallet = (current_wallet, is_silent, callback) => async (dispatch) => {
   try {
@@ -126,69 +79,6 @@ export const connectWallet = (current_wallet, is_silent, callback) => async (dis
       });
   } catch (err) {
     dispatch(setWalletLoading(false));
-    callback({ success: false, error: err });
-  }
-};
-
-export const buyer_pay = (send_addr, callback) => async (dispatch) => {
-  try {
-    window.cardano.enable().then((namiIsEnabled) => {
-      if (namiIsEnabled && send_addr) {
-        fetch(api_host + "/buyer_pay", {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            address: send_addr,
-          }),
-        })
-          .then((res) => res.json())
-          .then(
-            (res) => {
-              console.log(res);
-            },
-            (error) => {
-              console.log(error);
-            }
-          );
-      }
-    });
-  } catch (err) {
-    console.log({ err });
-    callback({ success: false, error: err });
-  }
-};
-
-export const create_txn = (send_addr, amount, callback) => async (dispatch) => {
-  try {
-    window.cardano.enable().then((namiIsEnabled) => {
-      if (namiIsEnabled && send_addr && amount >= 2) {
-        fetch(api_host + "/create_txn", {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            address: send_addr,
-            amount: amount,
-          }),
-        })
-          .then((res) => res.json())
-          .then(
-            (res) => {
-              receive_txn_for_user_sign(res, callback);
-            },
-            (error) => {
-              console.log(error);
-            }
-          );
-      }
-    });
-  } catch (err) {
-    console.log({ err });
     callback({ success: false, error: err });
   }
 };

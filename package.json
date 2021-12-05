@@ -9,7 +9,6 @@
     "@fortawesome/fontawesome-free": "^5.15.4",
     "bulma-checkradio": "^2.1.2",
     "bulma-extensions": "^6.2.7",
-    "cbor": "^8.0.0",
     "firebase": "^9.2.0",
     "font-awesome": "^4.7.0",
     "fuse.js": "^6.4.6",
