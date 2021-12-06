@@ -149,7 +149,7 @@ export const listToken = (wallet, asset, price, callback) => async (dispatch) =>
         wallet.data.address
       );
 
-      const updatedWallet = await listWalletAsset(wallet, assetNew, event);
+      const updatedWallet = await listWalletAsset(wallet.data, assetNew, event);
 
       const output = {
         policy_id: assetNew.details.policyId,
@@ -224,7 +224,7 @@ export const relistToken = (wallet, asset, newPrice, callback) => async (dispatc
           wallet.data.address
         );
 
-        const updatedWallet = await relistWalletAsset(wallet, assetNew, event);
+        const updatedWallet = await relistWalletAsset(wallet.data, assetNew, event);
 
         const output = {
           policy_id: asset.details.policyId,
@@ -293,7 +293,7 @@ export const delistToken = (wallet, asset, callback) => async (dispatch) => {
           wallet.data.address
         );
 
-        const updatedWallet = await delistWalletAsset(wallet, assetNew, event);
+        const updatedWallet = await delistWalletAsset(wallet.data, assetNew, event);
 
         const output = {
           policy_id: assetNew.details.policyId,
