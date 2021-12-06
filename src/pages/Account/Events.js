@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import Moment from 'react-moment';
 import { Link } from "react-router-dom";
 import { urls } from "../../config";
-import { MARKET_TYPE } from "../../store/market/marketTypes";
+import { MARKET_TYPE } from "../../store/wallet/walletTypes";
 import { fromLovelace } from "../../utils";
 import { get_assets } from "../../store/collection/api";
 

@@ -1,7 +1,0 @@
-export const MARKET_TYPE = {
-  'NEW_LISTING': 'NEW_LISTING',
-  'PRICE_UPDATE': 'PRICE_UPDATE',
-  'DELIST': 'DELIST',
-  'PURCHASE': 'PURCHASE',
-  'SOLD': 'SOLD',
-}

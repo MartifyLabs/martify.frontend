@@ -6,9 +6,8 @@ import Moment from 'react-moment';
 
 import { urls } from "../../config";
 import { load_collection, get_asset, asset_add_offer, opencnft_get_asset_tx } from "../../store/collection/api";
-import { listToken, updateToken, delistToken, purchaseToken } from "../../store/market/api";
-import { WALLET_STATE } from "../../store/wallet/walletTypes";
-import { MARKET_TYPE } from "../../store/market/marketTypes";
+import { listToken, relistToken, delistToken, purchaseToken } from "../../store/wallet/api";
+import { WALLET_STATE, MARKET_TYPE } from "../../store/wallet/walletTypes";
 
 import CollectionAbout from "../../components/CollectionAbout";
 import CollectionBanner from "../../components/CollectionBanner";
@@ -989,7 +988,7 @@ function mapDispatchToProps(dispatch) {
     load_collection: (callback) => dispatch(load_collection(callback)),
     get_asset: (asset_id, callback) => dispatch(get_asset(asset_id, callback)),
     list_token: (asset, price, callback) => dispatch(listToken(asset, price, callback)),
-    update_token: (asset, price, callback) => dispatch(updateToken(asset, price, callback)),
+    update_token: (asset, price, callback) => dispatch(relistToken(asset, price, callback)),
     delist_token: (asset, callback) => dispatch(delistToken(asset, callback)),
     purchase_token: (asset, callback) => dispatch(purchaseToken(asset, callback)),
     asset_add_offer: (asset_id, price, callback) => dispatch(asset_add_offer(asset_id, price, callback)),

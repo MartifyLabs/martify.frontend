@@ -3,10 +3,10 @@ import { compose } from "redux";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
-import { connectWallet, get_wallet_assets } from "../../store/wallet/api";
+import { connectWallet, getWalletAssets } from "../../store/wallet/api";
 import { WALLET_STATE } from "../../store/wallet/walletTypes";
 
-const ButtonConnect = ({state_wallet, connectWallet, get_wallet_assets}) => {
+const ButtonConnect = ({state_wallet, connectWallet, getWalletAssets}) => {
 
   const [showNotification, setShowNotification] = useState(false);
   const [showNotificationMessage, setShowNotificationMessage] = useState(false);
@@ -14,8 +14,8 @@ const ButtonConnect = ({state_wallet, connectWallet, get_wallet_assets}) => {
 
   function reconnect_wallet(){
     const timer = setTimeout(() => {
-      connectWallet(state_wallet, true, (res) => {
-        // get_wallet_assets((res) => {
+      connectWallet(true, (res) => {
+        // getWalletAssets((res) => {
           reconnect_wallet();
         // });
       });
@@ -24,7 +24,7 @@ const ButtonConnect = ({state_wallet, connectWallet, get_wallet_assets}) => {
   }
 
   function connect_wallet(){
-    connectWallet(state_wallet, false, (res) => {
+    connectWallet(false, (res) => {
       if(!res.success){
         setShowNotificationMessage(res.msg);
       }else{
@@ -43,7 +43,7 @@ const ButtonConnect = ({state_wallet, connectWallet, get_wallet_assets}) => {
 
     if(state_wallet.connected && !state_wallet.loading && !state_wallet.loaded_assets){
       setlistCurrentUtxos(state_wallet.data.utxos);
-      get_wallet_assets((res) => {});
+      getWalletAssets(state_wallet, (res) => {});
     }
 
     // if(state_wallet.connected && !state_wallet.loading && state_wallet.loaded_assets){
@@ -63,7 +63,7 @@ const ButtonConnect = ({state_wallet, connectWallet, get_wallet_assets}) => {
     //   }
 
     //   if(get_latest){
-    //     get_wallet_assets((res) => {
+    //     getWalletAssets((res) => {
     //       setlistCurrentUtxos(state_wallet.data.utxos);
     //     });
     //   }
@@ -138,8 +138,8 @@ function mapStateToProps(state, props) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    connectWallet: (wallet, is_silent, callback) => dispatch(connectWallet(wallet, is_silent, callback)),
-    get_wallet_assets: (callback) => dispatch(get_wallet_assets(callback)),
+    connectWallet: (is_silent, callback) => dispatch(connectWallet(is_silent, callback)),
+    getWalletAssets: (wallet, callback) => dispatch(getWalletAssets(wallet, callback)),
   };
 }
 

@@ -1,137 +1,429 @@
 import Cardano from "../../cardano/serialization-lib";
 import {
+  enableWallet,
+  getCollateral,
   getNetworkId,
   getOwnedAssets,
   getUsedAddress,
-  getCollateral,
+  getUtxos,
 } from "../../cardano/wallet";
-
-import { getAssets } from "../../database/assets";
-import { getWallet, setWalletAssets } from "../../database/wallets";
-import { WALLET_STATE } from "./walletTypes";
-
+import {
+  getAsset,
+  getAssets,
+  lockAsset,
+  unlockAsset,
+  addAssetEvent,
+} from "../../database/assets";
+import { getCollection } from "../../database/collections";
+import {
+  getWallet,
+  addWalletEvent,
+  listWalletAsset,
+  delistWalletAsset,
+  relistWalletAsset,
+  setWalletAssets,
+} from "../../database/wallets";
+import { WALLET_STATE, MARKET_TYPE } from "./walletTypes";
 import {
   walletConnected,
   setWalletLoading,
   setWalletData,
 } from "./walletActions";
+import {
+  listAsset,
+  updateListing,
+  cancelListing,
+  purchaseAsset,
+} from "../../cardano/market-contract/";
+import { contractAddress } from "../../cardano/market-contract/validator";
+import { createTxUnspentOutput } from "../../cardano/transaction";
+import { getLockedUtxosByAsset } from "../../cardano/blockfrost-api";
+import { collections_add_tokens } from "../collection/collectionActions";
+import { fromBech32 } from "../../utils";
+import { createEvent, createDatum } from "../../utils/factory";
 
-import { nami_network } from "../../config";
-
-
-export const connectWallet = (current_wallet, is_silent, callback) => async (dispatch) => {
+export const connectWallet = (isSilent, callback) => async (dispatch) => {
   try {
-    if(!is_silent) dispatch(setWalletLoading(WALLET_STATE.CONNECTING));
+    if (!isSilent) dispatch(setWalletLoading(WALLET_STATE.CONNECTING));
 
-    window.cardano
-      .enable()
-      .then(async (res) => {
+    if (await enableWallet()) {
+      await Cardano.load();
 
-        Cardano.load().then(() => {
-          console.log("cardano-serialization-lib Loaded.");
+      const namiNetworkId = await getNetworkId();
+      const usedNetworkId = parseInt(process.env.REACT_APP_CARDANO_NETWORK_ID);
+
+      if (usedNetworkId === namiNetworkId) {
+        const connectedWallet = {
+          nami: {
+            network: namiNetworkId,
+            collateral: await getCollateral(),
+          },
+          data: await getWallet(await getUsedAddress()),
+        };
+
+        dispatch(walletConnected(connectedWallet));
+        callback({
+          success: true,
+          data: connectedWallet,
         });
-
-        let network = await getNetworkId();
-          
-        if(nami_network === network){
-
-          let connected_wallet = {
-            nami: {},
-            data: {}
-          };
-          connected_wallet.nami.network = network;
-
-          let wallet_address = await getUsedAddress();
-
-          let this_wallet = await getWallet(wallet_address);
-          connected_wallet.data = this_wallet;
-
-          connected_wallet.nami.collateral = await getCollateral();
-    
-          dispatch(walletConnected(connected_wallet));
-
-          callback({
-            success: true,
-            data: connected_wallet,
-          });
-        }
-        // if network not correct
-        else{
-          dispatch(setWalletLoading(false));
-          callback({
-            success: false,
-            msg: "Switch your Nami Wallet network."
-          });
-        }
-        
-
-        // window.cardano.getUnusedAddresses().then((res) => {
-        // })
-
-        // window.cardano.getRewardAddress().then((res) => {
-        //   dispatch(setWalletRewardAddr(res));
-        // })
-      })
-      .catch((error) => {
-        console.log("ERROR connectWallet", error);
+      } else {
         dispatch(setWalletLoading(false));
-        callback({ success: false, error: error });
-      });
-  } catch (err) {
+        callback({
+          success: false,
+          msg: "Switch your Nami Wallet network.",
+        });
+      }
+    }
+  } catch (error) {
+    console.error(
+      `Unexpected error in connectWallet. [Message: ${error.message}]`
+    );
     dispatch(setWalletLoading(false));
-    callback({ success: false, error: err });
+    callback({ success: false, error });
   }
 };
 
-export const get_wallet_assets = (callback) => async (dispatch) => {
-  // console.log("getting wallet assets", WALLET_STATE.GETTING_ASSETS);
-  dispatch(setWalletLoading(WALLET_STATE.GETTING_ASSETS));
+export const getWalletAssets = (connectedWallet, callback) => async (dispatch) => {
+  try {
+    dispatch(setWalletLoading(WALLET_STATE.GETTING_ASSETS));
 
-  let wallet_assets = await getAssets(await getOwnedAssets());
-  wallet_assets = wallet_assets.filter((asset) => {
-    return asset!==undefined
-  })
-  .map((asset) => asset);
-  // console.log("gotten wallet_assets", wallet_assets);
+    const ownedAssets = await getOwnedAssets();
+    const ownedAssetsObj = (await getAssets(ownedAssets)).reduce((map, asset) => {
+      map[asset.details.asset] = asset;
+      return map;
+    }, {});
 
-  let assets = {};
-  for(var i in wallet_assets){
-    let asset = wallet_assets[i];
-    assets[asset.details.asset] = asset;
+    const updatedWallet = await setWalletAssets(connectedWallet.data, ownedAssetsObj);
+
+    dispatch(setWalletData(updatedWallet));
+    callback({ success: true });
+  } catch (error) {
+    console.error(
+      `Unexpected error in getWalletAssets. [Message: ${error.message}]`
+    );
+    dispatch(setWalletLoading(false));
+    callback({ success: false, error });
   }
+};
 
-  let wallet_address = await getUsedAddress();
-  let wallet = await getWallet(wallet_address);
-  // console.log("wallet", wallet)
-  // for(var asset in wallet.assets){
-  //   let this_asset = wallet.assets[asset];
-  //   if(this_asset.status.locked){
-  //     assets[asset] = this_asset;
-  //   }
-  // }
-  // console.log("assets", assets)
-  let updated_wallet = await setWalletAssets(wallet, assets);
-  // console.log("updated_wallet", updated_wallet);
-  dispatch(setWalletData(updated_wallet));
+export const listToken = (asset, price, callback) => async (dispatch) => {
+  try {
+    dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
-  // var list_assets = Object.keys(wallet_assets).map(function (key) {
-  //   if(wallet_assets[key]){
-  //     return wallet_assets[key]
-  //   }
-  //   return false;
-  // });
+    const assetOld = await getAsset(asset.details.asset);
+    const collectionDetails = await getCollection(assetOld.details.policyId);
+    const walletAddress = await getUsedAddress();
+    const walletUtxos = await getUtxos();
 
-  // let wallet_assets_dictionary = {};
-  // for(var i in wallet_assets){
-  //   var this_asset = wallet_assets[i];
-  //   if(this_asset){
-  //     wallet_assets_dictionary[this_asset.details.asset] = this_asset;
-  //   }
-  // }
-  
-  // await saveAssets(list_assets);
+    const royaltiesAddress =
+      collectionDetails?.royalties?.address ?? walletAddress;
+    const royaltiesPercentage = collectionDetails?.royalties?.percentage ?? 0;
 
-  // dispatch(setWalletAssets(wallet_assets_dictionary));
-  // callback({ success: true, assets: wallet_assets_dictionary });
-  callback({ success: true });
+    const datum = createDatum(
+      assetOld.details.assetName,
+      assetOld.details.policyId,
+      walletAddress,
+      royaltiesAddress,
+      royaltiesPercentage,
+      price
+    );
+
+    const listObj = await listAsset(datum, {
+      address: fromBech32(walletAddress),
+      utxos: walletUtxos,
+    });
+
+    if (listObj && listObj.datumHash && listObj.txHash) {
+      const assetNew = await lockAsset(assetOld, {
+        datum: datum,
+        datumHash: listObj.datumHash,
+        txHash: listObj.txHash,
+        address: walletAddress,
+        artistAddress: royaltiesAddress,
+        contractAddress: contractAddress().to_bech32(),
+      });
+
+      const walletObj = await getWallet(walletAddress);
+
+      const event = createEvent(
+        MARKET_TYPE.NEW_LISTING,
+        datum,
+        listObj.txHash,
+        walletAddress
+      );
+
+      const updatedWallet = await listWalletAsset(walletObj, assetNew, event);
+
+      const output = {
+        policy_id: assetNew.details.policyId,
+        listing: {
+          [assetNew.details.asset]: assetNew,
+        },
+      };
+
+      dispatch(setWalletLoading(false));
+      dispatch(setWalletData(updatedWallet));
+      dispatch(collections_add_tokens(output));
+      callback({ success: true, type: MARKET_TYPE.NEW_LISTING });
+    } else {
+      console.error("List Failed...");
+      dispatch(setWalletLoading(false));
+      callback({ success: false });
+    }
+  } catch (error) {
+    console.error(`Unexpected error in listToken. [Message: ${error.message}]`);
+    dispatch(setWalletLoading(false));
+    callback({ success: false });
+  }
+};
+
+export const relistToken = (asset, newPrice, callback) => async (dispatch) => {
+  try {
+    dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
+
+    const assetOld = await getAsset(asset.details.asset);
+    const walletAddress = await getUsedAddress();
+    const walletUtxos = await getUtxos();
+
+    const assetUtxo = (
+      await getLockedUtxosByAsset(
+        contractAddress().to_bech32(),
+        assetOld.details.asset
+      )
+    ).find((utxo) => utxo.data_hash === assetOld.status.datumHash);
+
+    if (assetUtxo) {
+      const datumNew = createDatum(
+        assetOld.status.datum.tn,
+        assetOld.status.datum.cs,
+        walletAddress,
+        assetOld.status.artistAddress,
+        assetOld.status.datum.rp,
+        newPrice
+      );
+      const updateObj = await updateListing(
+        assetOld.status.datum,
+        datumNew,
+        {
+          address: fromBech32(walletAddress),
+          utxos: walletUtxos,
+        },
+        createTxUnspentOutput(contractAddress(), assetUtxo)
+      );
+
+      if (updateObj && updateObj.datumHash && updateObj.txHash) {
+        const assetNew = await lockAsset(assetOld, {
+          datum: datumNew,
+          datumHash: updateObj.datumHash,
+          txHash: updateObj.txHash,
+          address: walletAddress,
+          artistAddress: assetOld.status.artistAddress,
+          contractAddress: contractAddress().to_bech32(),
+        });
+
+        const walletObj = await getWallet(walletAddress);
+
+        const event = createEvent(
+          MARKET_TYPE.PRICE_UPDATE,
+          datumNew,
+          updateObj.txHash,
+          walletAddress
+        );
+
+        const updatedWallet = await relistWalletAsset(walletObj, assetNew, event);
+
+        const output = {
+          policy_id: asset.details.policyId,
+          listing: {
+            [assetNew.details.asset]: assetNew,
+          },
+        };
+
+        dispatch(setWalletLoading(false));
+        dispatch(setWalletData(updatedWallet));
+        dispatch(collections_add_tokens(output));
+        callback({ success: true, type: MARKET_TYPE.PRICE_UPDATE });
+      } else {
+        console.error("Update Failed...");
+        dispatch(setWalletLoading(false));
+        callback({ success: false });
+      }
+    } else {
+      console.error("Update Failed, Datum Hash not matching...");
+      dispatch(setWalletLoading(false));
+      callback({ success: false });
+    }
+  } catch (error) {
+    console.error(
+      `Unexpected error in relistToken. [Message: ${error.message}]`
+    );
+    dispatch(setWalletLoading(false));
+    callback({ success: false });
+  }
+};
+
+export const delistToken = (asset, callback) => async (dispatch) => {
+  try {
+    dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
+
+    const assetOld = await getAsset(asset.details.asset);
+    const walletAddress = await getUsedAddress();
+    const walletUtxos = await getUtxos();
+
+    const assetUtxo = (
+      await getLockedUtxosByAsset(
+        contractAddress().to_bech32(),
+        assetOld.details.asset
+      )
+    ).find((utxo) => utxo.data_hash === assetOld.status.datumHash);
+
+    if (assetUtxo) {
+      const txHash = await cancelListing(
+        assetOld.status.datum,
+        {
+          address: fromBech32(walletAddress),
+          utxos: walletUtxos,
+        },
+        createTxUnspentOutput(contractAddress(), assetUtxo)
+      );
+
+      if (txHash) {
+        const assetNew = await unlockAsset(assetOld, {
+          txHash: txHash,
+          address: walletAddress,
+        });
+
+        const walletObj = await getWallet(walletAddress);
+
+        const event = createEvent(
+          MARKET_TYPE.DELIST,
+          assetOld.status.datum,
+          txHash,
+          walletAddress
+        );
+
+        const updatedWallet = await delistWalletAsset(walletObj, assetNew, event);
+
+        const output = {
+          policy_id: assetNew.details.policyId,
+          listing: {
+            [assetNew.details.asset]: assetNew,
+          },
+        };
+
+        dispatch(setWalletLoading(false));
+        dispatch(setWalletData(updatedWallet));
+        dispatch(collections_add_tokens(output));
+        callback({ success: true, type: MARKET_TYPE.DELIST });
+      } else {
+        console.error("Cancel Failed...");
+        dispatch(setWalletLoading(false));
+        callback({ success: false });
+      }
+    } else {
+      console.error("Cancel Failed, Datum Hash not matching...");
+      dispatch(setWalletLoading(false));
+      callback({ success: false });
+    }
+  } catch (error) {
+    console.error(
+      `Unexpected error in delistToken. [Message: ${error.message}]`
+    );
+    dispatch(setWalletLoading(false));
+    callback({ success: false });
+  }
+};
+
+export const purchaseToken = (asset, callback) => async (dispatch) => {
+  try {
+    dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
+
+    const assetOld = await getAsset(asset.details.asset);
+    const walletAddress = await getUsedAddress();
+    const walletUtxos = await getUtxos();
+
+    const assetUtxo = (
+      await getLockedUtxosByAsset(
+        contractAddress().to_bech32(),
+        assetOld.details.asset
+      )
+    ).find((utxo) => utxo.data_hash === assetOld.status.datumHash);
+
+    if (assetUtxo) {
+      const txHash = await purchaseAsset(
+        assetOld.status.datum,
+        {
+          address: fromBech32(walletAddress),
+          utxos: walletUtxos,
+        },
+        {
+          seller: fromBech32(assetOld.status.submittedBy),
+          artist: fromBech32(assetOld.status.artistAddress),
+          // TODO: Fetch market address
+          market: fromBech32(
+            "addr_test1qp6pykcc0kgaqj27z3jg4sjt7768p375qr8q4z3f4xdmf38skpyf2kgu5wqpnm54y5rqgee4uwyksg6eyd364qhmpwqsv2jjt3"
+          ),
+          // ----------------------------------------
+        },
+        createTxUnspentOutput(contractAddress(), assetUtxo)
+      );
+
+      if (txHash) {
+        const unlockedAsset = await unlockAsset(assetOld, {
+          txHash: txHash,
+          address: walletAddress,
+        });
+
+        const buyerWalletObj = await getWallet(walletAddress);
+
+        const event = createEvent(
+          MARKET_TYPE.PURCHASE,
+          assetOld.status.datum,
+          txHash,
+          walletAddress
+        );
+
+        await addWalletEvent(buyerWalletObj, event);
+
+        const assetNew = await addAssetEvent(unlockedAsset, event);
+
+        // Update the seller's wallet
+        const sellerWalletObj = await getWallet(assetOld.status.submittedBy);
+
+        const soldEvent = createEvent(
+          MARKET_TYPE.SOLD,
+          assetOld.status.datum,
+          txHash,
+          walletAddress
+        );
+
+        await delistWalletAsset(sellerWalletObj, assetNew, soldEvent);
+
+        const output = {
+          policy_id: asset.details.policyId,
+          listing: {
+            [assetNew.details.asset]: assetNew,
+          },
+        };
+
+        dispatch(setWalletLoading(false));
+        dispatch(collections_add_tokens(output));
+        callback({ success: true, type: MARKET_TYPE.PURCHASE });
+      } else {
+        console.error("Purchase Failed...");
+        dispatch(setWalletLoading(false));
+        callback({ success: false });
+      }
+    } else {
+      console.error("Purchase Failed, Datum Hash not matching...");
+      dispatch(setWalletLoading(false));
+      callback({ success: false });
+    }
+  } catch (error) {
+    console.error(
+      `Unexpected error in purchaseToken. [Message: ${error.message}]`
+    );
+    dispatch(setWalletLoading(false));
+    callback({ success: false });
+  }
 };

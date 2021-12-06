@@ -2,6 +2,10 @@ import Cardano from "../serialization-lib";
 import { serializeTxUnspentOutput, valueToAssets } from "../transaction";
 import { fromHex } from "../../utils";
 
+export const enableWallet = async () => {
+  return await window.cardano.enable();
+};
+
 export const getBalance = async () => {
   return await window.cardano.getBalance();
 };
