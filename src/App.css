@@ -1,14 +1,15 @@
-body{
+body {
   cursor: default;
+  font-family: "Titillium Web", sans-serif;
 }
 
-@font-face {
-  font-family: JosefinSansMediumItalic;
-  src: url(./assets/fonts/Josefin_Sans/static/JosefinSans-MediumItalic.ttf);
+button, input, optgroup, select, textarea {
+  font-family: "Titillium Web", sans-serif;
+  font-weight: 300;
 }
 
-.notification-window{
-  border-radius: .375em;
+.notification-window {
+  border-radius: 0.375em;
   bottom: 1em;
   right: 1em;
   width: 20rem;
@@ -19,20 +20,21 @@ body{
   z-index: 10;
 }
 
-.collection_logo{
+.collection_logo {
   object-fit: cover;
 }
 
-.ada_symbol{
+.ada_symbol {
   font-size: 12px;
 }
-.social-icon img{
+.social-icon img {
   /* padding: 0px; */
   width: 16px;
   height: 16px;
 }
 
-.pagination-previous, .pagination-next{
+.pagination-previous,
+.pagination-next {
   background-color: #fff;
   cursor: pointer;
 }

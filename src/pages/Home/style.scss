@@ -1,12 +1,9 @@
-
-
 // .homepage {
 //   background-color: black;
 //   // height: 100vh;
 //   // z-index: -99;
 //   // animation: shrink var(--duration) var(--delay) linear infinite;
 // }
-
 
 .homepage_gallery {
   position: absolute;
@@ -21,36 +18,35 @@
   perspective: 25rem;
 }
 
-.homepage_gallery .overlay{
+.homepage_gallery .overlay {
   height: 100%;
   width: 100%;
   position: absolute;
   z-index: 99;
 }
-.homepage_gallery .overlay_dark{
-  background: rgba(0, 0, 0, .3);
+.homepage_gallery .overlay_dark {
+  background: rgba(0, 0, 0, 0.3);
 }
 
-.homepage .slogan{
-  font-family: JosefinSansMediumItalic;
+.homepage .slogan {
   text-shadow: 1px 1px 2px grey, 0 0 1em grey, 0 0 0.2em grey;
 }
 
-.homepage .top-project-image{
+.homepage .top-project-image {
   height: 100%;
 }
 
-.homepage .top-project-name{
+.homepage .top-project-name {
   font-size: 1rem;
 }
 
-.homepage .rdt_TableRow{
+.homepage .rdt_TableRow {
   padding: 10px;
 }
 
-.top-project-title{
+.top-project-title {
   height: 36px;
-  
+
   @supports (-webkit-line-clamp: 2) {
     overflow: hidden;
     text-overflow: ellipsis;
