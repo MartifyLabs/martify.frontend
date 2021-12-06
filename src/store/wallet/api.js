@@ -83,7 +83,7 @@ export const connectWallet = (isSilent, callback) => async (dispatch) => {
   }
 };
 
-export const getWalletAssets = (connectedWallet, callback) => async (dispatch) => {
+export const getWalletAssets = (wallet, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.GETTING_ASSETS));
 
@@ -93,7 +93,7 @@ export const getWalletAssets = (connectedWallet, callback) => async (dispatch) =
       return map;
     }, {});
 
-    const updatedWallet = await setWalletAssets(connectedWallet.data, ownedAssetsObj);
+    const updatedWallet = await setWalletAssets(wallet.data, ownedAssetsObj);
 
     dispatch(setWalletData(updatedWallet));
     callback({ success: true });
@@ -106,30 +106,29 @@ export const getWalletAssets = (connectedWallet, callback) => async (dispatch) =
   }
 };
 
-export const listToken = (asset, price, callback) => async (dispatch) => {
+export const listToken = (wallet, asset, price, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
     const assetOld = await getAsset(asset.details.asset);
     const collectionDetails = await getCollection(assetOld.details.policyId);
-    const walletAddress = await getUsedAddress();
     const walletUtxos = await getUtxos();
 
     const royaltiesAddress =
-      collectionDetails?.royalties?.address ?? walletAddress;
+      collectionDetails?.royalties?.address ?? wallet.data.address;
     const royaltiesPercentage = collectionDetails?.royalties?.percentage ?? 0;
 
     const datum = createDatum(
       assetOld.details.assetName,
       assetOld.details.policyId,
-      walletAddress,
+      wallet.data.address,
       royaltiesAddress,
       royaltiesPercentage,
       price
     );
 
     const listObj = await listAsset(datum, {
-      address: fromBech32(walletAddress),
+      address: fromBech32(wallet.data.address),
       utxos: walletUtxos,
     });
 
@@ -138,21 +137,19 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
         datum: datum,
         datumHash: listObj.datumHash,
         txHash: listObj.txHash,
-        address: walletAddress,
+        address: wallet.data.address,
         artistAddress: royaltiesAddress,
         contractAddress: contractAddress().to_bech32(),
       });
-
-      const walletObj = await getWallet(walletAddress);
 
       const event = createEvent(
         MARKET_TYPE.NEW_LISTING,
         datum,
         listObj.txHash,
-        walletAddress
+        wallet.data.address
       );
 
-      const updatedWallet = await listWalletAsset(walletObj, assetNew, event);
+      const updatedWallet = await listWalletAsset(wallet, assetNew, event);
 
       const output = {
         policy_id: assetNew.details.policyId,
@@ -177,12 +174,11 @@ export const listToken = (asset, price, callback) => async (dispatch) => {
   }
 };
 
-export const relistToken = (asset, newPrice, callback) => async (dispatch) => {
+export const relistToken = (wallet, asset, newPrice, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
     const assetOld = await getAsset(asset.details.asset);
-    const walletAddress = await getUsedAddress();
     const walletUtxos = await getUtxos();
 
     const assetUtxo = (
@@ -196,7 +192,7 @@ export const relistToken = (asset, newPrice, callback) => async (dispatch) => {
       const datumNew = createDatum(
         assetOld.status.datum.tn,
         assetOld.status.datum.cs,
-        walletAddress,
+        wallet.data.address,
         assetOld.status.artistAddress,
         assetOld.status.datum.rp,
         newPrice
@@ -205,7 +201,7 @@ export const relistToken = (asset, newPrice, callback) => async (dispatch) => {
         assetOld.status.datum,
         datumNew,
         {
-          address: fromBech32(walletAddress),
+          address: fromBech32(wallet.data.address),
           utxos: walletUtxos,
         },
         createTxUnspentOutput(contractAddress(), assetUtxo)
@@ -216,21 +212,19 @@ export const relistToken = (asset, newPrice, callback) => async (dispatch) => {
           datum: datumNew,
           datumHash: updateObj.datumHash,
           txHash: updateObj.txHash,
-          address: walletAddress,
+          address: wallet.data.address,
           artistAddress: assetOld.status.artistAddress,
           contractAddress: contractAddress().to_bech32(),
         });
-
-        const walletObj = await getWallet(walletAddress);
 
         const event = createEvent(
           MARKET_TYPE.PRICE_UPDATE,
           datumNew,
           updateObj.txHash,
-          walletAddress
+          wallet.data.address
         );
 
-        const updatedWallet = await relistWalletAsset(walletObj, assetNew, event);
+        const updatedWallet = await relistWalletAsset(wallet, assetNew, event);
 
         const output = {
           policy_id: asset.details.policyId,
@@ -262,12 +256,11 @@ export const relistToken = (asset, newPrice, callback) => async (dispatch) => {
   }
 };
 
-export const delistToken = (asset, callback) => async (dispatch) => {
+export const delistToken = (wallet, asset, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
     const assetOld = await getAsset(asset.details.asset);
-    const walletAddress = await getUsedAddress();
     const walletUtxos = await getUtxos();
 
     const assetUtxo = (
@@ -281,7 +274,7 @@ export const delistToken = (asset, callback) => async (dispatch) => {
       const txHash = await cancelListing(
         assetOld.status.datum,
         {
-          address: fromBech32(walletAddress),
+          address: fromBech32(wallet.data.address),
           utxos: walletUtxos,
         },
         createTxUnspentOutput(contractAddress(), assetUtxo)
@@ -290,19 +283,17 @@ export const delistToken = (asset, callback) => async (dispatch) => {
       if (txHash) {
         const assetNew = await unlockAsset(assetOld, {
           txHash: txHash,
-          address: walletAddress,
+          address: wallet.data.address,
         });
-
-        const walletObj = await getWallet(walletAddress);
 
         const event = createEvent(
           MARKET_TYPE.DELIST,
           assetOld.status.datum,
           txHash,
-          walletAddress
+          wallet.data.address
         );
 
-        const updatedWallet = await delistWalletAsset(walletObj, assetNew, event);
+        const updatedWallet = await delistWalletAsset(wallet, assetNew, event);
 
         const output = {
           policy_id: assetNew.details.policyId,
@@ -334,12 +325,11 @@ export const delistToken = (asset, callback) => async (dispatch) => {
   }
 };
 
-export const purchaseToken = (asset, callback) => async (dispatch) => {
+export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
     const assetOld = await getAsset(asset.details.asset);
-    const walletAddress = await getUsedAddress();
     const walletUtxos = await getUtxos();
 
     const assetUtxo = (
@@ -353,7 +343,7 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
       const txHash = await purchaseAsset(
         assetOld.status.datum,
         {
-          address: fromBech32(walletAddress),
+          address: fromBech32(wallet.data.address),
           utxos: walletUtxos,
         },
         {
@@ -371,19 +361,17 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
       if (txHash) {
         const unlockedAsset = await unlockAsset(assetOld, {
           txHash: txHash,
-          address: walletAddress,
+          address: wallet.data.address,
         });
-
-        const buyerWalletObj = await getWallet(walletAddress);
 
         const event = createEvent(
           MARKET_TYPE.PURCHASE,
           assetOld.status.datum,
           txHash,
-          walletAddress
+          wallet.data.address
         );
 
-        await addWalletEvent(buyerWalletObj, event);
+        await addWalletEvent(wallet, event);
 
         const assetNew = await addAssetEvent(unlockedAsset, event);
 
@@ -394,7 +382,7 @@ export const purchaseToken = (asset, callback) => async (dispatch) => {
           MARKET_TYPE.SOLD,
           assetOld.status.datum,
           txHash,
-          walletAddress
+          wallet.data.address
         );
 
         await delistWalletAsset(sellerWalletObj, assetNew, soldEvent);

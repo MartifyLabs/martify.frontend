@@ -17,7 +17,7 @@ import { fromLovelace, get_asset_image_source } from "../../utils";
 
 import "./style.css";
 
-const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, list_token, update_token, delist_token, purchase_token, asset_add_offer, opencnft_get_asset_tx}) => {
+const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, list_token, relist_token, delist_token, purchase_token, asset_add_offer, opencnft_get_asset_tx}) => {
 
   const [asset, setAsset] = useState(false);
   const [thisCollection, setThisCollection] = useState(false);
@@ -58,7 +58,7 @@ const Asset = ({state_collection, state_wallet, policy_id, asset_id, get_asset, 
               <div className="columns">
                 <div className="column is-two-fifths">
                   <AssetImage asset={asset}/>
-                  <Listing asset={asset} state_wallet={state_wallet} list_token={list_token} update_token={update_token} delist_token={delist_token} purchase_token={purchase_token} asset_add_offer={asset_add_offer} />
+                  <Listing asset={asset} state_wallet={state_wallet} list_token={list_token} relist_token={relist_token} delist_token={delist_token} purchase_token={purchase_token} asset_add_offer={asset_add_offer} />
                 </div>
 
                 <div className="column">
@@ -168,7 +168,7 @@ const SocialLinks = ({asset}) => {
   );
 };
 
-const Listing = ({asset, state_wallet, list_token, update_token, delist_token, purchase_token, asset_add_offer}) => {
+const Listing = ({asset, state_wallet, list_token, relist_token, delist_token, purchase_token, asset_add_offer}) => {
   
   let is_owner = false;
   if(asset.details.asset in state_wallet.data.assets){
@@ -185,7 +185,7 @@ const Listing = ({asset, state_wallet, list_token, update_token, delist_token, p
   return (
     <div className="block">
       { is_owner ? 
-        <OwnerListAsset state_wallet={state_wallet} asset={asset} list_token={list_token} update_token={update_token} delist_token={delist_token} /> : 
+        <OwnerListAsset state_wallet={state_wallet} asset={asset} list_token={list_token} relist_token={relist_token} delist_token={delist_token} /> : 
         <PurchaseAsset asset={asset} asset_add_offer={asset_add_offer} state_wallet={state_wallet} purchase_token={purchase_token} /> 
       }
     </div>
@@ -216,7 +216,7 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
   }
 
   function purchase_this_token(){
-    purchase_token(asset, (res) => {
+    purchase_token(state_wallet, asset, (res) => {
       successful_transaction(res);
     });
   }
@@ -437,7 +437,7 @@ const ButtonBuy = ({state_wallet, purchase_this_token}) => {
   );
 };
 
-const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_token}) => {
+const OwnerListAsset = ({state_wallet, asset, list_token, relist_token, delist_token}) => {
 
   const [userInputAmount, setUserInputAmount] = useState("");
   const [showNotification, setShowNotification] = useState(false);
@@ -454,19 +454,19 @@ const OwnerListAsset = ({state_wallet, asset, list_token, update_token, delist_t
     }
   }
   function list_this_token(price){
-    list_token(asset, price, (res) => {
+    list_token(state_wallet, asset, price, (res) => {
       successful_transaction(res);
     });
   }
 
   function update_this_listing(price){
-    update_token(asset, price, (res) => {
+    relist_token(state_wallet, asset, price, (res) => {
       successful_transaction(res);
     });
   }
 
   function delist_this_token(){
-    delist_token(asset, (res) => {
+    delist_token(state_wallet, asset, (res) => {
       successful_transaction(res);
     });
   }
@@ -987,10 +987,10 @@ function mapDispatchToProps(dispatch) {
   return {
     load_collection: (callback) => dispatch(load_collection(callback)),
     get_asset: (asset_id, callback) => dispatch(get_asset(asset_id, callback)),
-    list_token: (asset, price, callback) => dispatch(listToken(asset, price, callback)),
-    update_token: (asset, price, callback) => dispatch(relistToken(asset, price, callback)),
-    delist_token: (asset, callback) => dispatch(delistToken(asset, callback)),
-    purchase_token: (asset, callback) => dispatch(purchaseToken(asset, callback)),
+    list_token: (wallet, asset, price, callback) => dispatch(listToken(wallet, asset, price, callback)),
+    relist_token: (wallet, asset, price, callback) => dispatch(relistToken(wallet, asset, price, callback)),
+    delist_token: (wallet, asset, callback) => dispatch(delistToken(wallet, asset, callback)),
+    purchase_token: (wallet, asset, callback) => dispatch(purchaseToken(wallet, asset, callback)),
     asset_add_offer: (asset_id, price, callback) => dispatch(asset_add_offer(asset_id, price, callback)),
     opencnft_get_asset_tx: (asset_id, callback) => dispatch(opencnft_get_asset_tx(asset_id, callback)),
   };
