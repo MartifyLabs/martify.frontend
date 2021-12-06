@@ -51,15 +51,10 @@ const Splash = ({listProjects}) => {
         <div className="hero-body">
           <div className="container">
             <div className="columns is-mobile is-multiline is-gapless">
-              <div className="column is-half is-offset-one-quarter">
-                <span className="logo-text">Martify</span>
-              </div>
+              <span className="logo-text">Martify</span>
               <div className="column is-full has-text-centered">
                 <p className="is-size-1 slogan" style={{color:"#fff", lineHeight:"1"}}>Your new CNFT marketplace.</p>
-                <p className="is-size-5" style={{color:"#fff"}}>The smoothest experience for you to buy and sell Cardano NFTs powered by smart contracts.</p>
-              </div>
-              <div className="column is-half is-offset-one-quarter">
-                <Search size="is-large" placeholder="Search NFTs by collection name or policy ID" />
+                <p className="is-size-5 slogan" style={{color:"#fff"}}>The smoothest experience for you to buy and sell Cardano NFTs powered by smart contracts.</p>
               </div>
             </div>
           </div>
