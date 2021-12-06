@@ -8,7 +8,6 @@ import {
   getUtxos,
 } from "../../cardano/wallet";
 import {
-  getAsset,
   getAssets,
   lockAsset,
   unlockAsset,
@@ -106,12 +105,12 @@ export const getWalletAssets = (wallet, callback) => async (dispatch) => {
   }
 };
 
-export const listToken = (wallet, asset, price, callback) => async (dispatch) => {
+export const listToken =
+  (wallet, asset, price, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
-    const assetOld = await getAsset(asset.details.asset);
-    const collectionDetails = await getCollection(assetOld.details.policyId);
+      const collectionDetails = await getCollection(asset.details.policyId);
     const walletUtxos = await getUtxos();
 
     const royaltiesAddress =
@@ -119,8 +118,8 @@ export const listToken = (wallet, asset, price, callback) => async (dispatch) =>
     const royaltiesPercentage = collectionDetails?.royalties?.percentage ?? 0;
 
     const datum = createDatum(
-      assetOld.details.assetName,
-      assetOld.details.policyId,
+        asset.details.assetName,
+        asset.details.policyId,
       wallet.data.address,
       royaltiesAddress,
       royaltiesPercentage,
@@ -133,7 +132,7 @@ export const listToken = (wallet, asset, price, callback) => async (dispatch) =>
     });
 
     if (listObj && listObj.datumHash && listObj.txHash) {
-      const assetNew = await lockAsset(assetOld, {
+        const updatedAsset = await lockAsset(asset, {
         datum: datum,
         datumHash: listObj.datumHash,
         txHash: listObj.txHash,
@@ -149,12 +148,16 @@ export const listToken = (wallet, asset, price, callback) => async (dispatch) =>
         wallet.data.address
       );
 
-      const updatedWallet = await listWalletAsset(wallet.data, assetNew, event);
+        const updatedWallet = await listWalletAsset(
+          wallet.data,
+          updatedAsset,
+          event
+        );
 
       const output = {
-        policy_id: assetNew.details.policyId,
+          policy_id: updatedAsset.details.policyId,
         listing: {
-          [assetNew.details.asset]: assetNew,
+            [updatedAsset.details.asset]: updatedAsset,
         },
       };
 
@@ -168,37 +171,39 @@ export const listToken = (wallet, asset, price, callback) => async (dispatch) =>
       callback({ success: false });
     }
   } catch (error) {
-    console.error(`Unexpected error in listToken. [Message: ${error.message}]`);
+      console.error(
+        `Unexpected error in listToken. [Message: ${error.message}]`
+      );
     dispatch(setWalletLoading(false));
     callback({ success: false });
   }
 };
 
-export const relistToken = (wallet, asset, newPrice, callback) => async (dispatch) => {
+export const relistToken =
+  (wallet, asset, newPrice, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
-    const assetOld = await getAsset(asset.details.asset);
     const walletUtxos = await getUtxos();
 
     const assetUtxo = (
       await getLockedUtxosByAsset(
         contractAddress().to_bech32(),
-        assetOld.details.asset
+          asset.details.asset
       )
-    ).find((utxo) => utxo.data_hash === assetOld.status.datumHash);
+      ).find((utxo) => utxo.data_hash === asset.status.datumHash);
 
     if (assetUtxo) {
       const datumNew = createDatum(
-        assetOld.status.datum.tn,
-        assetOld.status.datum.cs,
+          asset.status.datum.tn,
+          asset.status.datum.cs,
         wallet.data.address,
-        assetOld.status.artistAddress,
-        assetOld.status.datum.rp,
+          asset.status.artistAddress,
+          asset.status.datum.rp,
         newPrice
       );
       const updateObj = await updateListing(
-        assetOld.status.datum,
+          asset.status.datum,
         datumNew,
         {
           address: fromBech32(wallet.data.address),
@@ -208,12 +213,12 @@ export const relistToken = (wallet, asset, newPrice, callback) => async (dispatc
       );
 
       if (updateObj && updateObj.datumHash && updateObj.txHash) {
-        const assetNew = await lockAsset(assetOld, {
+          const updatedAsset = await lockAsset(asset, {
           datum: datumNew,
           datumHash: updateObj.datumHash,
           txHash: updateObj.txHash,
           address: wallet.data.address,
-          artistAddress: assetOld.status.artistAddress,
+            artistAddress: asset.status.artistAddress,
           contractAddress: contractAddress().to_bech32(),
         });
 
@@ -224,12 +229,16 @@ export const relistToken = (wallet, asset, newPrice, callback) => async (dispatc
           wallet.data.address
         );
 
-        const updatedWallet = await relistWalletAsset(wallet.data, assetNew, event);
+          const updatedWallet = await relistWalletAsset(
+            wallet.data,
+            updatedAsset,
+            event
+          );
 
         const output = {
           policy_id: asset.details.policyId,
           listing: {
-            [assetNew.details.asset]: assetNew,
+              [updatedAsset.details.asset]: updatedAsset,
           },
         };
 
@@ -260,19 +269,18 @@ export const delistToken = (wallet, asset, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
-    const assetOld = await getAsset(asset.details.asset);
     const walletUtxos = await getUtxos();
 
     const assetUtxo = (
       await getLockedUtxosByAsset(
         contractAddress().to_bech32(),
-        assetOld.details.asset
+        asset.details.asset
       )
-    ).find((utxo) => utxo.data_hash === assetOld.status.datumHash);
+    ).find((utxo) => utxo.data_hash === asset.status.datumHash);
 
     if (assetUtxo) {
       const txHash = await cancelListing(
-        assetOld.status.datum,
+        asset.status.datum,
         {
           address: fromBech32(wallet.data.address),
           utxos: walletUtxos,
@@ -281,24 +289,28 @@ export const delistToken = (wallet, asset, callback) => async (dispatch) => {
       );
 
       if (txHash) {
-        const assetNew = await unlockAsset(assetOld, {
+        const updatedAsset = await unlockAsset(asset, {
           txHash: txHash,
           address: wallet.data.address,
         });
 
         const event = createEvent(
           MARKET_TYPE.DELIST,
-          assetOld.status.datum,
+          asset.status.datum,
           txHash,
           wallet.data.address
         );
 
-        const updatedWallet = await delistWalletAsset(wallet.data, assetNew, event);
+        const updatedWallet = await delistWalletAsset(
+          wallet.data,
+          updatedAsset,
+          event
+        );
 
         const output = {
-          policy_id: assetNew.details.policyId,
+          policy_id: updatedAsset.details.policyId,
           listing: {
-            [assetNew.details.asset]: assetNew,
+            [updatedAsset.details.asset]: updatedAsset,
           },
         };
 
@@ -329,26 +341,25 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
-    const assetOld = await getAsset(asset.details.asset);
     const walletUtxos = await getUtxos();
 
     const assetUtxo = (
       await getLockedUtxosByAsset(
         contractAddress().to_bech32(),
-        assetOld.details.asset
+        asset.details.asset
       )
-    ).find((utxo) => utxo.data_hash === assetOld.status.datumHash);
+    ).find((utxo) => utxo.data_hash === asset.status.datumHash);
 
     if (assetUtxo) {
       const txHash = await purchaseAsset(
-        assetOld.status.datum,
+        asset.status.datum,
         {
           address: fromBech32(wallet.data.address),
           utxos: walletUtxos,
         },
         {
-          seller: fromBech32(assetOld.status.submittedBy),
-          artist: fromBech32(assetOld.status.artistAddress),
+          seller: fromBech32(asset.status.submittedBy),
+          artist: fromBech32(asset.status.artistAddress),
           // TODO: Fetch market address
           market: fromBech32(
             "addr_test1qp6pykcc0kgaqj27z3jg4sjt7768p375qr8q4z3f4xdmf38skpyf2kgu5wqpnm54y5rqgee4uwyksg6eyd364qhmpwqsv2jjt3"
@@ -359,38 +370,38 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
       );
 
       if (txHash) {
-        const unlockedAsset = await unlockAsset(assetOld, {
+        const unlockedAsset = await unlockAsset(asset, {
           txHash: txHash,
           address: wallet.data.address,
         });
 
         const event = createEvent(
           MARKET_TYPE.PURCHASE,
-          assetOld.status.datum,
+          asset.status.datum,
           txHash,
           wallet.data.address
         );
 
         await addWalletEvent(wallet, event);
 
-        const assetNew = await addAssetEvent(unlockedAsset, event);
+        const updatedAsset = await addAssetEvent(unlockedAsset, event);
 
         // Update the seller's wallet
-        const sellerWalletObj = await getWallet(assetOld.status.submittedBy);
+        const sellerWalletObj = await getWallet(asset.status.submittedBy);
 
         const soldEvent = createEvent(
           MARKET_TYPE.SOLD,
-          assetOld.status.datum,
+          asset.status.datum,
           txHash,
           wallet.data.address
         );
 
-        await delistWalletAsset(sellerWalletObj, assetNew, soldEvent);
+        await delistWalletAsset(sellerWalletObj, updatedAsset, soldEvent);
 
         const output = {
           policy_id: asset.details.policyId,
           listing: {
-            [assetNew.details.asset]: assetNew,
+            [updatedAsset.details.asset]: updatedAsset,
           },
         };
 
