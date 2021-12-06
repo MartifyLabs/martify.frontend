@@ -12,7 +12,7 @@ const Navbar = () => {
       <div className="the-blur"></div>
       <div className="navbar-brand">
         <Link className="navbar-item" to="/">
-          <img src="/images/martify2_small-logo.png" alt="Martify" width="112" height="28"/>
+          <span className="logo-text">Martify</span>
         </Link>
       </div>
 
