@@ -29,7 +29,7 @@
 }
 
 .homepage .slogan {
-  text-shadow: 1px 1px 2px grey, 0 0 1em grey, 0 0 0.2em grey;
+  filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.6));
 }
 
 .homepage .top-project-image {
@@ -58,16 +58,18 @@
 }
 
 .homepage {
-  .is-offset-one-quarter {
+  .columns {
     text-align: center;
     .logo-text {
-      font-size: 120px;
+      width: 100%;
+      font-size: 100px;
       font-weight: 700;
       background: -webkit-linear-gradient(45deg, #ffffff, #2ec4ff);
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
       -webkit-text-stroke: 2px #DC95CF;
-      filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.6))
+      filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.6));
     }
   }
 }
