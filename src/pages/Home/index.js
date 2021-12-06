@@ -52,8 +52,7 @@ const Splash = ({listProjects}) => {
           <div className="container">
             <div className="columns is-mobile is-multiline is-gapless">
               <div className="column is-half is-offset-one-quarter">
-                {/* <img src={listProjects.length>0?"/images/martify2_big-logo.png":"/images/martify2_big-logo.png"}/> */}
-                <img src="/images/martify2_big-logo.png"/>
+                <span className="logo-text">Martify</span>
               </div>
               <div className="column is-full has-text-centered">
                 <p className="is-size-1 slogan" style={{color:"#fff", lineHeight:"1"}}>Your new CNFT marketplace.</p>
