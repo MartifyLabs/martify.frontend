@@ -3,10 +3,10 @@ import { compose } from "redux";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
-import { connectWallet, getWalletAssets } from "../../store/wallet/api";
+import { connectWallet, loadAssets } from "../../store/wallet/api";
 import { WALLET_STATE } from "../../store/wallet/walletTypes";
 
-const ButtonConnect = ({state_wallet, connectWallet, getWalletAssets}) => {
+const ButtonConnect = ({state_wallet, connectWallet, loadAssets}) => {
 
   const [showNotification, setShowNotification] = useState(false);
   const [showNotificationMessage, setShowNotificationMessage] = useState(false);
@@ -15,7 +15,7 @@ const ButtonConnect = ({state_wallet, connectWallet, getWalletAssets}) => {
   function reconnect_wallet(){
     const timer = setTimeout(() => {
       connectWallet(true, (res) => {
-        // getWalletAssets((res) => {
+        // loadAssets((res) => {
           reconnect_wallet();
         // });
       });
@@ -43,7 +43,7 @@ const ButtonConnect = ({state_wallet, connectWallet, getWalletAssets}) => {
 
     if(state_wallet.connected && !state_wallet.loading && !state_wallet.loaded_assets){
       setlistCurrentUtxos(state_wallet.data.utxos);
-      getWalletAssets(state_wallet, (res) => {});
+      loadAssets(state_wallet, (res) => {});
     }
 
     // if(state_wallet.connected && !state_wallet.loading && state_wallet.loaded_assets){
@@ -63,7 +63,7 @@ const ButtonConnect = ({state_wallet, connectWallet, getWalletAssets}) => {
     //   }
 
     //   if(get_latest){
-    //     getWalletAssets((res) => {
+    //     loadAssets((res) => {
     //       setlistCurrentUtxos(state_wallet.data.utxos);
     //     });
     //   }
@@ -139,7 +139,7 @@ function mapStateToProps(state, props) {
 function mapDispatchToProps(dispatch) {
   return {
     connectWallet: (is_silent, callback) => dispatch(connectWallet(is_silent, callback)),
-    getWalletAssets: (wallet, callback) => dispatch(getWalletAssets(wallet, callback)),
+    loadAssets: (wallet, callback) => dispatch(loadAssets(wallet, callback)),
   };
 }
 

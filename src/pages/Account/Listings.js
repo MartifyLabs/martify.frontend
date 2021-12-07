@@ -3,9 +3,9 @@ import { compose } from "redux";
 import { connect } from "react-redux";
 
 import AssetCard from "../../components/AssetCard";
-import { getWalletAssets } from "../../store/wallet/api";
+import { loadAssets } from "../../store/wallet/api";
 
-const Listings = ({state_wallet, state_collection, getWalletAssets}) => {
+const Listings = ({state_wallet, state_collection, loadAssets}) => {
 
   const [listings, setListings] = useState([]);
   const [searchText, setSearchText] = useState("");
@@ -68,7 +68,7 @@ const Listings = ({state_wallet, state_collection, getWalletAssets}) => {
   }, [state_wallet]);
 
   useEffect(() => {
-    getWalletAssets(state_wallet, (res) => {
+    loadAssets(state_wallet, (res) => {
       load();
     });
   }, []);
@@ -261,7 +261,7 @@ function mapStateToProps(state, props) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    getWalletAssets: (wallet, callback) => dispatch(getWalletAssets(wallet, callback)),
+    loadAssets: (wallet, callback) => dispatch(loadAssets(wallet, callback)),
   };
 }
 
