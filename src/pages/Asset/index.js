@@ -364,17 +364,17 @@ const PurchaseAsset = ({asset, asset_add_offer, state_wallet, purchase_token}) =
             <div className="modal-background"></div>
             <div className="modal-card">
               <section className="modal-card-body has-text-centered">
-                <span className="icon has-text-success" style={{fontSize:"100px", margin:"50px"}}>
+                <span className="icon has-text-success" style={{fontSize:"60px", margin:"20px"}}>
                   <i className="far fa-check-circle"></i>
                 </span>
-                <p className="is-size-4">
+                <p className="is-size-5" style={{ padding: "10px" }}>
                   {
                     showModal === MARKET_TYPE.PURCHASE ? <span>Purchased <b>{asset.details.onchainMetadata.name}</b>!</span> : 
                     showModal === "offer-success" ? <span>You made an offer for <b>{asset.details.onchainMetadata.name}</b>!</span> : 
                     ""
                   }
                 </p>
-                <button className="button is-info is-outlined is-medium" onClick={() => setShowModal(false)}>
+                <button className="button is-info is-rounded" onClick={() => setShowModal(false)}>
                   {
                     ["Yes!", "Yay!", "Ok!", "Nice!"][(Math.random() * 4) | 0]
                   }
