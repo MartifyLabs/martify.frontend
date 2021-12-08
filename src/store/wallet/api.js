@@ -396,7 +396,7 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
           wallet.data.address
         );
 
-        await delistWalletAsset(sellerWalletObj, updatedAsset, soldEvent);
+        const _ = await delistWalletAsset(sellerWalletObj, updatedAsset, soldEvent);
 
         const output = {
           policy_id: asset.details.policyId,
