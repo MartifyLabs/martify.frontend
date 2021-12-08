@@ -27,41 +27,40 @@ const AssetCard = ({state_collection, asset, column_className, show_offer}) => {
                     <AssetImageFigure asset={asset}/>
                   </div>
                   <div className="card-content">
-                    {
-                      asset.status.locked ? 
-                      <span className="tag is-link is-medium is-rounded price_tag">
-                        <p className="" data-tooltip={`Buy now for ₳${fromLovelace(asset.status.datum.price)}`}><span className="ada_symbol">₳</span>{fromLovelace(asset.status.datum.price)}</p>
-                      </span> : <></>
-                    }
-                    {
-                      show_offer ? asset.offers ? Object.keys(asset.offers).length ? (
-                        <span className="tag is-warning is-medium is-rounded price_tag" style={{top:"50px"}}>
-                          <p className="" data-tooltip={`Highest offer`}>
-                            <span className="ada_symbol">₳</span>
-                            {
-                              Math.max.apply(Math, Object.keys(asset.offers).map(function(key){
-                                return asset.offers[key];
-                              }).map(function(o) { return o.p; }))
-                            }
-                          </p>
-                        </span>
-                      ) : <></> : <></> : <></>
-                    }
-
                     <div className="media is-clipped">
                       <div className="media-content clipped">
+                        <p className="title is-size-5 clipped">
+                          {asset.details.onchainMetadata.name}
+                        </p>
                         <p className="subtitle is-size-7 clipped">
                           {collection ? collection.is_martify_verified ? collection.meta.name : 
                           collection.is_cnft_verified ? collection.is_cnft_verified :
                           asset.details.policyId : asset.details.policyId
                           }
                         </p>
-                        <p className="title is-size-5 clipped">
-                          {asset.details.onchainMetadata.name}
-                        </p>
+                        {
+                          asset.status.locked ? 
+                          <p className="title is-size-5 tag-price">
+                            <p>{fromLovelace(asset.status.datum.price)}<span className="ada_symbol">&nbsp;₳</span></p>
+                          </p> : <></>
+                        }
+                        {
+                          show_offer ? asset.offers ? Object.keys(asset.offers).length ? (
+                            <span className="tag is-warning is-medium is-rounded price_tag" style={{top:"50px"}}>
+                              <p className="" data-tooltip={`Highest offer`}>
+                                <span className="ada_symbol">₳</span>
+                                {
+                                  Math.max.apply(Math, Object.keys(asset.offers).map(function(key){
+                                    return asset.offers[key];
+                                  }).map(function(o) { return o.p; }))
+                                }
+                              </p>
+                            </span>
+                          ) : <></> : <></> : <></>
+                        }
+                        
                       </div>
                     </div>
-                    
                   </div>
                 </div>
               </Link>

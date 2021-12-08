@@ -781,9 +781,9 @@ const AssetImage = ({asset}) => {
               <>
               {
                 asset.details.onchainMetadata.files[0].mediaType==="text/html" ? (
-                  <iframe src={get_asset_image_source(asset.details.onchainMetadata.files[0].src)} style={{width:"600px",height:"600px"}}>
+                  //<iframe src={get_asset_image_source(asset.details.onchainMetadata.files[0].src)} style={{width:"600px",height:"600px"}}>
                     <AssetImageFigure asset={asset} setShow={setShow}/>
-                  </iframe>
+                  //</iframe>
                 ) : (
                   <AssetImageFigure asset={asset} setShow={setShow}/>
                 )
