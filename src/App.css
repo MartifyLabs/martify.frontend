@@ -52,3 +52,28 @@ button, input, optgroup, select, textarea {
     transform: rotate(359deg);
   }
 }
+
+.card.asset_card {
+  -webkit-filter: drop-shadow(0 4px 6px #64646f33);
+  filter: drop-shadow(0 4px 6px #64646f33);
+  -webkit-transition: .3s ease;
+  transition: .3s ease;
+  padding: 1rem;
+}
+
+.card.asset_card .card-image figure {
+  background: #E6E6E6;
+}
+
+.card.asset_card .card-content {
+  padding: 0;
+  margin-top: 16px;
+}
+
+.card.asset_card .card-content .subtitle {
+  margin-bottom: 1rem;
+}
+
+.card.asset_card .card-content .tag-price {
+  padding-top: 1rem;
+}
