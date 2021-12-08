@@ -225,7 +225,7 @@ export const asset_add_offer =
 export const opencnft_get_top_projects =
   (time, callback) => async (dispatch) => {
     fetch("https://api.opencnft.io/1/rank?window=" + time, {
-      method: "GET",
+      
     })
       .then((res) => res.json())
       .then((res) => {
@@ -236,7 +236,7 @@ export const opencnft_get_top_projects =
 export const opencnft_get_policy =
   (policy_id, callback) => async (dispatch) => {
     fetch(`https://api.opencnft.io/1/policy/${policy_id}`, {
-      method: "GET",
+      
     })
       .then((res) => res.json())
       .then((res) => {
@@ -247,7 +247,7 @@ export const opencnft_get_policy =
 export const opencnft_get_asset_tx =
   (asset_id, callback) => async (dispatch) => {
     fetch(`https://api.opencnft.io/1/asset/${asset_id}/tx`, {
-      method: "GET",
+      
     })
       .then((res) => res.json())
       .then((res) => {
