@@ -28,6 +28,7 @@ import {
   setWalletLoading,
   setWalletData,
 } from "./walletActions";
+import { set_error } from "../error/errorActions";
 import {
   listAsset,
   updateListing,
@@ -40,6 +41,7 @@ import { getLockedUtxosByAsset } from "../../cardano/blockfrost-api";
 import { collections_add_tokens } from "../collection/collectionActions";
 import { fromBech32 } from "../../utils";
 import { createEvent, createDatum } from "../../utils/factory";
+import errorTypes from "../../cardano/blockfrost-api/error.types";
 
 export const connectWallet = (isSilent, callback) => async (dispatch) => {
   try {
@@ -79,6 +81,10 @@ export const connectWallet = (isSilent, callback) => async (dispatch) => {
     );
     dispatch(setWalletLoading(false));
     callback({ success: false, error });
+    dispatch(set_error({
+      message: "Could not connect wallet.",
+      detail: error,
+    }));
   }
 };
 
@@ -102,6 +108,10 @@ export const loadAssets = (wallet, callback) => async (dispatch) => {
     );
     dispatch(setWalletLoading(false));
     callback({ success: false, error });
+    dispatch(set_error({
+      message: errorTypes.COULD_NOT_RETRIEVE_ASSETS_FROM_DB,
+      detail: error,
+    }));
   }
 };
 
@@ -176,6 +186,10 @@ export const listToken =
       );
       dispatch(setWalletLoading(false));
       callback({ success: false });
+      dispatch(set_error({
+        message: errorTypes.COULD_NOT_RETRIEVE_ASSETS_FROM_DB,
+        detail: error,
+      }));
     }
   };
 
@@ -262,6 +276,10 @@ export const relistToken =
       );
       dispatch(setWalletLoading(false));
       callback({ success: false });
+      dispatch(set_error({
+        message: errorTypes.COULD_NOT_RETRIEVE_ASSETS_FROM_DB, 
+        detail: error,
+      }));
     }
   };
 
@@ -334,6 +352,10 @@ export const delistToken = (wallet, asset, callback) => async (dispatch) => {
     );
     dispatch(setWalletLoading(false));
     callback({ success: false });
+    dispatch(set_error({
+      message: errorTypes.COULD_NOT_RETRIEVE_ASSETS_FROM_DB, 
+      detail: error,
+    }));
   }
 };
 
@@ -424,5 +446,9 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
     );
     dispatch(setWalletLoading(false));
     callback({ success: false });
+    dispatch(set_error({
+      message: errorTypes.COULD_NOT_PURCHASE_TOKEN, 
+      detail: error,
+    }));
   }
 };

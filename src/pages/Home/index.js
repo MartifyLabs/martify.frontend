@@ -11,6 +11,9 @@ import { opencnft_get_top_projects } from "../../store/collection/api";
 import { get_asset_image_source, numFormatter } from "../../utils";
 import Image from "../../components/Image";
 
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+
 const Home = ({opencnft_get_top_projects}) => {
   
   const [listProjects, setListProjects] = useState([]);
@@ -256,6 +259,7 @@ const TopProjects = ({opencnft_get_top_projects, listProjects, setListProjects})
                       <div className="column is-one-fifth" key={i}>
                         <Link to={`/collection/${project.policies[0]}`}>
                           <div className="card">
+                            {/* <Skeleton height="100%"/> */}
                             <div className="card-image">
                               <figure className="image is-square">
                                 <img className="top-project-image" src={project.image} alt={project.name} />
