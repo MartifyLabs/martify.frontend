@@ -38,14 +38,13 @@ const AssetCard = ({ state_collection, asset, column_className, show_offer }) =>
                                   asset.details.policyId : asset.details.policyId
                               }
                             </p>
-                            {
-                              asset.status.locked ?
-                                <p className="title is-size-5 tag-price">
+                            <div className="title is-size-5 tag-price">
+                              {
+                                asset.status.locked ?
                                   <p>{fromLovelace(asset.status.datum.price)}<span className="ada_symbol">&nbsp;₳</span></p>
-                                </p> : <p className="title is-size-5 tag-price">
-                                  <p><span className="ada_symbol">Not Listed</span></p>
-                                </p>
-                            }
+                                  : <p><span className="ada_symbol">Not Listed</span></p>
+                              }
+                            </div>
                             {
                               show_offer ? asset.offers ? Object.keys(asset.offers).length ? (
                                 <span className="tag is-warning is-medium is-rounded price_tag" style={{ top: "50px" }}>
