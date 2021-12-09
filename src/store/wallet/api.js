@@ -382,11 +382,7 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
         {
           seller: fromBech32(asset.status.submittedBy),
           artist: fromBech32(asset.status.artistAddress),
-          // TODO: Fetch market address
-          market: fromBech32(
-            "addr_test1qp6pykcc0kgaqj27z3jg4sjt7768p375qr8q4z3f4xdmf38skpyf2kgu5wqpnm54y5rqgee4uwyksg6eyd364qhmpwqsv2jjt3"
-          ),
-          // ----------------------------------------
+          market: fromBech32(process.env.REACT_APP_MARTIFY_ADDRESS),
         },
         createTxUnspentOutput(contractAddress(), assetUtxo)
       );
@@ -419,6 +415,7 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
         );
 
         const _ = await delistWalletAsset(sellerWalletObj, updatedAsset, soldEvent);
+        // ----------------------------------------
 
         const output = {
           policy_id: asset.details.policyId,
