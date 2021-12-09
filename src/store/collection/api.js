@@ -87,6 +87,7 @@ export const get_listings = (policy_id, callback) => async (dispatch) => {
 
     callback(true);
   } catch (err) {
+    dispatch(collections_loading(false));
     dispatch(set_error({
       message: errorTypes.COULD_NOT_RETRIEVE_COLLECTION_ASSETS_FROM_DB,
       detail: err,
@@ -118,6 +119,7 @@ export const get_assets = (assetIds, callback) => async (dispatch) => {
 
     callback(true);
   } catch (err) {
+    dispatch(collections_loading(false));
     dispatch(set_error({
       message: errorTypes.COULD_NOT_RETRIEVE_ASSETS_FROM_DB,
       detail: err,
@@ -145,6 +147,7 @@ export const get_asset = (asset_id, callback) => async (dispatch) => {
     if (asset) add_token(asset, dispatch);
     callback(true);
   } catch (err) {
+    dispatch(collections_loading(false));
     dispatch(set_error({
       message: errorTypes.COULD_NOT_RETRIEVE_ASSET_FROM_DB,
       detail: err,
@@ -153,7 +156,6 @@ export const get_asset = (asset_id, callback) => async (dispatch) => {
 };
 
 export const get_listed_assets = (callback) => async (dispatch) => {
-  // dispatch(collections_loading(true));
   try {
     let listed_assets = await getLockedAssets(1);
 

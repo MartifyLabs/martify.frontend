@@ -695,17 +695,24 @@ const ListAttributes = ({asset, attr}) => {
           <th className="attr">{attr}</th>
           <td>
             {
-              typeof(asset.details.onchainMetadata[attr])=="object" ? (
+              typeof(asset.details.onchainMetadata[attr]) === "object" ? (
                 <table className="table is-narrow">
                   <tbody>
                   {
-                    asset.details.onchainMetadata[attr]
-                    .map((att, i) => {
-                      return(
-                        <tr key={i}><td>{att}</td></tr>
-                      )
-                    }
-                  )}
+                    Array.isArray(asset.details.onchainMetadata[attr])
+                      ? asset.details.onchainMetadata[attr].map((att, i) => {
+                          if (typeof(att) === "object") {
+                            const key = Object.keys(att).at(0);
+                            return <tr key={key}><td>{key}: {att[key]}</td></tr>
+                          }
+                          return(<tr key={i}><td>{att}</td></tr>)
+                        })
+                      : Object.entries(asset.details.onchainMetadata[attr]).map(([k,v]) => {
+                          return(
+                            <tr key={k}><td>{k}: {v}</td></tr>
+                          )
+                        })
+                  }
                   </tbody>
                 </table> 
               ) : asset.details.onchainMetadata[attr]
