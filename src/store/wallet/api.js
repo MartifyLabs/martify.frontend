@@ -400,8 +400,7 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
           wallet.data.address
         );
 
-        await addWalletEvent(wallet.data, event);
-
+        const updatedWallet = await addWalletEvent(wallet.data, event);
         const updatedAsset = await addAssetEvent(unlockedAsset, event);
 
         // Update the seller's wallet
@@ -414,7 +413,10 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
           wallet.data.address
         );
 
-        const _ = await delistWalletAsset(sellerWalletObj, updatedAsset, soldEvent);
+        const delistAsset = await delistWalletAsset(sellerWalletObj, updatedAsset, soldEvent);
+        if (delistAsset) {
+          console.log("asset delisted");
+        }
         // ----------------------------------------
 
         const output = {
@@ -425,6 +427,7 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
         };
 
         dispatch(setWalletLoading(false));
+        dispatch(setWalletData(updatedWallet));
         dispatch(collections_add_tokens(output));
         callback({ success: true, type: MARKET_TYPE.PURCHASE });
       } else {
