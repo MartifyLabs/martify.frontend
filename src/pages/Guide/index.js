@@ -1,6 +1,6 @@
 import React from "react";
 
-const HowGetStarted = () => {
+const Guide = () => {
 
   return (
     <div className="section container">
@@ -107,4 +107,4 @@ const HowGetStarted = () => {
   );
 };
 
-export default HowGetStarted;
+export default Guide;
