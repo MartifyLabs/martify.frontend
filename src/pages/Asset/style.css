@@ -1,0 +1,23 @@
+.asset .price{
+  font-size: 26px;
+}
+
+.asset .attr{
+  text-transform:capitalize
+}
+
+.asset th{
+  white-space: nowrap;
+}
+
+.asset .asset_name_block{
+  display: block;
+}
+
+.asset .asset_name_block h1{
+  margin-bottom: 0px;
+}
+
+.asset .image img{
+  object-fit: contain;
+}

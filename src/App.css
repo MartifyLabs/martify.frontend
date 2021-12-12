@@ -1,0 +1,79 @@
+body {
+  cursor: default;
+  font-family: "Titillium Web", sans-serif;
+}
+
+button, input, optgroup, select, textarea {
+  font-family: "Titillium Web", sans-serif;
+  font-weight: 300;
+}
+
+.notification-window {
+  border-radius: 0.375em;
+  bottom: 1em;
+  right: 1em;
+  width: 20rem;
+  background-color: #fff;
+  box-shadow: 0 0 1em rgb(0 0 0 / 10%);
+  padding: 1em 1.5em;
+  position: fixed;
+  z-index: 10;
+}
+
+.collection_logo {
+  object-fit: cover;
+}
+
+.ada_symbol {
+  font-size: 12px;
+}
+.social-icon img {
+  /* padding: 0px; */
+  width: 16px;
+  height: 16px;
+}
+
+.pagination-previous,
+.pagination-next {
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.icn-spinner {
+  animation: spin-animation 0.5s infinite;
+  display: inline-block;
+}
+
+@keyframes spin-animation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}
+
+.card.asset_card {
+  -webkit-filter: drop-shadow(0 4px 6px #64646f33);
+  filter: drop-shadow(0 4px 6px #64646f33);
+  -webkit-transition: .3s ease;
+  transition: .3s ease;
+  padding: 1rem;
+}
+
+.card.asset_card .card-image figure {
+  background: #E6E6E6;
+}
+
+.card.asset_card .card-content {
+  padding: 0;
+  margin-top: 16px;
+}
+
+.card.asset_card .card-content .subtitle {
+  margin-bottom: 1rem;
+}
+
+.card.asset_card .card-content .tag-price {
+  padding-top: 1rem;
+}

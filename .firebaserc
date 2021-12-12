@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "testnet": "vendere-3f235",
+    "mainnet": "martify-bc2f5"
+  },
+  "targets": {}
+}

@@ -1,0 +1,9 @@
+.explore .filter .field{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.explore .filter_label{
+  cursor: pointer
+}
