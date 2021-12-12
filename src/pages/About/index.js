@@ -18,10 +18,12 @@ const About = () => {
 
       <div className="content is-large has-text-centered">
         <h2 className="is-size-2">Roadmap</h2>
+        <p className="subtitle is-4">Work in Progress...</p>
       </div>
 
       <div className="content is-large has-text-centered">
         <h2 className="is-size-2">Team</h2>
+        <p className="subtitle is-4">Work in Progress...</p>
       </div>
     </div>
   );
