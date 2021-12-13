@@ -232,6 +232,9 @@ export const opencnft_get_top_projects =
       .then((res) => res.json())
       .then((res) => {
         callback({ success: true, data: res.ranking });
+      })
+      .catch((err) => {
+        console.error(err);
       });
   };
 
@@ -243,6 +246,9 @@ export const opencnft_get_policy =
       .then((res) => res.json())
       .then((res) => {
         callback({ success: true, data: res });
+      })
+      .catch((err) => {
+        console.error(err);
       });
   };
 
@@ -255,5 +261,8 @@ export const opencnft_get_asset_tx =
       .then((res) => {
         console.log(res)
         callback({ success: true, data: res });
+      })
+      .catch((err) => {
+        console.error(err);
       });
   };

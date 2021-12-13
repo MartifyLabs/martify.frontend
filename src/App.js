@@ -9,8 +9,7 @@ import Collection from "./pages/Collection";
 import Asset from "./pages/Asset";
 import Account from "./pages/Account";
 import About from "./pages/About";
-import HowGetStarted from "./pages/HowGetStarted";
-import FAQ from "./pages/FAQ";
+import Guide from "./pages/Guide";
 import Explore from "./pages/Explore";
 import SweetAlert from 'react-bootstrap-sweetalert';
 
@@ -39,15 +38,16 @@ const App = ({ state_collection, state_error, load_collection, error_clearError 
         <Route exact path="/assets/:policy_id/:asset_id" component={Asset} />
         <Route exact path="/explore" component={Explore} />
         <Route exact path="/account" component={Account} />
+        <Route exact path="/explore" component={Explore} />
         <Route exact path="/about" component={About} />
-        <Route exact path="/faq" component={FAQ} />
-        <Route exact path="/how-get-started" component={HowGetStarted} />
+        <Route exact path="/guide" component={Guide} />
       </Switch>
       <SweetAlert
         show={state_error.show}
         error
         title="OOPS!"
         onConfirm={error_clearError}
+        confirmBtnCssClass="button is-danger"
       >
         {state_error.message}
       </SweetAlert>
