@@ -36,7 +36,6 @@ const App = ({ state_collection, state_error, load_collection, error_clearError 
         <Route exact path="/" component={Home} />
         <Route exact path="/collection/:collection_id" component={Collection} />
         <Route exact path="/assets/:policy_id/:asset_id" component={Asset} />
-        <Route exact path="/explore" component={Explore} />
         <Route exact path="/account" component={Account} />
         <Route exact path="/explore" component={Explore} />
         <Route exact path="/about" component={About} />
