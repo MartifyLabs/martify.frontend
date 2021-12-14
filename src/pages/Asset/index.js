@@ -1023,20 +1023,7 @@ const AssetImage = ({ asset }) => {
       <div className={"modal " + (show ? "is-active" : "")}>
         <div className="modal-background" onClick={() => setShow(false)}></div>
         <div className="modal-content">
-          {asset.details.onchainMetadata.files ? (
-            <>
-              {asset.details.onchainMetadata.files[0].mediaType ===
-              "text/html" ? (
-                //<iframe src={get_asset_image_source(asset.details.onchainMetadata.files[0].src)} style={{width:"600px",height:"600px"}}>
-                <AssetImageFigure asset={asset} setShow={setShow} />
-              ) : (
-                //</iframe>
-                <AssetImageFigure asset={asset} setShow={setShow} />
-              )}
-            </>
-          ) : (
-            <AssetImageFigure asset={asset} setShow={setShow} />
-          )}
+          <AssetImageFigure asset={asset} setShow={setShow} />
         </div>
         <button
           className="modal-close is-large"
