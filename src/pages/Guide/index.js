@@ -114,7 +114,7 @@ const Guide = () => {
             <br />
           </li>
           <li>
-            <h4>How do I sell an NFT?</h4>
+            <h4>How do I list my NFT collection?</h4>
             <p>
               If you are an NFT Project wanting to launch on Martify please
               contact us on Twitter and/or Discord.
@@ -125,7 +125,7 @@ const Guide = () => {
             <h4>How do royalties work on Martify?</h4>
             <p>
               Each project can submit a request to get the verified by Martify
-              tick on our platform. When it is verified it can submit a royalty
+              on our platform. When it is verified it can submit a royalty
               receiving address and percentage. After this setup, every sale on
               NFTs of that project will reward project owners the percentage
               they submitted.
@@ -161,7 +161,7 @@ const Guide = () => {
             <h4>What are the fees involved when buying?</h4>
             <p>
               The buyer pays the exact amount displayed as price + Cardano
-              transaction fees. 2% of this goes to Martify, x% goes to the NFT
+              transaction fees. 1% of this goes to Martify, x% goes to the NFT
               creator (x can be 0 if the project has not setup royalties on
               Martify), the rest goes to the seller.
             </p>
