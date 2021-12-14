@@ -42,6 +42,7 @@ const App = ({ state_collection, state_error, load_collection, error_clearError 
         <Route exact path="/guide" component={Guide} />
       </Switch>
       <SweetAlert
+        title=""
         show={state_error.show}
         error
         confirmBtnText="Oops!"

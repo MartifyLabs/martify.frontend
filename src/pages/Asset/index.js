@@ -187,7 +187,7 @@ const SocialLinks = ({ asset }) => {
           data-tooltip="Share on Twitter"
         >
           <span className="icon">
-            <img src="/images/icons/twitter.svg" />
+            <img alt="" src="/images/icons/twitter.svg" />
           </span>
         </a>
       </p>
@@ -200,7 +200,7 @@ const SocialLinks = ({ asset }) => {
           data-tooltip="Share on Facebook"
         >
           <span className="icon">
-            <img src="/images/icons/facebook.svg" />
+            <img alt="" src="/images/icons/facebook.svg" />
           </span>
         </a>
       </p>
@@ -213,7 +213,7 @@ const SocialLinks = ({ asset }) => {
           data-tooltip="Check Cardanoscan"
         >
           <span className="icon">
-            <img src="/images/icons/cardanoscan.png" />
+            <img alt="" src="/images/icons/cardanoscan.png" />
           </span>
         </a>
       </p>
@@ -226,7 +226,7 @@ const SocialLinks = ({ asset }) => {
           data-tooltip="View it on pool.pm"
         >
           <span className="icon">
-            <img src="/images/icons/poolpm.png" />
+            <img alt="" src="/images/icons/poolpm.png" />
           </span>
         </a>
       </p>
@@ -503,6 +503,7 @@ const PurchaseAsset = ({
 
       {showModal ? (
         <SweetAlert
+          title=""
           show={showModal}
           success
           confirmBtnText={["Yes!", "Yay!", "Ok!", "Nice!"][(Math.random() * 4) | 0]}
@@ -794,6 +795,7 @@ const OwnerListAsset = ({
 
       {showModal ? (
         <SweetAlert
+          title=""
           show={showModal}
           success
           confirmBtnText={["Yes!", "Yay!", "Ok!", "Nice!"][(Math.random() * 4) | 0]}
@@ -880,7 +882,7 @@ const AboutAsset = ({ thisCollection, asset }) => {
                           style={{ marginLeft: "10px" }}
                         >
                           <span className="icon">
-                            <img src="/images/icons/cardanoscan.png" />
+                            <img alt="" src="/images/icons/cardanoscan.png" />
                           </span>
                         </a>
                       </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
 
@@ -62,10 +62,6 @@ const Listings = ({state_wallet, state_collection, loadAssets}) => {
 
     }
   }
-
-  useEffect(() => {
-    load();
-  }, [state_wallet]);
 
   useEffect(() => {
     loadAssets(state_wallet, (res) => {
