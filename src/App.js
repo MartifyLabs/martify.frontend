@@ -44,7 +44,7 @@ const App = ({ state_collection, state_error, load_collection, error_clearError 
       <SweetAlert
         show={state_error.show}
         error
-        title="OOPS!"
+        confirmBtnText="Oops!"
         onConfirm={error_clearError}
         confirmBtnCssClass="button is-danger"
       >

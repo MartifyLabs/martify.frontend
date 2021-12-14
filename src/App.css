@@ -77,3 +77,40 @@ button, input, optgroup, select, textarea {
 .card.asset_card .card-content .tag-price {
   padding-top: 1rem;
 }
+
+.sweet-alert {
+  padding: 0.625rem 0 1.625rem 0 !important;
+}
+
+.sweet-alert div:first-child {
+  transform: scale(0.6);
+  margin: 0 auto !important;
+}
+
+.sweet-alert div:nth-child(3) {
+  font-size: 1rem !important;
+}
+
+.sweet-alert h2 {
+  font-size: 1.2rem !important;
+}
+
+.sweet-alert p a.button {
+  border-width: 1px;
+  cursor: pointer;
+  justify-content: center;
+  padding-bottom: calc(0.5em - 1px);
+  padding-top: calc(0.5em - 1px);
+  text-align: center;
+  white-space: nowrap;
+  background-color: #3e8ed0;
+  border-color: transparent !important;
+  color: #fff;
+  border-radius: 9999px;
+  padding-left: calc(1em + 0.25em);
+  padding-right: calc(1em + 0.25em);
+}
+
+.sweet-alert p a.button:hover {
+  background-color: #3e8ed0;
+}

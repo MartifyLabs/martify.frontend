@@ -505,7 +505,7 @@ const PurchaseAsset = ({
         <SweetAlert
           show={showModal}
           success
-          title={["Yes!", "Yay!", "Ok!", "Nice!"][(Math.random() * 4) | 0]}
+          confirmBtnText={["Yes!", "Yay!", "Ok!", "Nice!"][(Math.random() * 4) | 0]}
           onConfirm={() => setShowModal(false)}
           confirmBtnCssClass="button is-success"
         >
@@ -796,7 +796,7 @@ const OwnerListAsset = ({
         <SweetAlert
           show={showModal}
           success
-          title={["Yes!", "Yay!", "Ok!", "Nice!"][(Math.random() * 4) | 0]}
+          confirmBtnText={["Yes!", "Yay!", "Ok!", "Nice!"][(Math.random() * 4) | 0]}
           onConfirm={() => setShowModal(false)}
           confirmBtnCssClass="button is-success"
         >
