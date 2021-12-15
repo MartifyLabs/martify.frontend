@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { AssetCard } from "components";
-import { loadAssets } from "../../store/wallet/api";
+import { loadAssets } from "store/wallet/api";
 
 const Holdings = () => {
   const dispatch = useDispatch()
