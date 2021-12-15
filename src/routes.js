@@ -16,8 +16,6 @@ import { MainLayout } from "layouts";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "@creativebulma/bulma-tooltip/dist/bulma-tooltip.min.css";
 
-import "./App.css";
-
 const RenderRoutes = () => {
 
   return (

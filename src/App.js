@@ -8,7 +8,7 @@ import { clearError } from "store/error/api";
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "@creativebulma/bulma-tooltip/dist/bulma-tooltip.min.css";
-import "App.css";
+import "./App.css";
 
 const App = () => {
   const dispatch = useDispatch();
