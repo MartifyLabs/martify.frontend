@@ -56,7 +56,7 @@ export const load_collection = (callback) => async (dispatch) => {
   }
 
   dispatch(collections_loaded(all_collections));
-  callback({ all_collections });
+  // callback({ all_collections });
 };
 
 export const get_listings = (policy_id, callback) => async (dispatch) => {
