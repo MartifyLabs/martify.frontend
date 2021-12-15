@@ -1,22 +1,23 @@
 import React, { useEffect, useState} from "react";
-import { compose } from "redux";
-import { connect } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 
 import "./style.scss";
 
-import Search from "../../components/Navbar/Search";
-import { opencnft_get_top_projects } from "../../store/collection/api";
-import { get_asset_image_source, numFormatter } from "../../utils";
-import Image from "../../components/Image";
+import { opencnft_get_top_projects as opencnftGetTopProjects } from "store/collection/api";
+import { get_asset_image_source, numFormatter } from "utils";
+import Image from "components/Image";
 
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-const Home = ({opencnft_get_top_projects}) => {
-  
+const Home = () => {
+  const dispatch = useDispatch()
   const [listProjects, setListProjects] = useState([]);
+
+  const opencnft_get_top_projects = (time, callback) =>  {
+    dispatch(opencnftGetTopProjects(time, callback))
+  }
 
   return (
     <div className="homepage">
@@ -303,16 +304,4 @@ const TopProjects = ({opencnft_get_top_projects, listProjects, setListProjects})
   )
 }
 
-function mapStateToProps(state, props) {
-  return {
-    
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    opencnft_get_top_projects: (time, callback) => dispatch(opencnft_get_top_projects(time, callback)),
-  };
-}
-
-export default compose(connect(mapStateToProps, mapDispatchToProps))(Home);
+export default Home;

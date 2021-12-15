@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { compose } from "redux";
-import { connect } from "react-redux";
+import { useDispatch } from "react-redux";
 
-import { get_listed_assets } from "../../store/collection/api";
-import ListingDisplayListing from "../../components/ListingDisplayListing";
+import { get_listed_assets } from "store/collection/api";
+import { ListingDisplayListing } from "components";
 
 import "bulma-checkradio/dist/css/bulma-checkradio.min.css";
 import "./style.css";
 
-const Explore = ({get_listed_assets}) => {
-  
+const Explore = () => {
+  const dispatch = useDispatch()
   const [allListings, setAllListings] = useState([]);
   const [listings, setListings] = useState([]);
   const [collections, setCollections] = useState([]);
 
   useEffect(() => {
-    get_listed_assets((res) => {
+    dispatch(get_listed_assets((res) => {
       
       if(res.data){
         let list_collections = {};
@@ -44,7 +43,7 @@ const Explore = ({get_listed_assets}) => {
         }
         setCollections(list_collections);
       }
-    });
+    }));
   }, []);
 
   return (
@@ -184,25 +183,9 @@ const ListingSection = ({listings}) => {
     {
       listings.length > 0 ? <ListingDisplayListing listings={listings} /> : <></>
     }
-    {/* {
-      listings.length == 0 ? <NoAssetFound state_collection={state_collection} policyIds={policyIds} /> : <></>
-    } */}
   </>
   );
 }
 
-function mapStateToProps(state, props) {
-  return {
-    state_collection: state.collection,
-    state_wallet: state.wallet,
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    get_listed_assets: (callback) => dispatch(get_listed_assets(callback)),
-  };
-}
-
-export default compose(connect(mapStateToProps, mapDispatchToProps))(Explore);
+export default Explore;
 

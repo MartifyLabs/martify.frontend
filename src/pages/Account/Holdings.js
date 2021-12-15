@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { compose } from "redux";
-import { connect } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import AssetCard from "../../components/AssetCard";
+import { AssetCard } from "components";
 import { loadAssets } from "../../store/wallet/api";
 
-const Holdings = ({state_wallet, state_collection, loadAssets}) => {
+const Holdings = () => {
+  const dispatch = useDispatch()
+  const state_wallet = useSelector(state => state.wallet)
+  const state_collection = useSelector(state => state.collection)
 
   const [listings, setListings] = useState([]);
   const [searchText, setSearchText] = useState("");
@@ -64,9 +66,9 @@ const Holdings = ({state_wallet, state_collection, loadAssets}) => {
   }
 
   useEffect(() => {
-    loadAssets(state_wallet, (res) => {
+    dispatch (loadAssets(state_wallet, (res) => {
       load();
-    });
+    }));
   }, []);
 
   const searchingFor = searchText => {
@@ -248,17 +250,4 @@ const NoAssetFound = ({state_wallet}) => {
   )
 }
 
-function mapStateToProps(state, props) {
-  return {
-    state_collection: state.collection,
-    state_wallet: state.wallet
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    loadAssets: (wallet, callback) => dispatch(loadAssets(wallet, callback)),
-  };
-}
-
-export default compose(connect(mapStateToProps, mapDispatchToProps))(Holdings);
+export default Holdings;

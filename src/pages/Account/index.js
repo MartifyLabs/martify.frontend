@@ -1,13 +1,15 @@
-import React, { useEffect, useState} from "react";
-import { compose } from "redux";
-import { connect } from "react-redux";
+import React, { useState} from "react";
+import { useSelector } from "react-redux";
 
 import AllAssets from "./AllAssets";
 import Holdings from "./Holdings";
 import Listings from "./Listings";
 import Events from "./Events";
 
-const Account = ({state_wallet, state_collection}) => {
+const Account = () => {
+  const state_wallet = useSelector(state => state.wallet)
+  const state_collection = useSelector(state => state.collection)
+
   return (
     <>
       {
@@ -96,16 +98,4 @@ const NotConnected = () => {
   )
 }
 
-function mapStateToProps(state, props) {
-  return {
-    state_collection: state.collection,
-    state_wallet: state.wallet
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-  };
-}
-
-export default compose(connect(mapStateToProps, mapDispatchToProps))(Account);
+export default Account;
