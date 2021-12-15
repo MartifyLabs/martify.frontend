@@ -1,52 +1,35 @@
 import React, { useEffect } from "react";
-import { compose } from "redux";
-import { connect } from "react-redux";
-import { Switch, Route } from "react-router-dom";
-
-import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
-import Collection from "./pages/Collection";
-import Asset from "./pages/Asset";
-import Account from "./pages/Account";
-import About from "./pages/About";
-import Guide from "./pages/Guide";
-import Explore from "./pages/Explore";
 import SweetAlert from 'react-bootstrap-sweetalert';
+import { useDispatch, useSelector } from "react-redux";
+import RenderRoutes from "routes";
+
+import { load_collection } from "store/collection/api";
+import { clearError } from "store/error/api";
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "@creativebulma/bulma-tooltip/dist/bulma-tooltip.min.css";
-
 import "./App.css";
 
-import { load_collection } from "./store/collection/api";
-import { clearError } from "./store/error/api";
+const App = () => {
+  const dispatch = useDispatch();
+  const state_collection = useSelector(state => state.collection)
+  const state_error = useSelector(state => state.error)
 
-const App = ({ state_collection, state_error, load_collection, error_clearError }) => {
   useEffect(() => {
     if (!state_collection.loaded && !state_collection.loading) {
-      load_collection((res) => {
-      });
+      dispatch(load_collection)
     }
-  }, [state_collection, load_collection, error_clearError]);
+  }, [state_collection.loaded, state_collection.loading]);
 
   return (
     <>
-      <Navbar />
-      <Switch>
-        <Route exact path="/" component={Home} />
-        <Route exact path="/collection/:collection_id" component={Collection} />
-        <Route exact path="/assets/:policy_id/:asset_id" component={Asset} />
-        <Route exact path="/account" component={Account} />
-        <Route exact path="/explore" component={Explore} />
-        <Route exact path="/about" component={About} />
-        <Route exact path="/guide" component={Guide} />
-      </Switch>
+      <RenderRoutes />
       <SweetAlert
         title=""
         show={state_error.show}
         error
         confirmBtnText="Oops!"
-        onConfirm={error_clearError}
+        onConfirm={() => dispatch(clearError)}
         confirmBtnCssClass="button is-danger"
       >
         {state_error.message}
@@ -55,18 +38,4 @@ const App = ({ state_collection, state_error, load_collection, error_clearError 
   );
 };
 
-function mapStateToProps(state, props) {
-  return {
-    state_collection: state.collection,
-    state_error: state.error,
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    load_collection: (callback) => dispatch(load_collection(callback)),
-    error_clearError: () => dispatch(clearError()),
-  };
-}
-
-export default compose(connect(mapStateToProps, mapDispatchToProps))(App);
+export default App;

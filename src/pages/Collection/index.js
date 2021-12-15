@@ -1,17 +1,19 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { compose } from "redux";
-import { connect } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
-import { load_collection, get_listings, opencnft_get_policy } from "../../store/collection/api";
-import AssetCard from "../../components/AssetCard";
-import CollectionAbout from "../../components/CollectionAbout";
-import CollectionBanner from "../../components/CollectionBanner";
-import { numFormatter } from "../../utils";
+import { load_collection, get_listings, opencnft_get_policy } from "store/collection/api";
+
+import { AssetCard, CollectionAbout, CollectionBanner } from "components";
+import { numFormatter } from "utils";
 
 import "./style.css";
 
-const Collection = ({state_collection, collection_id, get_listings, opencnft_get_policy}) => {
-  
+const Collection = () => {
+  const {collection_id} = useParams()
+  const state_collection = useSelector(state => state.collection)
+  const dispatch = useDispatch()
+
   const default_meta = {
     id: "",
     meta: {
@@ -52,7 +54,7 @@ const Collection = ({state_collection, collection_id, get_listings, opencnft_get
 
         for(var i in policy_ids){
           var policy_id = policy_ids[i];
-          opencnft_get_policy(policy_id, (res) => {
+          dispatch(opencnft_get_policy(policy_id, (res) => {
             if(res.data.statusCode===404){}else{
               if(!("opencnft" in this_collection)){
                 this_collection.opencnft = [];
@@ -60,7 +62,7 @@ const Collection = ({state_collection, collection_id, get_listings, opencnft_get
               this_collection.opencnft.push(res.data);
               setThisCollection({...this_collection});
             }
-          });
+          }));
         }
       }
     }
@@ -69,7 +71,7 @@ const Collection = ({state_collection, collection_id, get_listings, opencnft_get
   useEffect(() => {
     if(policyIds){
       for(var i in policyIds){
-        get_listings(policyIds[i], (res) => {});
+        dispatch(get_listings(policyIds[i], (res) => {}));
       }
     }
   }, [policyIds]);
@@ -332,19 +334,4 @@ const NoAssetFound = ({state_collection, policyIds}) => {
   )
 }
 
-function mapStateToProps(state, props) {
-  return {
-    collection_id: props.match.params.collection_id,
-    state_collection: state.collection
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    load_collection: (callback) => dispatch(load_collection(callback)),
-    get_listings: (policy_id, callback) => dispatch(get_listings(policy_id, callback)),
-    opencnft_get_policy: (policy_id, callback) => dispatch(opencnft_get_policy(policy_id, callback)),
-  };
-}
-
-export default compose(connect(mapStateToProps, mapDispatchToProps))(Collection);
+export default Collection;

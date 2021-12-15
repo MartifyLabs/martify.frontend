@@ -1,46 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { compose } from "redux";
-import { connect } from "react-redux";
-import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { Link, useParams } from "react-router-dom";
 import Moment from "react-moment";
 import SweetAlert from "react-bootstrap-sweetalert";
 
-import { urls } from "../../config";
+import { urls } from "config";
 import {
-  load_collection,
-  get_asset,
-  asset_add_offer,
-  opencnft_get_asset_tx,
-} from "../../store/collection/api";
+  load_collection as loadCollection,
+  get_asset as getAsset,
+  asset_add_offer as assetAddOffer,
+  opencnft_get_asset_tx as opencnftGetAssetTx,
+} from "store/collection/api";
 import {
   listToken,
   relistToken,
   delistToken,
   purchaseToken,
-} from "../../store/wallet/api";
-import { WALLET_STATE, MARKET_TYPE } from "../../store/wallet/walletTypes";
-
-import CollectionAbout from "../../components/CollectionAbout";
-import CollectionBanner from "../../components/CollectionBanner";
-import AssetImageFigure from "../../components/AssetImageFigure";
-
-import { fromLovelace, get_asset_image_source } from "../../utils";
+} from "store/wallet/api";
+import { WALLET_STATE, MARKET_TYPE } from "store/wallet/walletTypes";
+import { CollectionAbout, CollectionBanner, AssetImageFigure } from "components";
+import { fromLovelace, get_asset_image_source } from "utils";
 
 import "./style.css";
 
-const Asset = ({
-  state_collection,
-  state_wallet,
-  policy_id,
-  asset_id,
-  get_asset,
-  list_token,
-  relist_token,
-  delist_token,
-  purchase_token,
-  asset_add_offer,
-  opencnft_get_asset_tx,
-}) => {
+const Asset = () => {
+  const {policy_id, asset_id} = useParams()
+  const state_wallet = useSelector(state => state.wallet)
+  const state_collection = useSelector(state => state.collection)
+  const dispatch = useDispatch()
+  
   const [asset, setAsset] = useState(false);
   const [thisCollection, setThisCollection] = useState(false);
 
@@ -63,9 +51,31 @@ const Asset = ({
     }
 
     if (query_asset && !state_collection.loading) {
-      get_asset(asset_id, (res) => {});
+      dispatch(getAsset(asset_id, (res) => {}));
     }
   }, [policy_id, asset_id, state_collection]);
+
+  const load_collection = (callback) => {
+    dispatch(loadCollection(callback))
+  }
+  const list_token = (wallet, asset, price, callback) => {
+    dispatch(listToken(wallet, asset, price, callback))
+  }
+  const relist_token = (wallet, asset, price, callback) => {
+    dispatch(relistToken(wallet, asset, price, callback))
+  }
+  const delist_token = (wallet, asset, callback) => {
+    dispatch(delistToken(wallet, asset, callback))
+  }
+  const purchase_token = (wallet, asset, callback) => {
+    dispatch(purchaseToken(wallet, asset, callback))
+  }
+  const asset_add_offer = (asset_id, price, callback) => {
+    dispatch(assetAddOffer(asset_id, price, callback))
+  }
+  const opencnft_get_asset_tx = (asset_id, callback) => {
+    dispatch(opencnftGetAssetTx(asset_id, callback))
+  }
 
   return (
     <>
@@ -1218,32 +1228,4 @@ const ShowNoAssetFound = () => {
   );
 };
 
-function mapStateToProps(state, props) {
-  return {
-    policy_id: props.match.params.policy_id,
-    asset_id: props.match.params.asset_id,
-    state_collection: state.collection,
-    state_wallet: state.wallet,
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    load_collection: (callback) => dispatch(load_collection(callback)),
-    get_asset: (asset_id, callback) => dispatch(get_asset(asset_id, callback)),
-    list_token: (wallet, asset, price, callback) =>
-      dispatch(listToken(wallet, asset, price, callback)),
-    relist_token: (wallet, asset, price, callback) =>
-      dispatch(relistToken(wallet, asset, price, callback)),
-    delist_token: (wallet, asset, callback) =>
-      dispatch(delistToken(wallet, asset, callback)),
-    purchase_token: (wallet, asset, callback) =>
-      dispatch(purchaseToken(wallet, asset, callback)),
-    asset_add_offer: (asset_id, price, callback) =>
-      dispatch(asset_add_offer(asset_id, price, callback)),
-    opencnft_get_asset_tx: (asset_id, callback) =>
-      dispatch(opencnft_get_asset_tx(asset_id, callback)),
-  };
-}
-
-export default compose(connect(mapStateToProps, mapDispatchToProps))(Asset);
+export default Asset;

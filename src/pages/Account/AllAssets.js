@@ -1,12 +1,14 @@
 import React, { useEffect, useState} from "react";
-import { compose } from "redux";
-import { connect } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import AssetCard from "../../components/AssetCard";
-import { loadAssets } from "../../store/wallet/api";
+import { AssetCard } from "components";
+import { loadAssets } from "store/wallet/api";
 
-const AllAssets = ({state_wallet, state_collection, loadAssets}) => {
-
+const AllAssets = () => {
+  const dispatch = useDispatch()
+  const state_wallet = useSelector(state => state.wallet)
+  const state_collection = useSelector(state => state.collection)
+   
   const [listings, setListings] = useState([]);
   const [searchText, setSearchText] = useState("");
   const default_list_projects = [{"value": "all", "label": "All Projects"}];
@@ -19,7 +21,15 @@ const AllAssets = ({state_wallet, state_collection, loadAssets}) => {
   ];
   const [filterAsset, setFilterAsset] = useState("all");
 
-  function add_asset(list_nfts, dict_projects, this_asset){
+  useEffect(() => {
+    dispatch(loadAssets(state_wallet))
+  }, []);
+  
+  useEffect(() => {
+    load();
+  }, [state_wallet]);
+
+  const add_asset = (list_nfts, dict_projects, this_asset) => {
     if(this_asset){
       list_nfts.push(this_asset);
       let policy_id = this_asset.details.policyId;
@@ -31,7 +41,7 @@ const AllAssets = ({state_wallet, state_collection, loadAssets}) => {
     }
   }
 
-  function load(){
+  const load = () => {
     if(state_wallet.loaded_assets){
       let list_nfts = [];
       let list_projects = [...default_list_projects];
@@ -56,16 +66,6 @@ const AllAssets = ({state_wallet, state_collection, loadAssets}) => {
 
     }
   }
-
-  useEffect(() => {
-    load();
-  }, [state_wallet]);
-
-  useEffect(() => {
-    loadAssets(state_wallet, (res) => {
-      load();
-    });
-  }, []);
 
   const searchingFor = searchText => {
     return x => {
@@ -246,17 +246,4 @@ const NoAssetFound = ({state_wallet}) => {
   )
 }
 
-function mapStateToProps(state, props) {
-  return {
-    state_collection: state.collection,
-    state_wallet: state.wallet
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    loadAssets: (wallet, callback) => dispatch(loadAssets(wallet, callback)),
-  };
-}
-
-export default compose(connect(mapStateToProps, mapDispatchToProps))(AllAssets);
+export default AllAssets;
