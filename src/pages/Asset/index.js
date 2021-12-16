@@ -559,8 +559,8 @@ const PurchaseAsset = ({
 
 const ButtonBuy = ({ state_wallet, purchase_this_token }) => {
   const [showNotification, setShowNotification] = useState(false);
-  async function begin_buy_process() {
-    purchase_this_token();
+  const begin_buy_process = async () => {
+    await purchase_this_token();
   }
   return (
     <>
@@ -574,7 +574,7 @@ const ButtonBuy = ({ state_wallet, purchase_this_token }) => {
           !state_wallet.connected ||
           state_wallet.nami.collateral.length === 0
         }
-        onClick={() => begin_buy_process()}
+        onClick={begin_buy_process}
       >
         <span>Buy Now</span>
       </button>
