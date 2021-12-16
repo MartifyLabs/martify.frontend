@@ -671,6 +671,7 @@ const OwnerListAsset = ({
   }
 
   useEffect(() => {
+    let isMounted = true;
     if (state_wallet.loading) {
       if (state_wallet.loading === WALLET_STATE.AWAITING_SIGNATURE) {
         setShowNotification("Awaiting signature...");
@@ -678,6 +679,7 @@ const OwnerListAsset = ({
     } else {
       setShowNotification(false);
     }
+    return () => { isMounted = false };
   }, [state_wallet.loading]);
 
   return (
