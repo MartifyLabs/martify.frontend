@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import RenderRoutes from "routes";
 
 import { load_collection } from "store/collection/api";
-import { clearError } from "store/error/api";
+import { clear_error } from "store/error/errorActions";
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "@creativebulma/bulma-tooltip/dist/bulma-tooltip.min.css";
@@ -29,7 +29,7 @@ const App = () => {
         show={state_error.show}
         error
         confirmBtnText="Oops!"
-        onConfirm={() => dispatch(clearError)}
+        onConfirm={() => dispatch(clear_error)}
         confirmBtnCssClass="button is-danger"
       >
         {state_error.message}

@@ -343,8 +343,10 @@ const PurchaseAsset = ({
       if (state_wallet.loading === WALLET_STATE.AWAITING_SIGNATURE) {
         setShowNotification("Awaiting signature...");
       }
+    } else {
+      setShowNotification(false);
     }
-  }, [state_wallet]);
+  }, [state_wallet.loading]);
 
   return (
     <div className="card">
@@ -518,7 +520,7 @@ const PurchaseAsset = ({
       {showModal ? (
         <SweetAlert
           title=""
-          show={showModal}
+          show={showModal !== false}
           success
           confirmBtnText={
             ["Yes!", "Yay!", "Ok!", "Nice!"][(Math.random() * 4) | 0]
