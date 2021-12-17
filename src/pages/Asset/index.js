@@ -631,8 +631,9 @@ const OwnerListAsset = ({
   function successful_transaction(res) {
     setUserInputAmount("");
     if (res.success) {
-      setShowModal(true);
       setOperation(res.type);
+      setShowModal(true);
+      console.log("after set: " + showModal);
       setShowNotification(false);
     } else {
       console.log("fail", res);
@@ -689,6 +690,7 @@ const OwnerListAsset = ({
           List {asset.details.onchainMetadata.name} for sale in the Marketplace
         </p>
       </header>
+      
       <div className="card-content">
         {asset.offers ? (
           Object.keys(asset.offers).length ? (
@@ -815,10 +817,11 @@ const OwnerListAsset = ({
         <></>
       )}
 
+      { console.log(showModal) /* here showModal is false, why??? */ } 
+
       {showModal ? (
         <SweetAlert
           title=""
-          show={showModal}
           success
           confirmBtnText={
             ["Yes!", "Yay!", "Ok!", "Nice!"][(Math.random() * 4) | 0]
