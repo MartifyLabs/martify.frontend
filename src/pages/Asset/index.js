@@ -563,7 +563,7 @@ const ButtonBuy = ({ state_wallet, purchase_this_token }) => {
   const [showNotification, setShowNotification] = useState(false);
   const begin_buy_process = async () => {
     await purchase_this_token();
-  }
+  };
   return (
     <>
       <button
@@ -672,7 +672,6 @@ const OwnerListAsset = ({
   }
 
   useEffect(() => {
-    let isMounted = true;
     if (state_wallet.loading) {
       if (state_wallet.loading === WALLET_STATE.AWAITING_SIGNATURE) {
         setShowNotification("Awaiting signature...");
@@ -680,7 +679,6 @@ const OwnerListAsset = ({
     } else {
       setShowNotification(false);
     }
-    return () => { isMounted = false };
   }, [state_wallet.loading]);
 
   return (
@@ -690,7 +688,7 @@ const OwnerListAsset = ({
           List {asset.details.onchainMetadata.name} for sale in the Marketplace
         </p>
       </header>
-      
+
       <div className="card-content">
         {asset.offers ? (
           Object.keys(asset.offers).length ? (
@@ -817,7 +815,7 @@ const OwnerListAsset = ({
         <></>
       )}
 
-      { console.log(showModal) /* here showModal is false, why??? */ } 
+      {console.log(showModal) /* here showModal is false, why??? */}
 
       {showModal ? (
         <SweetAlert
@@ -966,13 +964,16 @@ const ListAttributes = ({ asset, attr }) => {
                       })
                     : Object.entries(asset.details.onchainMetadata[attr]).map(
                         ([k, v]) => {
-                          return (
-                            <tr key={k}>
-                              <td>
-                                {k}: {v}
-                              </td>
-                            </tr>
-                          );
+                          if (typeof v !== "object") {
+                            return (
+                              <tr key={k}>
+                                <td>
+                                  {k}: {v}
+                                </td>
+                              </tr>
+                            );
+                          }
+                          return <></>; // TODO: handle properties object
                         }
                       )}
                 </tbody>
