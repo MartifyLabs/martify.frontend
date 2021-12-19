@@ -18,17 +18,21 @@ import {
   purchaseToken,
 } from "store/wallet/api";
 import { WALLET_STATE, MARKET_TYPE } from "store/wallet/walletTypes";
-import { CollectionAbout, CollectionBanner, AssetImageFigure } from "components";
-import { fromLovelace, get_asset_image_source } from "utils";
+import {
+  CollectionAbout,
+  CollectionBanner,
+  AssetImageFigure,
+} from "components";
+import { fromLovelace } from "utils";
 
 import "./style.css";
 
 const Asset = () => {
-  const {policy_id, asset_id} = useParams()
-  const state_wallet = useSelector(state => state.wallet)
-  const state_collection = useSelector(state => state.collection)
-  const dispatch = useDispatch()
-  
+  const { policy_id, asset_id } = useParams();
+  const state_wallet = useSelector((state) => state.wallet);
+  const state_collection = useSelector((state) => state.collection);
+  const dispatch = useDispatch();
+
   const [asset, setAsset] = useState(false);
   const [thisCollection, setThisCollection] = useState(false);
 
@@ -56,26 +60,26 @@ const Asset = () => {
   }, [policy_id, asset_id, state_collection]);
 
   const load_collection = (callback) => {
-    dispatch(loadCollection(callback))
-  }
+    dispatch(loadCollection(callback));
+  };
   const list_token = (wallet, asset, price, callback) => {
-    dispatch(listToken(wallet, asset, price, callback))
-  }
+    dispatch(listToken(wallet, asset, price, callback));
+  };
   const relist_token = (wallet, asset, price, callback) => {
-    dispatch(relistToken(wallet, asset, price, callback))
-  }
+    dispatch(relistToken(wallet, asset, price, callback));
+  };
   const delist_token = (wallet, asset, callback) => {
-    dispatch(delistToken(wallet, asset, callback))
-  }
+    dispatch(delistToken(wallet, asset, callback));
+  };
   const purchase_token = (wallet, asset, callback) => {
-    dispatch(purchaseToken(wallet, asset, callback))
-  }
+    dispatch(purchaseToken(wallet, asset, callback));
+  };
   const asset_add_offer = (asset_id, price, callback) => {
-    dispatch(assetAddOffer(asset_id, price, callback))
-  }
+    dispatch(assetAddOffer(asset_id, price, callback));
+  };
   const opencnft_get_asset_tx = (asset_id, callback) => {
-    dispatch(opencnftGetAssetTx(asset_id, callback))
-  }
+    dispatch(opencnftGetAssetTx(asset_id, callback));
+  };
 
   return (
     <>
@@ -339,8 +343,10 @@ const PurchaseAsset = ({
       if (state_wallet.loading === WALLET_STATE.AWAITING_SIGNATURE) {
         setShowNotification("Awaiting signature...");
       }
+    } else {
+      setShowNotification(false);
     }
-  }, [state_wallet]);
+  }, [state_wallet.loading]);
 
   return (
     <div className="card">
@@ -514,9 +520,11 @@ const PurchaseAsset = ({
       {showModal ? (
         <SweetAlert
           title=""
-          show={showModal}
+          show={showModal !== false}
           success
-          confirmBtnText={["Yes!", "Yay!", "Ok!", "Nice!"][(Math.random() * 4) | 0]}
+          confirmBtnText={
+            ["Yes!", "Yay!", "Ok!", "Nice!"][(Math.random() * 4) | 0]
+          }
           onConfirm={() => setShowModal(false)}
           confirmBtnCssClass="button is-success"
         >
@@ -553,9 +561,9 @@ const PurchaseAsset = ({
 
 const ButtonBuy = ({ state_wallet, purchase_this_token }) => {
   const [showNotification, setShowNotification] = useState(false);
-  async function begin_buy_process() {
-    purchase_this_token();
-  }
+  const begin_buy_process = async () => {
+    await purchase_this_token();
+  };
   return (
     <>
       <button
@@ -568,7 +576,7 @@ const ButtonBuy = ({ state_wallet, purchase_this_token }) => {
           !state_wallet.connected ||
           state_wallet.nami.collateral.length === 0
         }
-        onClick={() => begin_buy_process()}
+        onClick={begin_buy_process}
       >
         <span>Buy Now</span>
       </button>
@@ -618,17 +626,21 @@ const OwnerListAsset = ({
   const [userInputAmount, setUserInputAmount] = useState("");
   const [showNotification, setShowNotification] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [operation, setOperation] = useState("");
 
   function successful_transaction(res) {
     setUserInputAmount("");
     if (res.success) {
-      setShowModal(res.type);
+      setOperation(res.type);
+      setShowModal(true);
+      console.log("after set: " + showModal);
       setShowNotification(false);
     } else {
       console.log("fail", res);
       setShowNotification("Previous transaction not validated.");
     }
   }
+
   function list_this_token(price) {
     list_token(state_wallet, asset, price, (res) => {
       successful_transaction(res);
@@ -664,11 +676,10 @@ const OwnerListAsset = ({
       if (state_wallet.loading === WALLET_STATE.AWAITING_SIGNATURE) {
         setShowNotification("Awaiting signature...");
       }
+    } else {
+      setShowNotification(false);
     }
-    // else{
-    //   setShowNotification(false);
-    // }
-  }, [state_wallet]);
+  }, [state_wallet.loading]);
 
   return (
     <div className="card">
@@ -677,6 +688,7 @@ const OwnerListAsset = ({
           List {asset.details.onchainMetadata.name} for sale in the Marketplace
         </p>
       </header>
+
       <div className="card-content">
         {asset.offers ? (
           Object.keys(asset.offers).length ? (
@@ -803,25 +815,28 @@ const OwnerListAsset = ({
         <></>
       )}
 
+      {console.log(showModal) /* here showModal is false, why??? */}
+
       {showModal ? (
         <SweetAlert
           title=""
-          show={showModal}
           success
-          confirmBtnText={["Yes!", "Yay!", "Ok!", "Nice!"][(Math.random() * 4) | 0]}
+          confirmBtnText={
+            ["Yes!", "Yay!", "Ok!", "Nice!"][(Math.random() * 4) | 0]
+          }
           onConfirm={() => setShowModal(false)}
           confirmBtnCssClass="button is-success"
         >
-          {showModal === MARKET_TYPE.NEW_LISTING ? (
+          {operation === MARKET_TYPE.NEW_LISTING ? (
             <span>
               Listed <b>{asset.details.onchainMetadata.name}</b> successfully!
             </span>
-          ) : showModal === MARKET_TYPE.PRICE_UPDATE ? (
+          ) : operation === MARKET_TYPE.PRICE_UPDATE ? (
             <span>
               Listing price for <b>{asset.details.onchainMetadata.name}</b>{" "}
               updated!
             </span>
-          ) : showModal === MARKET_TYPE.DELIST ? (
+          ) : operation === MARKET_TYPE.DELIST ? (
             <span>
               <b>{asset.details.onchainMetadata.name}</b> removed from the
               marketplace.
@@ -949,13 +964,16 @@ const ListAttributes = ({ asset, attr }) => {
                       })
                     : Object.entries(asset.details.onchainMetadata[attr]).map(
                         ([k, v]) => {
-                          return (
-                            <tr key={k}>
-                              <td>
-                                {k}: {v}
-                              </td>
-                            </tr>
-                          );
+                          if (typeof v !== "object") {
+                            return (
+                              <tr key={k}>
+                                <td>
+                                  {k}: {v}
+                                </td>
+                              </tr>
+                            );
+                          }
+                          return <></>; // TODO: handle properties object
                         }
                       )}
                 </tbody>

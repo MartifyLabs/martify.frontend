@@ -22,7 +22,7 @@ const AllAssets = () => {
   const [filterAsset, setFilterAsset] = useState("all");
 
   useEffect(() => {
-    dispatch(loadAssets(state_wallet))
+    dispatch(loadAssets(state_wallet, (res) => {}))
   }, []);
   
   useEffect(() => {

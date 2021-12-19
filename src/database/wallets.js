@@ -129,7 +129,7 @@ export const listWalletAsset = async (wallet, walletAsset, newEvent) => {
         [walletAsset.details.asset]: walletAsset,
       },
     };
-    await saveWallet(updatedWallet);
+    await saveWallet(updatedWallet, false);
     return updatedWallet;
   }
   return wallet;
@@ -150,7 +150,7 @@ export const delistWalletAsset = async (wallet, listedAsset, newEvent) => {
       events: [...wallet.events, newEvent],
       market: updatedMarket,
     };
-    await saveWallet(updatedWallet);
+    await saveWallet(updatedWallet, false);
     return updatedWallet;
   }
   return wallet;
@@ -179,11 +179,11 @@ export const relistWalletAsset = async (wallet, listedAsset, newEvent) => {
 /**
  * @throws COULD_NOT_SAVE_WALLET_TO_DB
  */
-export const saveWallet = async (wallet) => {
+export const saveWallet = async (wallet, merge = true) => {
   try {
     if (wallet) {
       const reference = doc(firestore, "wallets", wallet.address);
-      await setDoc(reference, wallet, { merge: true });
+      await setDoc(reference, wallet, { merge });
     }
   } catch (error) {
     console.error(
