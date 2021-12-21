@@ -5,8 +5,15 @@ import { useParams } from "react-router-dom";
 import { get_listings, opencnft_get_policy } from "store/collection/api";
 
 import { AssetCard, CollectionAbout, CollectionBanner } from "components";
-
 import "./style.css";
+
+function debounce(func, timeout = 1000){
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+  };
+}
 
 const Collection = () => {
   const { collection_id } = useParams();
@@ -23,28 +30,29 @@ const Collection = () => {
     links: {},
   };
 
-  const [policyIds, setPolicyIds] = useState(false);
+  const [policyIds, setPolicyIds] = useState(undefined);
+  // const [paginationObject, setPaginationObject] = useState({})
   const [thisCollection, setThisCollection] = useState(default_meta);
 
   useEffect(() => {
     if (state_collection.loaded) {
       let policy_ids = false;
-      var this_collection = false;
+      let currentCollectionIterator = undefined;
 
       if (collection_id in state_collection.collections) {
-        this_collection = {
+        currentCollectionIterator = {
           ...default_meta,
           ...state_collection.collections[collection_id],
         };
-        policy_ids = this_collection.policy_ids;
+        policy_ids = currentCollectionIterator.policy_ids;
       } else if (collection_id in state_collection.policies_collections) {
-        this_collection = {
+        currentCollectionIterator = {
           ...default_meta,
           ...state_collection.policies_collections[collection_id],
         };
         policy_ids = [collection_id];
       } else {
-        this_collection = {
+        currentCollectionIterator = {
           ...default_meta,
           id: collection_id,
           policy_id: collection_id,
@@ -52,21 +60,21 @@ const Collection = () => {
         policy_ids = [collection_id];
       }
 
-      if (this_collection.id !== thisCollection.id) {
+      if (currentCollectionIterator.id !== thisCollection.id) {
         setPolicyIds(policy_ids);
-        setThisCollection({ ...this_collection });
+        setThisCollection({ ...currentCollectionIterator });
 
-        for (var i in policy_ids) {
-          var policy_id = policy_ids[i];
+        for (let policyIdx in policy_ids) {
+          let policy_id = policy_ids[policyIdx];
           dispatch(
             opencnft_get_policy(policy_id, (res) => {
               if (res.data.statusCode === 404) {
               } else {
-                if (!("opencnft" in this_collection)) {
-                  this_collection.opencnft = [];
+                if (!("opencnft" in currentCollectionIterator)) {
+                  currentCollectionIterator.opencnft = [];
                 }
-                this_collection.opencnft.push(res.data);
-                setThisCollection({ ...this_collection });
+                currentCollectionIterator.opencnft.push(res.data);
+                setThisCollection({ ...currentCollectionIterator });
               }
             })
           );
@@ -85,7 +93,7 @@ const Collection = () => {
       <section className="section">
         <div className="columns">
           {thisCollection.is_martify_verified ||
-          thisCollection.is_cnft_verified ? (
+            thisCollection.is_cnft_verified ? (
             <div className="column is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
               <div className="block">
                 <CollectionAbout thisCollection={thisCollection} />
@@ -109,27 +117,81 @@ const Collection = () => {
 };
 
 const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
+  const ITEMS_PER_PAGE = 23;
   const dispatch = useDispatch();
   const [listings, setListings] = useState([]);
+  const [currentPolicy, setCurrentpolicy] = useState('bla');
+  const [flag, setFlag] = useState(false);
+  const [paginationObject, setPaginationObject] = useState(null);
+  // define an object that can be accessed from thr event listener
+  const myStateRef = React.useRef(paginationObject);
+
+  const setMyStatePage = data => {
+    myStateRef.current = data;
+    setPaginationObject(data);
+  };
+  // console.log(paginationObject)
+  const onScroll = (ev) => {
+    if (window) {
+      if ((window.innerHeight + window.scrollY + 100) > document.body.offsetHeight) {
+        loadNextPage();
+      }
+    }
+  };
+
+  const findCurrentLoadingPolicy = () => {
+    for (let objKey of Object.keys(myStateRef.current)) {
+      console.log(objKey)
+      if (myStateRef.current[objKey].itemsCap > myStateRef.current[objKey].itemsLoaded) {
+        return myStateRef.current[objKey];
+      }
+    }
+    return null;
+  };
+
+  const loadNextPage = () => {
+    // console.log(myStateRef.current);
+    let currentPolicy = findCurrentLoadingPolicy()
+    dispatch(get_listings(currentPolicy._id, currentPolicy.page, ITEMS_PER_PAGE, (countLoadedAssets) => {
+      let currentItemsLoaded = myStateRef.current[currentPolicy._id];
+      currentItemsLoaded['itemsLoaded'] = currentPolicy.itemsLoaded + countLoadedAssets;
+      currentItemsLoaded['page'] = currentPolicy.page + 1;
+      setMyStatePage(...currentItemsLoaded)
+    }));
+  }
+
+  //and effect that boostraps the first collection
+  useEffect(() => {
+    if (paginationObject !== null) {
+      let currentPolicy = findCurrentLoadingPolicy()
+      loadNextPage();
+    }
+  }, [paginationObject]);
 
   useEffect(() => {
-    if (thisCollection.opencnft) {
-      dispatch(get_listings(policyIds.at(0), (res) => {}))
+    if (policyIds && thisCollection.opencnft) {
+      let tmpPaginationObj = {};
+      for (let policy of policyIds) {
+        let opencnftItem = thisCollection.opencnft.find((it) => it.policy == policy)
+        tmpPaginationObj[policy] = { page: 0, itemsLoaded: 0, itemsCap: opencnftItem.asset_minted, _id: policy };
+      }
+      setMyStatePage(tmpPaginationObj);
     }
-  }, [thisCollection]);
+  }, [policyIds, thisCollection]);
 
-  function load() {
+  const load = () => {
     setListings([]);
     let tmp_list = [];
-    for (var i in policyIds) {
-      var policy_id = policyIds[i];
+    for (let i in policyIds) {
+      let policy_id = policyIds[i];
       if (policy_id in state_collection.policies_assets) {
         let tmp = Object.values(state_collection.policies_assets[policy_id]);
+        console.log(tmp)
         tmp_list.push(...tmp);
       }
     }
     setListings(tmp_list);
-  }
+  };
 
   useEffect(() => {
     load();
@@ -137,6 +199,10 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
 
   useEffect(() => {
     load();
+    window.addEventListener('scroll', debounce(() => onScroll()));
+    return () =>
+      window.removeEventListener('scroll', debounce(() => onScroll()));
+
   }, []);
 
   return (
@@ -145,6 +211,10 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
         <DisplayListing
           state_collection={state_collection}
           listings={listings}
+          currentPolicy={currentPolicy}
+          setCurrentpolicy={setCurrentpolicy}
+          thisCollection={thisCollection}
+          paginationObject={paginationObject}
         />
       ) : (
         <></>
@@ -161,16 +231,33 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   );
 };
 
-const DisplayListing = ({ state_collection, listings }) => {
-  const [currentPage, setCurrentPage] = useState(1);
+const DisplayListing = ({ state_collection, listings, setCurrentpolicy, thisCollection }) => {
+  const [currentpolicyPage, setCurrentpolicyPage] = useState({});
 
   // search and filter
   const [searchText, setSearchText] = useState("");
   const [sortby, setSortby] = useState("lowtohigh");
+  const [allAssetsMinted, setAllAssetsMinted] = useState(0);
+
   const sort_options = [
     { value: "lowtohigh", label: "Price: Low to High" },
     { value: "hightolow", label: "Price: High to Low" },
   ];
+
+  useEffect(() => {
+    let overallAssets = 0;
+    for (let collection of thisCollection.opencnft) {
+      overallAssets += collection.asset_minted;
+    }
+    setAllAssetsMinted(overallAssets);
+  }, [thisCollection])
+
+  useEffect(() => {
+    // time to fetch next page.
+    // when we fetch next page, we get back the page data and if the page has more pages.
+    // if the policy does not have more pages, we update it.
+  }, [currentpolicyPage]);
+
 
   const searchingFor = (searchText) => {
     return (x) => {
@@ -244,7 +331,7 @@ const DisplayListing = ({ state_collection, listings }) => {
         </div>
       </div>
       <div className="columns is-multiline">{filtered_listing}</div>
-      <button
+      {/* <button
         className={
           "button is-rounded is-info" +
           (state_collection.loading ? " is-loading" : "")
@@ -253,7 +340,7 @@ const DisplayListing = ({ state_collection, listings }) => {
         onClick={() => setCurrentPage(currentPage + 1)}
       >
         <span>Load More...{currentPage}</span>
-      </button>
+      </button> */}
     </div>
   );
 };
