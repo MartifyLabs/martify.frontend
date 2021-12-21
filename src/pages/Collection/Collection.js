@@ -9,12 +9,12 @@ import "./style.css";
 
 function throttle(func, wait = 2000) {
   let time = Date.now();
-  return function() {
-    if ((time + wait - Date.now()) < 0) {
+  return function () {
+    if (time + wait - Date.now() < 0) {
       func();
       time = Date.now();
     }
-  }
+  };
 }
 
 const Collection = () => {
@@ -139,7 +139,7 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
     setPaginationObject(data);
   };
   // console.log(paginationObject)
-  const onScroll = useCallback((ev) => {
+  const onScroll = (ev) => {
     if (window) {
       if (
         window.innerHeight + window.scrollY + 100 >
@@ -150,7 +150,7 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
         }
       }
     }
-  }, []);
+  };
 
   const findCurrentLoadingPolicy = () => {
     if (myStateRef.current) {
@@ -168,29 +168,31 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   };
 
   const loadNextPage = () => {
-    setIsFetching(true);
-    let currentPolicy = findCurrentLoadingPolicy();
-    let listingsRef = myStateRefListing.current;
-    dispatch(
-      get_listings(
-        currentPolicy._id,
-        currentPolicy.page,
-        ITEMS_PER_PAGE,
-        listingsRef && listingsRef.length > 0
-          ? listingsRef[listingsRef.length - 1].details.readableAssetName
-          : "",
-        (countLoadedAssets) => {
-          let currentItemsLoaded = myStateRef.current[currentPolicy._id];
-          currentItemsLoaded["itemsLoaded"] =
-            currentPolicy.itemsLoaded + countLoadedAssets;
-          currentItemsLoaded["page"] = currentPolicy.page + 1;
-          let newObj = {};
-          newObj[currentPolicy._id] = currentItemsLoaded;
-          setMyStatePage(newObj);
-          setIsFetching(false);
-        }
-      )
-    );
+    throttle(() => {
+      setIsFetching(true);
+      let currentPolicy = findCurrentLoadingPolicy();
+      let listingsRef = myStateRefListing.current;
+      dispatch(
+        get_listings(
+          currentPolicy._id,
+          currentPolicy.page,
+          ITEMS_PER_PAGE,
+          listingsRef && listingsRef.length > 0
+            ? listingsRef[listingsRef.length - 1].details.readableAssetName
+            : "",
+          (countLoadedAssets) => {
+            let currentItemsLoaded = myStateRef.current[currentPolicy._id];
+            currentItemsLoaded["itemsLoaded"] =
+              currentPolicy.itemsLoaded + countLoadedAssets;
+            currentItemsLoaded["page"] = currentPolicy.page + 1;
+            let newObj = {};
+            newObj[currentPolicy._id] = currentItemsLoaded;
+            setMyStatePage(newObj);
+            setIsFetching(false);
+          }
+        )
+      );
+    });
   };
 
   //and effect that boostraps the first collection
@@ -245,7 +247,7 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
         "scroll",
         throttle(() => onScroll())
       );
-  }, [onScroll]);
+  }, []);
 
   return (
     <>
