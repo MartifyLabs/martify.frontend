@@ -1,7 +1,6 @@
 import {
   collections_loaded,
   collections_add_tokens,
-  collections_append_tokens,
   collections_loading,
   collections_add_assets,
 } from "./collectionActions";
@@ -71,20 +70,12 @@ export const get_listings = (policy_id, page, count, lastVisible, callback) => a
 
     const assets = await getCollectionAssets(policy_id, page, count, lastVisible);
     if (assets) {
-      for (let i in assets) {
-        let asset = assets[i];
-        if (asset) {
-          if (asset.details) {
-            output.listing[asset.details.asset] = asset;
-          }
-        }
-      }
+      output.listing = Object.assign({}, ...assets.map((a) => ({[a.details.asset]: a})));
 
       if (output.policy_id && output.listing) {
         dispatch(collections_add_tokens(output));
       }
     }
-    //const newAssets = Object.assign({}, ...assets.map((a) => ({[a.details.asset]: a})));
 
     callback(assets ? assets.length : 0);
   } catch (err) {

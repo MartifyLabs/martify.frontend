@@ -7,11 +7,13 @@ import { get_listings, opencnft_get_policy } from "store/collection/api";
 import { AssetCard, CollectionAbout, CollectionBanner } from "components";
 import "./style.css";
 
-function debounce(func, timeout = 1000){
+function debounce(func, timeout = 1000) {
   let timer;
   return (...args) => {
     clearTimeout(timer);
-    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    timer = setTimeout(() => {
+      func.apply(this, args);
+    }, timeout);
   };
 }
 
@@ -92,7 +94,7 @@ const Collection = () => {
       <section className="section">
         <div className="columns">
           {thisCollection.is_martify_verified ||
-            thisCollection.is_cnft_verified ? (
+          thisCollection.is_cnft_verified ? (
             <div className="column is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
               <div className="block">
                 <CollectionAbout thisCollection={thisCollection} />
@@ -119,7 +121,7 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   const ITEMS_PER_PAGE = 23;
   const dispatch = useDispatch();
   const [listings, setListings] = useState([]);
-  const [currentPolicy, setCurrentpolicy] = useState('bla');
+  const [currentPolicy, setCurrentpolicy] = useState("bla");
   const [flag, setFlag] = useState(false);
   const [paginationObject, setPaginationObject] = useState(null);
   // define an object that can be accessed from thr event listener
@@ -127,11 +129,11 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
 
   const myStateRefListing = React.useRef(listings);
 
-  const setMyStateRefListing = data => {
+  const setMyStateRefListing = (data) => {
     myStateRefListing.current = data;
     setListings(data);
   };
-  const setMyStatePage = data => {
+  const setMyStatePage = (data) => {
     myStateRef.current = data;
     console.log(data);
     setPaginationObject(data);
@@ -139,41 +141,57 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   // console.log(paginationObject)
   const onScroll = (ev) => {
     if (window) {
-      if ((window.innerHeight + window.scrollY + 100) > document.body.offsetHeight) {
+      if (
+        window.innerHeight + window.scrollY + 100 >
+        document.body.offsetHeight
+      ) {
         loadNextPage();
       }
     }
   };
 
   const findCurrentLoadingPolicy = () => {
-    for (let objKey of Object.keys(myStateRef.current)) {
-      console.log(objKey)
-      if (myStateRef.current[objKey].itemsCap > myStateRef.current[objKey].itemsLoaded) {
-        return myStateRef.current[objKey];
+    if (myStateRef.current) {
+      for (let objKey of Object.keys(myStateRef.current)) {
+        console.log(objKey);
+        if (
+          myStateRef.current[objKey].itemsCap >
+          myStateRef.current[objKey].itemsLoaded
+        ) {
+          return myStateRef.current[objKey];
+        }
       }
     }
     return null;
   };
 
   const loadNextPage = () => {
-    // console.log(myStateRef.current);
     let currentPolicy = findCurrentLoadingPolicy();
     let listingsRef = myStateRefListing.current;
-    console.log(listingsRef && listingsRef.length > 0 ? listingsRef[listingsRef.length - 1].details.readableAssetName  : "");
-    dispatch(get_listings(currentPolicy._id, currentPolicy.page, ITEMS_PER_PAGE, listingsRef && listingsRef.length > 0 ? listingsRef[listingsRef.length -1].details.readableAssetName : "", (countLoadedAssets) => {
-      let currentItemsLoaded = myStateRef.current[currentPolicy._id];
-      currentItemsLoaded['itemsLoaded'] = currentPolicy.itemsLoaded + countLoadedAssets;
-      currentItemsLoaded['page'] = currentPolicy.page + 1;
-      let newObj = {};
-      newObj[currentPolicy._id] = currentItemsLoaded;
-      setMyStatePage(newObj);
-    }));
-  }
+    dispatch(
+      get_listings(
+        currentPolicy._id,
+        currentPolicy.page,
+        ITEMS_PER_PAGE,
+        listingsRef && listingsRef.length > 0
+          ? listingsRef[listingsRef.length - 1].details.readableAssetName
+          : "",
+        (countLoadedAssets) => {
+          let currentItemsLoaded = myStateRef.current[currentPolicy._id];
+          currentItemsLoaded["itemsLoaded"] =
+            currentPolicy.itemsLoaded + countLoadedAssets;
+          currentItemsLoaded["page"] = currentPolicy.page + 1;
+          let newObj = {};
+          newObj[currentPolicy._id] = currentItemsLoaded;
+          setMyStatePage(newObj);
+        }
+      )
+    );
+  };
 
   //and effect that boostraps the first collection
   useEffect(() => {
     if (paginationObject !== null && !flag) {
-      let currentPolicy = findCurrentLoadingPolicy()
       loadNextPage();
       setFlag(true);
     }
@@ -183,8 +201,15 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
     if (policyIds && thisCollection.opencnft) {
       let tmpPaginationObj = {};
       for (let policy of policyIds) {
-        let opencnftItem = thisCollection.opencnft.find((it) => it.policy === policy)
-        tmpPaginationObj[policy] = { page: 1, itemsLoaded: 0, itemsCap: opencnftItem.asset_minted, _id: policy };
+        let opencnftItem = thisCollection.opencnft.find(
+          (it) => it.policy === policy
+        );
+        tmpPaginationObj[policy] = {
+          page: 1,
+          itemsLoaded: 0,
+          itemsCap: opencnftItem.asset_minted,
+          _id: policy,
+        };
       }
       setMyStatePage(tmpPaginationObj);
     }
@@ -208,12 +233,16 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   }, [policyIds, state_collection]);
 
   useEffect(() => {
-    load();
-    window.addEventListener('scroll', debounce(() => onScroll()));
+    window.addEventListener(
+      "scroll",
+      debounce(() => onScroll())
+    );
     return () =>
-      window.removeEventListener('scroll', debounce(() => onScroll()));
-
-  }, []);
+      window.removeEventListener(
+        "scroll",
+        debounce(() => onScroll())
+      );
+  });
 
   return (
     <>
@@ -241,7 +270,12 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   );
 };
 
-const DisplayListing = ({ state_collection, listings, setCurrentpolicy, thisCollection }) => {
+const DisplayListing = ({
+  state_collection,
+  listings,
+  setCurrentpolicy,
+  thisCollection,
+}) => {
   const [currentpolicyPage, setCurrentpolicyPage] = useState({});
 
   // search and filter
@@ -255,19 +289,20 @@ const DisplayListing = ({ state_collection, listings, setCurrentpolicy, thisColl
   ];
 
   useEffect(() => {
-    let overallAssets = 0;
-    for (let collection of thisCollection.opencnft) {
-      overallAssets += collection.asset_minted;
+    if (thisCollection.opencnft) {
+      let overallAssets = 0;
+      for (let collection of thisCollection.opencnft) {
+        overallAssets += collection.asset_minted;
+      }
+      setAllAssetsMinted(overallAssets);
     }
-    setAllAssetsMinted(overallAssets);
-  }, [thisCollection])
+  }, [thisCollection.opencnft]);
 
   useEffect(() => {
     // time to fetch next page.
     // when we fetch next page, we get back the page data and if the page has more pages.
     // if the policy does not have more pages, we update it.
   }, [currentpolicyPage]);
-
 
   const searchingFor = (searchText) => {
     return (x) => {
@@ -341,16 +376,6 @@ const DisplayListing = ({ state_collection, listings, setCurrentpolicy, thisColl
         </div>
       </div>
       <div className="columns is-multiline">{filtered_listing}</div>
-      {/* <button
-        className={
-          "button is-rounded is-info" +
-          (state_collection.loading ? " is-loading" : "")
-        }
-        disabled={state_collection.loading}
-        onClick={() => setCurrentPage(currentPage + 1)}
-      >
-        <span>Load More...{currentPage}</span>
-      </button> */}
     </div>
   );
 };
