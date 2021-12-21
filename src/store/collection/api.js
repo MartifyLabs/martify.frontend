@@ -60,8 +60,7 @@ export const load_collection = (callback) => async (dispatch) => {
   callback({ all_collections });
 };
 
-export const get_listings = (policy_id, page, count, callback) => async (dispatch) => {
-  console.log(policy_id, page, count)
+export const get_listings = (policy_id, page, count, lastVisible, callback) => async (dispatch) => {
   try {
     dispatch(collections_loading(true));
 
@@ -70,7 +69,7 @@ export const get_listings = (policy_id, page, count, callback) => async (dispatc
       listing: {},
     };
 
-    const assets = await getCollectionAssets(policy_id, page, count);
+    const assets = await getCollectionAssets(policy_id, page, count, lastVisible);
     if (assets) {
       for (let i in assets) {
         let asset = assets[i];
@@ -85,14 +84,12 @@ export const get_listings = (policy_id, page, count, callback) => async (dispatc
         dispatch(collections_add_tokens(output));
       }
     }
+    //const newAssets = Object.assign({}, ...assets.map((a) => ({[a.details.asset]: a})));
 
-    callback(assets ? assets.length : 0);
+    //callback(assets ? assets.length : 0);
   } catch (err) {
     dispatch(collections_loading(false));
-    dispatch(set_error({
-      message: errorTypes.COULD_NOT_RETRIEVE_COLLECTION_ASSETS_FROM_DB,
-      detail: err,
-    }));
+    console.error(err);
   }
 };
 

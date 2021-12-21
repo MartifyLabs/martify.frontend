@@ -93,14 +93,14 @@ export const getAssets = async (assetIds) => {
 /**
  * @throws COULD_NOT_RETRIEVE_COLLECTION_ASSETS_FROM_DB
  */
-export const getCollectionAssets = async (policyId, page = 1, count = 100) => {
+export const getCollectionAssets = async (policyId, page = 1, count = 100, lastVisible) => {
   try {
     if (policyId) {
       const reference = await query(
         collection(firestore, "assets"),
         where("details.policyId", "==", policyId),
         orderBy("details.readableAssetName"),
-        startAfter((page - 1) * count),
+        startAfter(lastVisible),
         limit(count)
       );
 

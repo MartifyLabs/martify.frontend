@@ -151,12 +151,13 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
 
   const loadNextPage = () => {
     // console.log(myStateRef.current);
-    let currentPolicy = findCurrentLoadingPolicy()
-    dispatch(get_listings(currentPolicy._id, currentPolicy.page, ITEMS_PER_PAGE, (countLoadedAssets) => {
+    let currentPolicy = findCurrentLoadingPolicy();
+    console.log("LLL", listings && listings.length > 0 ? listings[listings.length -1] : "");
+    dispatch(get_listings(currentPolicy._id, currentPolicy.page, ITEMS_PER_PAGE, listings && listings.length > 0 ? listings[listings.length -1].details.readableAssetName : "", (countLoadedAssets) => {
       let currentItemsLoaded = myStateRef.current[currentPolicy._id];
       currentItemsLoaded['itemsLoaded'] = currentPolicy.itemsLoaded + countLoadedAssets;
       currentItemsLoaded['page'] = currentPolicy.page + 1;
-      setMyStatePage(...currentItemsLoaded)
+      setMyStatePage(...currentItemsLoaded);
     }));
   }
 
@@ -172,8 +173,8 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
     if (policyIds && thisCollection.opencnft) {
       let tmpPaginationObj = {};
       for (let policy of policyIds) {
-        let opencnftItem = thisCollection.opencnft.find((it) => it.policy == policy)
-        tmpPaginationObj[policy] = { page: 0, itemsLoaded: 0, itemsCap: opencnftItem.asset_minted, _id: policy };
+        let opencnftItem = thisCollection.opencnft.find((it) => it.policy === policy)
+        tmpPaginationObj[policy] = { page: 1, itemsLoaded: 0, itemsCap: opencnftItem.asset_minted, _id: policy };
       }
       setMyStatePage(tmpPaginationObj);
     }
