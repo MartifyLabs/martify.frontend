@@ -86,7 +86,7 @@ export const get_listings = (policy_id, page, count, lastVisible, callback) => a
     }
     //const newAssets = Object.assign({}, ...assets.map((a) => ({[a.details.asset]: a})));
 
-    //callback(assets ? assets.length : 0);
+    callback(assets ? assets.length : 0);
   } catch (err) {
     dispatch(collections_loading(false));
     console.error(err);

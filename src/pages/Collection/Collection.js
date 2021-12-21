@@ -19,7 +19,6 @@ const Collection = () => {
   const { collection_id } = useParams();
   const state_collection = useSelector((state) => state.collection);
   const dispatch = useDispatch();
-
   const default_meta = {
     id: "",
     meta: {},
@@ -126,8 +125,15 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   // define an object that can be accessed from thr event listener
   const myStateRef = React.useRef(paginationObject);
 
+  const myStateRefListing = React.useRef(listings);
+
+  const setMyStateRefListing = data => {
+    myStateRefListing.current = data;
+    setListings(data);
+  };
   const setMyStatePage = data => {
     myStateRef.current = data;
+    console.log(data);
     setPaginationObject(data);
   };
   // console.log(paginationObject)
@@ -152,20 +158,24 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   const loadNextPage = () => {
     // console.log(myStateRef.current);
     let currentPolicy = findCurrentLoadingPolicy();
-    console.log("LLL", listings && listings.length > 0 ? listings[listings.length -1] : "");
-    dispatch(get_listings(currentPolicy._id, currentPolicy.page, ITEMS_PER_PAGE, listings && listings.length > 0 ? listings[listings.length -1].details.readableAssetName : "", (countLoadedAssets) => {
+    let listingsRef = myStateRefListing.current;
+    console.log(listingsRef && listingsRef.length > 0 ? listingsRef[listingsRef.length - 1].details.readableAssetName  : "");
+    dispatch(get_listings(currentPolicy._id, currentPolicy.page, ITEMS_PER_PAGE, listingsRef && listingsRef.length > 0 ? listingsRef[listingsRef.length -1].details.readableAssetName : "", (countLoadedAssets) => {
       let currentItemsLoaded = myStateRef.current[currentPolicy._id];
       currentItemsLoaded['itemsLoaded'] = currentPolicy.itemsLoaded + countLoadedAssets;
       currentItemsLoaded['page'] = currentPolicy.page + 1;
-      setMyStatePage(...currentItemsLoaded);
+      let newObj = {};
+      newObj[currentPolicy._id] = currentItemsLoaded;
+      setMyStatePage(newObj);
     }));
   }
 
   //and effect that boostraps the first collection
   useEffect(() => {
-    if (paginationObject !== null) {
+    if (paginationObject !== null && !flag) {
       let currentPolicy = findCurrentLoadingPolicy()
       loadNextPage();
+      setFlag(true);
     }
   }, [paginationObject]);
 
@@ -181,17 +191,16 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   }, [policyIds, thisCollection]);
 
   const load = () => {
-    setListings([]);
+    setMyStateRefListing([]);
     let tmp_list = [];
     for (let i in policyIds) {
       let policy_id = policyIds[i];
       if (policy_id in state_collection.policies_assets) {
         let tmp = Object.values(state_collection.policies_assets[policy_id]);
-        console.log(tmp)
         tmp_list.push(...tmp);
       }
     }
-    setListings(tmp_list);
+    setMyStateRefListing(tmp_list);
   };
 
   useEffect(() => {
