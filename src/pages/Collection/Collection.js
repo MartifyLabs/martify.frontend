@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
@@ -7,14 +7,14 @@ import { get_listings, opencnft_get_policy } from "store/collection/api";
 import { AssetCard, CollectionAbout, CollectionBanner } from "components";
 import "./style.css";
 
-function debounce(func, timeout = 1000) {
-  let timer;
-  return (...args) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      func.apply(this, args);
-    }, timeout);
-  };
+function throttle(func, wait = 2000) {
+  let time = Date.now();
+  return function() {
+    if ((time + wait - Date.now()) < 0) {
+      func();
+      time = Date.now();
+    }
+  }
 }
 
 const Collection = () => {
@@ -122,7 +122,7 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   const dispatch = useDispatch();
   const [listings, setListings] = useState([]);
   const [currentPolicy, setCurrentpolicy] = useState("bla");
-  const [flag, setFlag] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
   const [paginationObject, setPaginationObject] = useState(null);
   // define an object that can be accessed from thr event listener
   const myStateRef = React.useRef(paginationObject);
@@ -139,16 +139,18 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
     setPaginationObject(data);
   };
   // console.log(paginationObject)
-  const onScroll = (ev) => {
+  const onScroll = useCallback((ev) => {
     if (window) {
       if (
         window.innerHeight + window.scrollY + 100 >
         document.body.offsetHeight
       ) {
-        loadNextPage();
+        if (!isFetching) {
+          loadNextPage();
+        }
       }
     }
-  };
+  }, []);
 
   const findCurrentLoadingPolicy = () => {
     if (myStateRef.current) {
@@ -166,6 +168,7 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   };
 
   const loadNextPage = () => {
+    setIsFetching(true);
     let currentPolicy = findCurrentLoadingPolicy();
     let listingsRef = myStateRefListing.current;
     dispatch(
@@ -184,6 +187,7 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
           let newObj = {};
           newObj[currentPolicy._id] = currentItemsLoaded;
           setMyStatePage(newObj);
+          setIsFetching(false);
         }
       )
     );
@@ -191,9 +195,8 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
 
   //and effect that boostraps the first collection
   useEffect(() => {
-    if (paginationObject !== null && !flag) {
+    if (paginationObject !== null && !isFetching) {
       loadNextPage();
-      setFlag(true);
     }
   }, [paginationObject]);
 
@@ -235,14 +238,14 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   useEffect(() => {
     window.addEventListener(
       "scroll",
-      debounce(() => onScroll())
+      throttle(() => onScroll())
     );
     return () =>
       window.removeEventListener(
         "scroll",
-        debounce(() => onScroll())
+        throttle(() => onScroll())
       );
-  });
+  }, [onScroll]);
 
   return (
     <>
