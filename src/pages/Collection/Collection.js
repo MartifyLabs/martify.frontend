@@ -193,7 +193,7 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
     let lastItem = '';
     if (state_collection.policies_assets && Object.keys(state_collection.policies_assets).length > 0) {
       let keys = Object.keys(state_collection.policies_assets[currentPolicy._id]);
-      lastItem = state_collection.policies_assets[currentPolicy._id][keys[keys.length - 1]]
+      lastItem = state_collection.policies_assets[currentPolicy._id][keys[keys.length - 1]].details.readableAssetName;
     }
     console.log(lastItem);
     dispatch(
@@ -294,10 +294,6 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
             setCurrentpolicy={setCurrentpolicy}
             thisCollection={thisCollection}
           />
-          {currentLoadingPolicy && currentLoadingPolicy.itemsCap}
-          <br></br>
-          {currentLoadingPolicy && currentLoadingPolicy.itemsLoaded}
-          {(currentLoadingPolicy.itemsCap > currentLoadingPolicy.itemsLoaded) ? "true" : "false"}
         </InfiniteScroll>
       ) : (
         <></>
