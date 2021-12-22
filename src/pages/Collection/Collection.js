@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
@@ -33,7 +33,6 @@ const Collection = () => {
   };
 
   const [policyIds, setPolicyIds] = useState(undefined);
-  // const [paginationObject, setPaginationObject] = useState({})
   const [thisCollection, setThisCollection] = useState(default_meta);
 
   useEffect(() => {
@@ -95,7 +94,7 @@ const Collection = () => {
       <section className="section">
         <div className="columns">
           {thisCollection.is_martify_verified ||
-            thisCollection.is_cnft_verified ? (
+          thisCollection.is_cnft_verified ? (
             <div className="column is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
               <div className="block">
                 <CollectionAbout thisCollection={thisCollection} />
@@ -119,13 +118,13 @@ const Collection = () => {
 };
 
 const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
-  const ITEMS_PER_PAGE = 23;
+  const ITEMS_PER_PAGE = 24;
   const dispatch = useDispatch();
-  const [listings, setListings] = useState([]);
-  const [currentPolicy, setCurrentpolicy] = useState("bla");
+  const [totalMinted, setTotalMinted] = useState(0);
+  const [totalLoaded, setTotalLoaded] = useState(0);
   const [isFetching, setIsFetching] = useState(false);
+  const [listings, setListings] = useState([]);
   const [paginationObject, setPaginationObject] = useState(null);
-  const [flag, setFlag] = useState(false);
   const [currentLoadingPolicy, setCurrentLoadingPolicy] = useState({});
   // const [throttleFunc, setThrottleFunc] = useState(null);
   // const throttled = useRef(throttle((newValue) => {
@@ -188,32 +187,40 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   const loadNextPage = () => {
     if (isFetching) return;
     setIsFetching(true);
-    console.log('fetching', paginationObject)
-    let currentPolicy = findCurrentLoadingPolicy();
-    let lastItem = '';
-    if (state_collection.policies_assets && Object.keys(state_collection.policies_assets).length > 0) {
-      let keys = Object.keys(state_collection.policies_assets[currentPolicy._id]);
-      lastItem = state_collection.policies_assets[currentPolicy._id][keys[keys.length - 1]].details.readableAssetName;
-    }
-    console.log(lastItem);
-    dispatch(
-      get_listings(
-        currentPolicy._id,
-        currentPolicy.page,
-        ITEMS_PER_PAGE,
-        lastItem,
-        (countLoadedAssets) => {
-
-          let currentItemsLoaded = paginationObject[currentPolicy._id];
-          currentItemsLoaded["itemsLoaded"] =
-            currentPolicy.itemsLoaded + countLoadedAssets;
-          let newObj = {};
-          newObj[currentPolicy._id] = currentItemsLoaded;
-          setPaginationObject(newObj);
-          setIsFetching(false);
+    console.log("fetching", paginationObject);
+    const currentPolicy = findCurrentLoadingPolicy();
+    if (currentPolicy) {
+      let lastItem = "";
+      if (listings.length > 0) {
+        let currentPolicyAssets = listings.filter(
+          (a) => a.details.policyId === currentPolicy._id
+        );
+        if (currentPolicyAssets.length > 0) {
+          lastItem =
+            currentPolicyAssets[currentPolicyAssets.length - 1].details
+              .readableAssetName;
         }
-      )
-    );
+      }
+      console.log(lastItem);
+      dispatch(
+        get_listings(
+          currentPolicy._id,
+          currentPolicy.page,
+          ITEMS_PER_PAGE,
+          lastItem,
+          (countLoadedAssets) => {
+            let currentItemsLoaded = paginationObject[currentPolicy._id];
+            currentItemsLoaded["itemsLoaded"] =
+              currentPolicy.itemsLoaded + countLoadedAssets;
+            let newObj = {};
+            newObj[currentPolicy._id] = currentItemsLoaded;
+            setTotalLoaded(totalLoaded + countLoadedAssets);
+            setPaginationObject({ ...paginationObject, ...newObj });
+            setIsFetching(false);
+          }
+        )
+      );
+    }
   };
 
   //and effect that boostraps the first collection
@@ -230,12 +237,15 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
         let opencnftItem = thisCollection.opencnft.find(
           (it) => it.policy === policy
         );
-        tmpPaginationObj[policy] = {
-          page: 1,
-          itemsLoaded: 0,
-          itemsCap: opencnftItem.asset_minted,
-          _id: policy,
-        };
+        if (opencnftItem) {
+          tmpPaginationObj[policy] = {
+            page: 1,
+            itemsLoaded: 0,
+            itemsCap: opencnftItem.asset_minted,
+            _id: policy,
+          };
+          setTotalMinted(totalMinted + opencnftItem.asset_minted);
+        }
       }
       setPaginationObject(tmpPaginationObj);
     }
@@ -274,12 +284,15 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
 
   return (
     <>
-      {(listings.length > 0 && currentLoadingPolicy && currentLoadingPolicy) ? (
+      {listings.length > 0 && currentLoadingPolicy ? (
         <InfiniteScroll
-          dataLength={currentLoadingPolicy.itemsLoaded}
+          className="infinite-scroll-container"
+          dataLength={totalLoaded}
           next={loadNextPage}
-          hasMore={currentLoadingPolicy.itemsCap > currentLoadingPolicy.itemsLoaded}
-          loader={<h4>Loading...</h4>}
+          hasMore={totalMinted > totalLoaded}
+          loader={
+            <progress className="progress is-small is-primary" max="100"></progress>
+          }
           endMessage={
             <p style={{ textAlign: "center" }}>
               <b>Yay! You have seen it all</b>
@@ -290,8 +303,6 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
           <DisplayListing
             state_collection={state_collection}
             listings={listings}
-            currentPolicy={currentPolicy}
-            setCurrentpolicy={setCurrentpolicy}
             thisCollection={thisCollection}
           />
         </InfiniteScroll>
@@ -310,33 +321,17 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   );
 };
 
-const DisplayListing = ({
-  state_collection,
-  listings,
-  setCurrentpolicy,
-  thisCollection,
-}) => {
-  const [currentpolicyPage, setCurrentpolicyPage] = useState({});
+const DisplayListing = ({ state_collection, listings, thisCollection }) => {
+  const [currentpolicyPage, setCurrentPolicyPage] = useState({});
 
   // search and filter
   const [searchText, setSearchText] = useState("");
   const [sortby, setSortby] = useState("lowtohigh");
-  const [allAssetsMinted, setAllAssetsMinted] = useState(0);
 
   const sort_options = [
     { value: "lowtohigh", label: "Price: Low to High" },
     { value: "hightolow", label: "Price: High to Low" },
   ];
-
-  useEffect(() => {
-    if (thisCollection.opencnft) {
-      let overallAssets = 0;
-      for (let collection of thisCollection.opencnft) {
-        overallAssets += collection.asset_minted;
-      }
-      setAllAssetsMinted(overallAssets);
-    }
-  }, [thisCollection.opencnft]);
 
   useEffect(() => {
     // time to fetch next page.
