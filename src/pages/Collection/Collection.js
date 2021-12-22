@@ -322,8 +322,6 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
 };
 
 const DisplayListing = ({ state_collection, listings, thisCollection }) => {
-  const [currentpolicyPage, setCurrentPolicyPage] = useState({});
-
   // search and filter
   const [searchText, setSearchText] = useState("");
   const [sortby, setSortby] = useState("lowtohigh");
@@ -332,12 +330,6 @@ const DisplayListing = ({ state_collection, listings, thisCollection }) => {
     { value: "lowtohigh", label: "Price: Low to High" },
     { value: "hightolow", label: "Price: High to Low" },
   ];
-
-  useEffect(() => {
-    // time to fetch next page.
-    // when we fetch next page, we get back the page data and if the page has more pages.
-    // if the policy does not have more pages, we update it.
-  }, [currentpolicyPage]);
 
   const searchingFor = (searchText) => {
     return (x) => {

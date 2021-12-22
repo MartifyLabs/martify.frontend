@@ -146,7 +146,7 @@ export const get_asset = (asset_id, callback) => async (dispatch) => {
 
 export const get_listed_assets = (callback) => async (dispatch) => {
   try {
-    let listed_assets = await getLockedAssets(1);
+    let listed_assets = await getLockedAssets();
 
     let listed_assets_by_policy = {};
 
