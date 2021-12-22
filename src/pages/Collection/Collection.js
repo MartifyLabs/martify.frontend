@@ -1,13 +1,14 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
 import { get_listings, opencnft_get_policy } from "store/collection/api";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import { AssetCard, CollectionAbout, CollectionBanner } from "components";
 import "./style.css";
 
-function throttle(func, wait = 2000) {
+function throttle(func, wait = 100) {
   let time = Date.now();
   return function () {
     if (time + wait - Date.now() < 0) {
@@ -94,7 +95,7 @@ const Collection = () => {
       <section className="section">
         <div className="columns">
           {thisCollection.is_martify_verified ||
-          thisCollection.is_cnft_verified ? (
+            thisCollection.is_cnft_verified ? (
             <div className="column is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
               <div className="block">
                 <CollectionAbout thisCollection={thisCollection} />
@@ -124,43 +125,60 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   const [currentPolicy, setCurrentpolicy] = useState("bla");
   const [isFetching, setIsFetching] = useState(false);
   const [paginationObject, setPaginationObject] = useState(null);
-  // define an object that can be accessed from thr event listener
-  const myStateRef = React.useRef(paginationObject);
+  const [flag, setFlag] = useState(false);
+  const [currentLoadingPolicy, setCurrentLoadingPolicy] = useState({});
+  // const [throttleFunc, setThrottleFunc] = useState(null);
+  // const throttled = useRef(throttle((newValue) => {
+  //   if (!isFetching) loadNextPage();
+  // }, 1000))
 
-  const myStateRefListing = React.useRef(listings);
+  // // define objects that can be accessed from the event listener
+  // const myStateRef = React.useRef(paginationObject);
+  // const myStateRefListing = React.useRef(listings);
+  // const myStateRefIsFetching = React.useRef(isFetching);
+  // const myThrottleFuncRef = React.useRef(throttleFunc);
 
-  const setMyStateRefListing = (data) => {
-    myStateRefListing.current = data;
-    setListings(data);
-  };
-  const setMyStatePage = (data) => {
-    myStateRef.current = data;
-    console.log(data);
-    setPaginationObject(data);
-  };
+  // const setListings = (data) => {
+  //   listings = data;
+  //   setListings(data);
+  // };
+
+  // const setMyStatePage = (data) => {
+  //   paginationObject = data;
+  //   setPaginationObject(data);
+  // };
+
+  // const setMyStateRefIsFetching = (data) => {
+  //   myStateRefIsFetching.current = data;
+  //   setIsFetching(data);
+  // };
+  // const setMyThrottleFuncRef = (data) => {
+  //   myThrottleFuncRef.current = data;
+  //   setThrottleFunc(data);
+  // };
+
   // console.log(paginationObject)
-  const onScroll = (ev) => {
-    if (window) {
-      if (
-        window.innerHeight + window.scrollY + 100 >
-        document.body.offsetHeight
-      ) {
-        if (!isFetching) {
-          loadNextPage();
-        }
-      }
-    }
-  };
+  // const onScroll = () => {
+
+  //   if (window) {
+  //     if (
+  //       window.innerHeight + window.scrollY + 200 >
+  //       document.body.offsetHeight
+  //     ) {
+  //       throttled.current();
+  //     }
+  //   }
+  // };
 
   const findCurrentLoadingPolicy = () => {
-    if (myStateRef.current) {
-      for (let objKey of Object.keys(myStateRef.current)) {
-        console.log(objKey);
+    if (paginationObject) {
+      for (let objKey of Object.keys(paginationObject)) {
         if (
-          myStateRef.current[objKey].itemsCap >
-          myStateRef.current[objKey].itemsLoaded
+          paginationObject[objKey].itemsCap >
+          paginationObject[objKey].itemsLoaded
         ) {
-          return myStateRef.current[objKey];
+          setCurrentLoadingPolicy(paginationObject[objKey]);
+          return paginationObject[objKey];
         }
       }
     }
@@ -168,25 +186,30 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   };
 
   const loadNextPage = () => {
+    if (isFetching) return;
     setIsFetching(true);
+    console.log('fetching', paginationObject)
     let currentPolicy = findCurrentLoadingPolicy();
-    let listingsRef = myStateRefListing.current;
+    let lastItem = '';
+    if (state_collection.policies_assets && Object.keys(state_collection.policies_assets).length > 0) {
+      let keys = Object.keys(state_collection.policies_assets[currentPolicy._id]);
+      lastItem = state_collection.policies_assets[currentPolicy._id][keys[keys.length - 1]]
+    }
+    console.log(lastItem);
     dispatch(
       get_listings(
         currentPolicy._id,
         currentPolicy.page,
         ITEMS_PER_PAGE,
-        listingsRef && listingsRef.length > 0
-          ? listingsRef[listingsRef.length - 1].details.readableAssetName
-          : "",
+        lastItem,
         (countLoadedAssets) => {
-          let currentItemsLoaded = myStateRef.current[currentPolicy._id];
+
+          let currentItemsLoaded = paginationObject[currentPolicy._id];
           currentItemsLoaded["itemsLoaded"] =
             currentPolicy.itemsLoaded + countLoadedAssets;
-          currentItemsLoaded["page"] = currentPolicy.page + 1;
           let newObj = {};
           newObj[currentPolicy._id] = currentItemsLoaded;
-          setMyStatePage(newObj);
+          setPaginationObject(newObj);
           setIsFetching(false);
         }
       )
@@ -214,12 +237,12 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
           _id: policy,
         };
       }
-      setMyStatePage(tmpPaginationObj);
+      setPaginationObject(tmpPaginationObj);
     }
   }, [policyIds, thisCollection]);
 
   const load = () => {
-    setMyStateRefListing([]);
+    // setListings([]);
     let tmp_list = [];
     for (let i in policyIds) {
       let policy_id = policyIds[i];
@@ -228,36 +251,54 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
         tmp_list.push(...tmp);
       }
     }
-    setMyStateRefListing(tmp_list);
+    setListings(tmp_list);
+    // setIsFetching(false);
   };
 
   useEffect(() => {
     load();
   }, [policyIds, state_collection]);
 
-  useEffect(() => {
-    window.addEventListener(
-      "scroll",
-      throttle(() => onScroll())
-    );
-    return () =>
-      window.removeEventListener(
-        "scroll",
-        throttle(() => onScroll())
-      );
-  }, []);
+  // useEffect(() => {
+  //   setMyThrottleFuncRef(throttle);
+  //   window.addEventListener(
+  //     "scroll",
+  //     onScroll
+  //   );
+  //   return () =>
+  //     window.removeEventListener(
+  //       "scroll",
+  //       onScroll
+  //     );
+  // }, []);
 
   return (
     <>
-      {listings.length > 0 ? (
-        <DisplayListing
-          state_collection={state_collection}
-          listings={listings}
-          currentPolicy={currentPolicy}
-          setCurrentpolicy={setCurrentpolicy}
-          thisCollection={thisCollection}
-          paginationObject={paginationObject}
-        />
+      {(listings.length > 0 && currentLoadingPolicy && currentLoadingPolicy) ? (
+        <InfiniteScroll
+          dataLength={currentLoadingPolicy.itemsLoaded}
+          next={loadNextPage}
+          hasMore={currentLoadingPolicy.itemsCap > currentLoadingPolicy.itemsLoaded}
+          loader={<h4>Loading...</h4>}
+          endMessage={
+            <p style={{ textAlign: "center" }}>
+              <b>Yay! You have seen it all</b>
+            </p>
+          }
+          scrollableTarget="body"
+        >
+          <DisplayListing
+            state_collection={state_collection}
+            listings={listings}
+            currentPolicy={currentPolicy}
+            setCurrentpolicy={setCurrentpolicy}
+            thisCollection={thisCollection}
+          />
+          {currentLoadingPolicy && currentLoadingPolicy.itemsCap}
+          <br></br>
+          {currentLoadingPolicy && currentLoadingPolicy.itemsLoaded}
+          {(currentLoadingPolicy.itemsCap > currentLoadingPolicy.itemsLoaded) ? "true" : "false"}
+        </InfiniteScroll>
       ) : (
         <></>
       )}
