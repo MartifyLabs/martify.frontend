@@ -19,5 +19,25 @@
       "website": "https://pixelhead.io/"
     },
     "asset_attributes": ["Creature Name", "creature name", "Narrative", "narrative", "description", "States", "project"]
+  },
+  "kaizennft": {
+    "id": "lovelacesaga",
+    "policy_ids": [
+      "788888fd99cb7ef837570ce5bf8808d959697a025adeca03d46349f1"
+    ],
+    "meta": {
+      "name": "Lovelace Saga - Kaizen NFT",
+      "description": "Adventure awaits as the battles for the crypto space unfold!"
+    },
+    "style": {
+      "logo": "logo.png",
+      "banner":"banner.png",
+      "font_color_title": "#f5f3db"
+    },
+    "links": {
+      "website": "https://www.lovelacesaga.com/",
+      "twitter": "https://twitter.com/LovelaceSaga",
+      "discord": "https://discord.gg/Trnssx5qTF"
+    }
   }
 }

@@ -38,6 +38,7 @@ const About = () => {
             <h4>Q2 2022</h4>
             <ol>New feature : On-chain Auction system</ol>
             <ol>Seed round and private sales</ol>
+            <ol>Governance Paper</ol>
           </li>
           <li>
             <h4>Q3 2022</h4>
@@ -50,6 +51,7 @@ const About = () => {
             <ol>Martify integration for game engines (Unreal Engine, Unity, ...)</ol>
             <ol>API including NFT Minting, Forging, Burning, Swapping, Native Token support, ...</ol>
             <ol>Integrate in wallet (Maybe Genius)</ol>
+            <ol>Governance implementation</ol>
           </li>
         </ul>
       </div>
