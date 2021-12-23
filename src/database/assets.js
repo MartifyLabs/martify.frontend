@@ -93,7 +93,12 @@ export const getAssets = async (assetIds) => {
 /**
  * @throws COULD_NOT_RETRIEVE_COLLECTION_ASSETS_FROM_DB
  */
-export const getCollectionAssets = async (policyId, page = 1, count = 100, lastVisible = "") => {
+export const getCollectionAssets = async (
+  policyId,
+  page = 1,
+  count = 100,
+  lastVisible = ""
+) => {
   try {
     if (policyId) {
       const reference = await query(
@@ -182,13 +187,13 @@ export const unlockAsset = async (asset, { txHash, address }) => {
 /**
  * @throws COULD_NOT_RETRIEVE_LOCKED_ASSETS_FROM_DB
  */
-export const getLockedAssets = async (count = 100, lastVisible = "") => {
+export const getLockedAssets = async (count = 100, lastVisible = 0) => {
   try {
     const reference = await query(
       collection(firestore, "assets"),
       where("status.locked", "==", true),
       orderBy("status.submittedOn"),
-      //startAfter(lastVisible),
+      startAfter(lastVisible),
       limit(count)
     );
 

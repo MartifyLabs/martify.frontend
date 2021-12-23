@@ -9,44 +9,68 @@ import "bulma-checkradio/dist/css/bulma-checkradio.min.css";
 import "./style.css";
 
 const Explore = () => {
+  const ITEMS_PER_PAGE = 48;
   const dispatch = useDispatch();
+  const [isFetching, setIsFetching] = useState(false);
   const [listings, setListings] = useState([]);
-  const [allListings, setAllListings] = useState([]);
+  const [filteredListings, setFilteredListings] = useState([]);
   const [collections, setCollections] = useState([]);
+  const [lastVisible, setLastVisible] = useState(0);
+  const [hasMore, sethasMore] = useState(true);
 
   useEffect(() => {
-    dispatch(
-      get_listed_assets((res) => {
-        if (res.data) {
-          let list_collections = {};
-          setListings(res.data);
-          setAllListings(res.data);
+    if (!isFetching) {
+      loadNext();
+    }
+  });
 
-          let counter = 0;
-          for (var i in res.data) {
-            let this_listing = res.data[i];
-            if ("id" in this_listing.collection) {
-              list_collections[this_listing.collection.meta.name] = {
-                policy_ids: this_listing.collection.policy_ids,
-                label: this_listing.collection.meta.name,
-                rank: "is_martify_verified" in this_listing.collection ? 1 : 2,
-                index: counter,
-              };
-            } else {
-              list_collections[this_listing.collection.policy_id] = {
-                policy_ids: [this_listing.collection.policy_id],
-                label: this_listing.collection.policy_id,
-                rank: 3,
-                index: counter,
-              };
+  const loadNext = () => {
+    if (hasMore) {
+      setIsFetching(true);
+      dispatch(
+        get_listed_assets(ITEMS_PER_PAGE, lastVisible, (res) => {
+          if (res.data) {
+            setListings([...listings, ...res.data]);
+            setFilteredListings([...filteredListings, ...res.data]);
+            sethasMore(res.data.length > 0);
+
+            if (res.data.length > 0) {
+              setLastVisible(res.data[res.data.length - 1].status.submittedOn);
             }
-            counter += 1;
+
+            let counter = 0;
+            let list_collections = {};
+            for (var i in res.data) {
+              let this_listing = res.data[i];
+              if ("id" in this_listing.collection) {
+                list_collections[this_listing.collection.meta.name] = {
+                  policy_ids: this_listing.collection.policy_ids,
+                  label: this_listing.collection.meta.name,
+                  rank:
+                    "is_martify_verified" in this_listing.collection ? 1 : 2,
+                  index: counter,
+                };
+              } else {
+                list_collections[this_listing.collection.policy_id] = {
+                  policy_ids: [this_listing.collection.policy_id],
+                  label: this_listing.collection.policy_id,
+                  rank: 3,
+                  index: counter,
+                };
+              }
+              counter += 1;
+            }
+
+            setCollections({
+              ...collections,
+              ...list_collections,
+            });
+            setIsFetching(false);
           }
-          setCollections(list_collections);
-        }
-      })
-    );
-  }, []);
+        })
+      );
+    }
+  };
 
   return (
     <div className="section explore">
@@ -54,16 +78,16 @@ const Explore = () => {
         <div className="column is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
           <Filter
             collections={collections}
-            allListings={allListings}
-            setListings={setListings}
+            listings={listings}
+            setFilteredListings={setFilteredListings}
           />
         </div>
         <div className="column">
           <InfiniteScroll
             className="infinite-scroll-container"
-            dataLength={10}
-            next={() => []}
-            hasMore={true}
+            dataLength={listings.length}
+            next={loadNext}
+            hasMore={hasMore}
             loader={
               <progress
                 className="progress is-small is-primary"
@@ -71,13 +95,16 @@ const Explore = () => {
               ></progress>
             }
             endMessage={
-              <p style={{ textAlign: "center" }}>
+              <div style={{ textAlign: "center" }}>
+                <span class="icon has-text-info">
+                  <i class="fas fa-info-circle"></i>
+                </span>
                 <b>Yay! You have seen it all</b>
-              </p>
+              </div>
             }
             scrollableTarget="body"
           >
-            <ListingSection listings={listings} />
+            <ListingSection listings={filteredListings} />
           </InfiniteScroll>
         </div>
       </div>
@@ -85,7 +112,7 @@ const Explore = () => {
   );
 };
 
-const Filter = ({ collections, allListings, setListings }) => {
+const Filter = ({ collections, listings, setFilteredListings }) => {
   const [collectionsMultiSelect, setCollectionsMultiSelect] = useState(false);
   const [collectionsIndexSelected, setCollectionsIndexSelected] = useState([]);
   const [collectionsSelected, setCollectionsSelected] = useState({});
@@ -108,21 +135,21 @@ const Filter = ({ collections, allListings, setListings }) => {
 
     if (Object.keys(tmp_collectionsSelected).length > 0) {
       let list_policy = [];
-      for (var i in tmp_collectionsSelected) {
+      for (let i in tmp_collectionsSelected) {
         list_policy.push(...tmp_collectionsSelected[i].policy_ids);
       }
 
       // filter listings
       let tmp_listings = [];
-      for (var i in allListings) {
-        let this_listing = allListings[i];
+      for (let i in listings) {
+        let this_listing = listings[i];
         if (list_policy.includes(this_listing.details.policyId)) {
           tmp_listings.push(this_listing);
         }
       }
-      setListings(tmp_listings);
+      setFilteredListings(tmp_listings);
     } else {
-      setListings(allListings);
+      setFilteredListings(listings);
     }
 
     setCollectionsSelected(tmp_collectionsSelected);
