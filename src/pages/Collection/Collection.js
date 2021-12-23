@@ -1,22 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import { get_listings, opencnft_get_policy } from "store/collection/api";
-import InfiniteScroll from "react-infinite-scroll-component";
 
 import { AssetCard, CollectionAbout, CollectionBanner } from "components";
 import "./style.css";
-
-function throttle(func, wait = 100) {
-  let time = Date.now();
-  return function () {
-    if (time + wait - Date.now() < 0) {
-      func();
-      time = Date.now();
-    }
-  };
-}
 
 const Collection = () => {
   const { collection_id } = useParams();
@@ -126,48 +116,6 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   const [listings, setListings] = useState([]);
   const [paginationObject, setPaginationObject] = useState(null);
   const [currentLoadingPolicy, setCurrentLoadingPolicy] = useState({});
-  // const [throttleFunc, setThrottleFunc] = useState(null);
-  // const throttled = useRef(throttle((newValue) => {
-  //   if (!isFetching) loadNextPage();
-  // }, 1000))
-
-  // // define objects that can be accessed from the event listener
-  // const myStateRef = React.useRef(paginationObject);
-  // const myStateRefListing = React.useRef(listings);
-  // const myStateRefIsFetching = React.useRef(isFetching);
-  // const myThrottleFuncRef = React.useRef(throttleFunc);
-
-  // const setListings = (data) => {
-  //   listings = data;
-  //   setListings(data);
-  // };
-
-  // const setMyStatePage = (data) => {
-  //   paginationObject = data;
-  //   setPaginationObject(data);
-  // };
-
-  // const setMyStateRefIsFetching = (data) => {
-  //   myStateRefIsFetching.current = data;
-  //   setIsFetching(data);
-  // };
-  // const setMyThrottleFuncRef = (data) => {
-  //   myThrottleFuncRef.current = data;
-  //   setThrottleFunc(data);
-  // };
-
-  // console.log(paginationObject)
-  // const onScroll = () => {
-
-  //   if (window) {
-  //     if (
-  //       window.innerHeight + window.scrollY + 200 >
-  //       document.body.offsetHeight
-  //     ) {
-  //       throttled.current();
-  //     }
-  //   }
-  // };
 
   const findCurrentLoadingPolicy = () => {
     if (paginationObject) {
@@ -252,7 +200,6 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   }, [policyIds, thisCollection]);
 
   const load = () => {
-    // setListings([]);
     let tmp_list = [];
     for (let i in policyIds) {
       let policy_id = policyIds[i];
@@ -262,25 +209,11 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
       }
     }
     setListings(tmp_list);
-    // setIsFetching(false);
   };
 
   useEffect(() => {
     load();
   }, [policyIds, state_collection]);
-
-  // useEffect(() => {
-  //   setMyThrottleFuncRef(throttle);
-  //   window.addEventListener(
-  //     "scroll",
-  //     onScroll
-  //   );
-  //   return () =>
-  //     window.removeEventListener(
-  //       "scroll",
-  //       onScroll
-  //     );
-  // }, []);
 
   return (
     <>
@@ -291,7 +224,10 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
           next={loadNextPage}
           hasMore={totalMinted > totalLoaded}
           loader={
-            <progress className="progress is-small is-primary" max="100"></progress>
+            <progress
+              className="progress is-small is-primary"
+              max="100"
+            ></progress>
           }
           endMessage={
             <p style={{ textAlign: "center" }}>
@@ -300,11 +236,7 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
           }
           scrollableTarget="body"
         >
-          <DisplayListing
-            state_collection={state_collection}
-            listings={listings}
-            thisCollection={thisCollection}
-          />
+          <DisplayListing listings={listings} />
         </InfiniteScroll>
       ) : (
         <></>
@@ -321,7 +253,7 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
   );
 };
 
-const DisplayListing = ({ state_collection, listings, thisCollection }) => {
+const DisplayListing = ({ listings }) => {
   // search and filter
   const [searchText, setSearchText] = useState("");
   const [sortby, setSortby] = useState("lowtohigh");

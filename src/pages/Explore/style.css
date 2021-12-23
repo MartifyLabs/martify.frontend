@@ -7,3 +7,7 @@
 .explore .filter_label{
   cursor: pointer
 }
+
+.infinite-scroll-container {
+  padding: 0 16px;
+}
