@@ -13,3 +13,7 @@
 .collection .social-links{
   float: right
 }
+
+.infinite-scroll-container {
+  padding: 0 16px;
+}

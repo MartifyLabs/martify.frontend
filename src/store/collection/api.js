@@ -25,8 +25,8 @@ import { getUsedAddress } from "../../cardano/wallet";
 export const load_collection = (callback) => async (dispatch) => {
   let all_collections = {};
 
-  for (var collection_id in data_collections) {
-    var tmp = data_collections[collection_id];
+  for (let collection_id in data_collections) {
+    let tmp = data_collections[collection_id];
     tmp.is_martify_verified = true;
 
     if (tmp.style) {
@@ -38,8 +38,8 @@ export const load_collection = (callback) => async (dispatch) => {
     all_collections[collection_id] = tmp;
   }
 
-  for (var collection_id in data_collections_cnft) {
-    var tmp = data_collections_cnft[collection_id];
+  for (let collection_id in data_collections_cnft) {
+    let tmp = data_collections_cnft[collection_id];
     if (tmp.id in all_collections) {
       all_collections[tmp.id].policy_ids = [
         ...all_collections[tmp.id].policy_ids,
@@ -51,7 +51,7 @@ export const load_collection = (callback) => async (dispatch) => {
     }
   }
 
-  for (var collection_id in all_collections) {
+  for (let collection_id in all_collections) {
     all_collections[collection_id].policy_ids = [...new Set(all_collections[collection_id].policy_ids)];
   }
 
@@ -59,8 +59,7 @@ export const load_collection = (callback) => async (dispatch) => {
   callback({ all_collections });
 };
 
-export const get_listings = (policy_id, callback) => async (dispatch) => {
-
+export const get_listings = (policy_id, page, count, lastVisible, callback) => async (dispatch) => {
   try {
     dispatch(collections_loading(true));
 
@@ -69,29 +68,20 @@ export const get_listings = (policy_id, callback) => async (dispatch) => {
       listing: {},
     };
 
-    const assets = await getCollectionAssets(policy_id);
+    const assets = await getCollectionAssets(policy_id, page, count, lastVisible);
+
     if (assets) {
-      for (var i in assets) {
-        let asset = assets[i];
-        if (asset) {
-          if (asset.details) {
-            output.listing[asset.details.asset] = asset;
-          }
-        }
-      }
+      output.listing = Object.assign({}, ...assets.map((a) => ({[a.details.asset]: a})));
 
       if (output.policy_id && output.listing) {
         dispatch(collections_add_tokens(output));
       }
     }
 
-    callback(true);
+    callback(assets);
   } catch (err) {
     dispatch(collections_loading(false));
-    dispatch(set_error({
-      message: errorTypes.COULD_NOT_RETRIEVE_COLLECTION_ASSETS_FROM_DB,
-      detail: err,
-    }));
+    console.error(err);
   }
 };
 
@@ -106,7 +96,7 @@ export const get_assets = (assetIds, callback) => async (dispatch) => {
     };
     let assets = await getAssets(assetIds);
 
-    for (var i in assets) {
+    for (let i in assets) {
       let asset = assets[i];
       if (asset) {
         if (asset.details) {
@@ -155,13 +145,13 @@ export const get_asset = (asset_id, callback) => async (dispatch) => {
   }
 };
 
-export const get_listed_assets = (callback) => async (dispatch) => {
+export const get_listed_assets = (count, lastVisible, callback) => async (dispatch) => {
   try {
-    let listed_assets = await getLockedAssets(1);
+    let listed_assets = await getLockedAssets(count, lastVisible);
 
     let listed_assets_by_policy = {};
 
-    for (var i in listed_assets) {
+    for (let i in listed_assets) {
       let asset = listed_assets[i];
 
       if (asset) {
@@ -179,7 +169,7 @@ export const get_listed_assets = (callback) => async (dispatch) => {
       }
     }
 
-    for (var policy_id in listed_assets_by_policy) {
+    for (let policy_id in listed_assets_by_policy) {
       dispatch(collections_add_tokens(listed_assets_by_policy[policy_id]));
     }
 
@@ -227,7 +217,7 @@ export const asset_add_offer =
 export const opencnft_get_top_projects =
   (time, callback) => async (dispatch) => {
     fetch("https://api.opencnft.io/1/rank?window=" + time, {
-      
+
     })
       .then((res) => res.json())
       .then((res) => {
@@ -241,7 +231,7 @@ export const opencnft_get_top_projects =
 export const opencnft_get_policy =
   (policy_id, callback) => async (dispatch) => {
     fetch(`https://api.opencnft.io/1/policy/${policy_id}`, {
-      
+
     })
       .then((res) => res.json())
       .then((res) => {
@@ -255,7 +245,7 @@ export const opencnft_get_policy =
 export const opencnft_get_asset_tx =
   (asset_id, callback) => async (dispatch) => {
     fetch(`https://api.opencnft.io/1/asset/${asset_id}/tx`, {
-      
+
     })
       .then((res) => res.json())
       .then((res) => {
