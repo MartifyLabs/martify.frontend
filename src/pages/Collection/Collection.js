@@ -144,7 +144,7 @@ const ListingSection = ({ state_collection, policyIds }) => {
       [collectionMetadata.policyId]: {
         ...collectionMetadata,
         page: collectionMetadata.page + 1,
-        hasMore: loadedAssets.length > 0,
+        hasMore: ITEMS_PER_PAGE === loadedAssets.length,
       },
     });
   };
@@ -157,7 +157,7 @@ const ListingSection = ({ state_collection, policyIds }) => {
     return "";
   };
 
-  const hasMore = () => {console.log(paginationObject);
+  const hasMore = () => {
     if (listings.length < totalMinted && paginationObject !== undefined) {
       for (let key of Object.keys(paginationObject)) {
         if (paginationObject[key].hasMore) {
@@ -208,7 +208,7 @@ const ListingSection = ({ state_collection, policyIds }) => {
           className="infinite-scroll-container"
           dataLength={listings.length}
           next={loadNext}
-          hasMore={totalMinted > listings.length}
+          hasMore={hasMore()}
           loader={
             <progress
               className="progress is-small is-primary"
