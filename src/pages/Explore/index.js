@@ -25,7 +25,7 @@ const Explore = () => {
   });
 
   const loadNext = () => {
-    if (hasMore) {
+    if (hasMore && !isFetching) {
       setIsFetching(true);
       dispatch(
         get_listed_assets(ITEMS_PER_PAGE, lastVisible, (res) => {
@@ -96,8 +96,8 @@ const Explore = () => {
             }
             endMessage={
               <div style={{ textAlign: "center" }}>
-                <span class="icon has-text-info">
-                  <i class="fas fa-info-circle"></i>
+                <span className="icon has-text-info">
+                  <i className="fas fa-info-circle"></i>
                 </span>
                 <b>Yay! You have seen it all</b>
               </div>
