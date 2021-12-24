@@ -8,10 +8,10 @@ const About = () => {
         <p className="subtitle is-4">
           Martify is a marketplace for Cardano Non-Fungible Tokens. Our goal is
           to make it easy for everyone to trade NFTs in a fast, safe and secure
-          manner. Try us out and you’ll fall in love with our simple and
+          manner. Try us out and you'll fall in love with our simple and
           intuitive user interface. If you have any ideas to improve user
           experience, feel free to reach out to us at contact@martify.io, on
-          Twitter @martify_labs or join us in our Discord to discuss favorite
+          Twitter @MartifyLabs or join us in our Discord to discuss favorite
           projects, feature suggestions, giveaways and other cool things.
         </p>
       </div>
