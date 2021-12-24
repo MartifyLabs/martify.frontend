@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 
+import { usePolicyMetadatas } from "hooks/usePolicyMetadatas";
 import { get_listings, opencnft_get_policy } from "store/collection/api";
 
 import { AssetCard, CollectionAbout, CollectionBanner } from "components";
@@ -22,7 +23,7 @@ const Collection = () => {
     links: {},
   };
 
-  const [policyIds, setPolicyIds] = useState(undefined);
+  const [policyIds, setPolicyIds] = useState([]);
   const [thisCollection, setThisCollection] = useState(default_meta);
 
   useEffect(() => {
@@ -51,8 +52,8 @@ const Collection = () => {
         policy_ids = [collection_id];
       }
 
+      setPolicyIds(currentCollectionIterator.policy_ids);
       if (currentCollectionIterator.id !== thisCollection.id) {
-        setPolicyIds(policy_ids);
         setThisCollection({ ...currentCollectionIterator });
 
         for (let policyIdx in policy_ids) {
@@ -97,7 +98,6 @@ const Collection = () => {
           <div className="column">
             <ListingSection
               state_collection={state_collection}
-              thisCollection={thisCollection}
               policyIds={policyIds}
             />
           </div>
@@ -107,63 +107,79 @@ const Collection = () => {
   );
 };
 
-const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
-  const ITEMS_PER_PAGE = 24;
+const ListingSection = ({ state_collection, policyIds }) => {
+  const ITEMS_PER_PAGE = 48;
   const dispatch = useDispatch();
-  const [totalMinted, setTotalMinted] = useState(0);
-  const [totalLoaded, setTotalLoaded] = useState(0);
-  const [isFetching, setIsFetching] = useState(false);
   const [listings, setListings] = useState([]);
-  const [paginationObject, setPaginationObject] = useState(null);
-  const [currentLoadingPolicy, setCurrentLoadingPolicy] = useState({});
+  const [totalMinted, setTotalMinted] = useState(0);
+  const [isFetching, setIsFetching] = useState(false);
+  const [paginationObject, setPaginationObject] = useState(undefined);
+  const [policyMetadatas, loadingData] = usePolicyMetadatas(policyIds);
 
-  const findCurrentLoadingPolicy = () => {
-    if (paginationObject) {
-      for (let objKey of Object.keys(paginationObject)) {
-        if (
-          paginationObject[objKey].itemsCap >
-          paginationObject[objKey].itemsLoaded
-        ) {
-          setCurrentLoadingPolicy(paginationObject[objKey]);
-          return paginationObject[objKey];
+  const resetComponentState = useCallback(() => {
+    if (policyMetadatas.length > 0) {
+      let tmpTotalMinted = 0;
+      let tmpPaginationObject = {};
+      for (let metadata of policyMetadatas) {
+        if (metadata) {
+          tmpPaginationObject[metadata.policy] = {
+            page: 1,
+            hasMore: true,
+            itemsMinted: metadata.asset_minted,
+            policyId: metadata.policy,
+          };
+          tmpTotalMinted += metadata.asset_minted;
+        }
+      }
+      setListings([]);
+      setTotalMinted(tmpTotalMinted);
+      setPaginationObject(tmpPaginationObject);
+    }
+  }, [policyMetadatas]);
+
+  const updateComponentState = (collectionMetadata, loadedAssets) => {
+    setListings([...listings, ...loadedAssets]);
+    setPaginationObject({
+      ...paginationObject,
+      [collectionMetadata.policyId]: {
+        ...collectionMetadata,
+        page: collectionMetadata.page + 1,
+        hasMore: loadedAssets.length > 0,
+      },
+    });
+  };
+
+  const getLastVisible = () => {
+    const lastItem = listings[listings.length - 1];
+    if (lastItem) {
+      return lastItem?.details?.readableAssetName;
+    }
+    return "";
+  };
+
+  const hasMore = () => {console.log(paginationObject);
+    if (listings.length < totalMinted && paginationObject !== undefined) {
+      for (let key of Object.keys(paginationObject)) {
+        if (paginationObject[key].hasMore) {
+          return paginationObject[key];
         }
       }
     }
-    return null;
+    return false;
   };
 
-  const loadNextPage = () => {
-    if (isFetching) return;
-    setIsFetching(true);
-    console.log("fetching", paginationObject);
-    const currentPolicy = findCurrentLoadingPolicy();
-    if (currentPolicy) {
-      let lastItem = "";
-      if (listings.length > 0) {
-        let currentPolicyAssets = listings.filter(
-          (a) => a.details.policyId === currentPolicy._id
-        );
-        if (currentPolicyAssets.length > 0) {
-          lastItem =
-            currentPolicyAssets[currentPolicyAssets.length - 1].details
-              .readableAssetName;
-        }
-      }
-      console.log(lastItem);
+  const loadNext = () => {
+    const collectionMetadata = hasMore();
+    if (!isFetching && collectionMetadata) {
+      setIsFetching(true);
       dispatch(
         get_listings(
-          currentPolicy._id,
-          currentPolicy.page,
+          collectionMetadata.policyId,
+          collectionMetadata.page,
           ITEMS_PER_PAGE,
-          lastItem,
-          (countLoadedAssets) => {
-            let currentItemsLoaded = paginationObject[currentPolicy._id];
-            currentItemsLoaded["itemsLoaded"] =
-              currentPolicy.itemsLoaded + countLoadedAssets;
-            let newObj = {};
-            newObj[currentPolicy._id] = currentItemsLoaded;
-            setTotalLoaded(totalLoaded + countLoadedAssets);
-            setPaginationObject({ ...paginationObject, ...newObj });
+          getLastVisible(),
+          (loadedAssets) => {
+            updateComponentState(collectionMetadata, loadedAssets);
             setIsFetching(false);
           }
         )
@@ -171,58 +187,28 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
     }
   };
 
-  //and effect that boostraps the first collection
   useEffect(() => {
-    if (paginationObject !== null && !isFetching) {
-      loadNextPage();
-    }
-  }, [paginationObject]);
+    if (!isFetching && listings.length === 0) loadNext();
+  });
 
   useEffect(() => {
-    if (policyIds && thisCollection.opencnft) {
-      let tmpPaginationObj = {};
-      for (let policy of policyIds) {
-        let opencnftItem = thisCollection.opencnft.find(
-          (it) => it.policy === policy
-        );
-        if (opencnftItem) {
-          tmpPaginationObj[policy] = {
-            page: 1,
-            itemsLoaded: 0,
-            itemsCap: opencnftItem.asset_minted,
-            _id: policy,
-          };
-          setTotalMinted(totalMinted + opencnftItem.asset_minted);
-        }
-      }
-      setPaginationObject(tmpPaginationObj);
+    if (policyMetadatas?.length > 0) {
+      resetComponentState();
+    } else {
+      setListings([]);
+      setTotalMinted(0);
+      setPaginationObject(undefined);
     }
-  }, [policyIds, thisCollection]);
-
-  const load = () => {
-    let tmp_list = [];
-    for (let i in policyIds) {
-      let policy_id = policyIds[i];
-      if (policy_id in state_collection.policies_assets) {
-        let tmp = Object.values(state_collection.policies_assets[policy_id]);
-        tmp_list.push(...tmp);
-      }
-    }
-    setListings(tmp_list);
-  };
-
-  useEffect(() => {
-    load();
-  }, [policyIds, state_collection]);
+  }, [resetComponentState, policyMetadatas]);
 
   return (
     <>
-      {listings.length > 0 && currentLoadingPolicy ? (
+      {!loadingData && listings.length > 0 ? (
         <InfiniteScroll
           className="infinite-scroll-container"
-          dataLength={totalLoaded}
-          next={loadNextPage}
-          hasMore={totalMinted > totalLoaded}
+          dataLength={listings.length}
+          next={loadNext}
+          hasMore={totalMinted > listings.length}
           loader={
             <progress
               className="progress is-small is-primary"
@@ -230,9 +216,12 @@ const ListingSection = ({ state_collection, thisCollection, policyIds }) => {
             ></progress>
           }
           endMessage={
-            <p style={{ textAlign: "center" }}>
+            <div style={{ textAlign: "center" }}>
+              <span className="icon has-text-info">
+                <i className="fas fa-info-circle"></i>
+              </span>
               <b>Yay! You have seen it all</b>
-            </p>
+            </div>
           }
           scrollableTarget="body"
         >
