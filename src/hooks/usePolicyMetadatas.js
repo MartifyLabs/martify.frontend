@@ -26,7 +26,7 @@ export const usePolicyMetadatas = (policyIds) => {
       }
     };
 
-    if (policyIds.length > 0) {
+    if (policyIds?.length > 0) {
       setLoadingData(true);
       fetchMetadatas(policyIds);
       setLoadingData(false);
