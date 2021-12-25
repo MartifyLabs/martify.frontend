@@ -6,7 +6,6 @@ import SweetAlert from "react-bootstrap-sweetalert";
 
 import { urls } from "config";
 import {
-  load_collection as loadCollection,
   get_asset as getAsset,
   asset_add_offer as assetAddOffer,
   opencnft_get_asset_tx as opencnftGetAssetTx,
@@ -59,9 +58,6 @@ const Asset = () => {
     }
   }, [policy_id, asset_id, state_collection]);
 
-  const load_collection = (callback) => {
-    dispatch(loadCollection(callback));
-  };
   const list_token = (wallet, asset, price, callback) => {
     dispatch(listToken(wallet, asset, price, callback));
   };
@@ -365,12 +361,12 @@ const PurchaseAsset = ({
                 >
                   <a>Buy Now</a>
                 </li>
-                <li
+                {/*<li
                   className={showTab === "offer" ? "is-active" : ""}
                   onClick={() => setShowTab("offer")}
                 >
                   <a>Offer</a>
-                </li>
+                </li>*/}
               </ul>
             </div>
           ) : (
@@ -808,8 +804,6 @@ const OwnerListAsset = ({
       ) : (
         <></>
       )}
-
-      {console.log(showModal) /* here showModal is false, why??? */}
 
       {showModal ? (
         <SweetAlert
