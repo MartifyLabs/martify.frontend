@@ -1,6 +1,6 @@
 import Cardano from "../serialization-lib";
 import { serializeTxUnspentOutput, valueToAssets } from "../transaction";
-import { fromHex } from "../../utils";
+import { fromHex } from "../../utils/converter";
 
 export const enableWallet = async () => {
   return await window.cardano.enable();

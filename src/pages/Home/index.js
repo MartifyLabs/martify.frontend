@@ -6,7 +6,7 @@ import DataTable from "react-data-table-component";
 import "./style.scss";
 
 import { opencnft_get_top_projects as opencnftGetTopProjects } from "store/collection/api";
-import { get_asset_image_source, numFormatter } from "utils";
+import { get_asset_image_source, numFormatter } from "utils/converter";
 import Image from "components/Image";
 
 import "react-loading-skeleton/dist/skeleton.css";
@@ -70,11 +70,11 @@ const Splash = ({ listProjects }) => {
                   className="is-size-1 slogan"
                   style={{ color: "#fff", lineHeight: "1" }}
                 >
-                  Your new CNFT marketplace.
+                  Welcome to The Digital Universe.
                 </p>
                 <p className="is-size-5 slogan" style={{ color: "#fff" }}>
-                  The smoothest experience for you to buy and sell Cardano NFTs
-                  powered by smart contracts.
+                  The Smoothest Experience for You to Buy & Sell Cardano NFTs
+                  Powered By Smart Contracts.
                 </p>
               </div>
             </div>
@@ -219,7 +219,7 @@ const TopProjects = ({
     setPending(false);
   }
 
-  function onchange_window(win) {
+  const onchange_window = (win) => {
     setWindow(win);
     setPending(true);
     setListProjects([]);

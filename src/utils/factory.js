@@ -1,5 +1,5 @@
 import Cardano from "../cardano/serialization-lib";
-import { toHex, toLovelace } from "./index";
+import { toHex, toLovelace } from "./converter";
 
 export const createDatum = (
   tokenName,

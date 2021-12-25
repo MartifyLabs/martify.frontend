@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import "./style.css";
 import AssetImageFigure from "../AssetImageFigure";
-import { fromLovelace } from "../../utils";
+import { fromLovelace } from "../../utils/converter";
 
 const AssetCard = ({ state_collection, asset, column_className, show_offer }) => {
 

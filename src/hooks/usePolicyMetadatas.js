@@ -18,15 +18,15 @@ export const usePolicyMetadatas = (policyIds) => {
         );
         setPolicyMetadatas(metadatas);
       } catch (error) {
-        setLoadingData(false);
-        setErrorMessage(error.message);
         console.error(
           `Unexpected error in usePolicyMetadatas. [Message: ${error.message}]`
         );
+        setLoadingData(false);
+        setErrorMessage(error.message);
       }
     };
 
-    if (policyIds.length > 0) {
+    if (policyIds?.length > 0) {
       setLoadingData(true);
       fetchMetadatas(policyIds);
       setLoadingData(false);

@@ -9,7 +9,7 @@ import {
   finalizeTx,
   initializeTx,
 } from "../transaction";
-import { fromHex, toHex } from "../../utils";
+import { fromHex, toHex } from "../../utils/converter";
 
 export const listAsset = async (
   datum,
@@ -218,7 +218,11 @@ const handleError = (error, source) => {
     case "MAX_SIZE_REACHED":
       throw new Error(ErrorTypes.TRANSACTION_FAILED_MAX_TX_SIZE_REACHED);
     default:
-      if (error.message.search("OutputTooSmallUTxO") !== -1) {
+      if (error.message.search("NonOutputSupplimentaryDatums") !== -1) {
+        throw new Error(ErrorTypes.TRANSACTION_FAILED_DATUMS_NOT_MATCHING);
+      } else if (error.message.search("MissingScriptWitnessesUTXOW") !== -1) {
+        throw new Error(ErrorTypes.TRANSACTION_FAILED_WRONG_SCRIPT_CONTRACT);
+      } else if (error.message.search("OutputTooSmallUTxO") !== -1) {
         throw new Error(ErrorTypes.TRANSACTION_FAILED_ASSET_NOT_SPENDABLE);
       }
       throw error;

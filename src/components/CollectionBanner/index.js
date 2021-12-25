@@ -3,7 +3,7 @@ import React, { useEffect, useState} from "react";
 import {usePalette} from 'react-palette'
 
 import CollectionLinks from "../CollectionLinks";
-import { numFormatter, get_asset_image_source } from "../../utils";
+import { numFormatter, get_asset_image_source } from "../../utils/converter";
 
 const CollectionBanner = ({thisCollection, size, asset}) => {
   

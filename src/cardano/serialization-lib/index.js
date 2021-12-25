@@ -5,7 +5,7 @@ class Cardano {
     try {
       this._wasm = await import("@emurgo/cardano-serialization-lib-browser");
     } catch (error) {
-      console.error(`Unexpected error in load. [Message: ${error.message}]`);
+      throw error;
     }
   }
 
