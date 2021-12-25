@@ -309,8 +309,6 @@ const PurchaseAsset = ({
     if (res.success) {
       setShowModal(res.type);
       setShowNotification(false);
-    } else {
-      setShowNotification("Previous transaction not validated.");
     }
   }
 
@@ -633,11 +631,7 @@ const OwnerListAsset = ({
     if (res.success) {
       setOperation(res.type);
       setShowModal(true);
-      console.log("after set: " + showModal);
       setShowNotification(false);
-    } else {
-      console.log("fail", res);
-      setShowNotification("Previous transaction not validated.");
     }
   }
 
