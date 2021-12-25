@@ -23,7 +23,7 @@ import {
   CollectionBanner,
   AssetImageFigure,
 } from "components";
-import { fromLovelace } from "utils";
+import { fromLovelace } from "utils/converter";
 
 import "./style.css";
 

@@ -9,7 +9,7 @@ import {
   finalizeTx,
   initializeTx,
 } from "../transaction";
-import { fromHex, toHex } from "../../utils";
+import { fromHex, toHex } from "../../utils/converter";
 
 export const listAsset = async (
   datum,

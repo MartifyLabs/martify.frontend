@@ -1,5 +1,5 @@
 import React from "react";
-import { get_asset_image_source } from "../../utils";
+import { get_asset_image_source } from "../../utils/converter";
 import Image from "../../components/Image";
 import LazyLoad from 'react-lazyload';
 

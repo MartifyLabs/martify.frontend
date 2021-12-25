@@ -5,7 +5,7 @@ import Moment from 'react-moment';
 import { Link } from "react-router-dom";
 import { urls } from "../../config";
 import { MARKET_TYPE } from "../../store/wallet/walletTypes";
-import { fromLovelace } from "../../utils";
+import { fromLovelace } from "../../utils/converter";
 import { get_assets } from "../../store/collection/api";
 
 const Events = ({state_wallet, state_collection, get_assets}) => {

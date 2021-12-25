@@ -39,7 +39,7 @@ import { contractAddress } from "../../cardano/market-contract/validator";
 import { createTxUnspentOutput } from "../../cardano/transaction";
 import { getLockedUtxosByAsset } from "../../cardano/blockfrost-api";
 import { collections_add_tokens } from "../collection/collectionActions";
-import { fromBech32 } from "../../utils";
+import { fromBech32 } from "../../utils/converter";
 import { createEvent, createDatum } from "../../utils/factory";
 import errorTypes from "../../cardano/blockfrost-api/error.types";
 

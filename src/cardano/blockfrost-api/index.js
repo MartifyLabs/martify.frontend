@@ -1,6 +1,6 @@
 import ErrorTypes from "./error.types";
 import { apiKey, cardanoUrl } from "../../config";
-import { fromHex, toString } from "../../utils";
+import { fromHex, toString } from "../../utils/converter";
 
 /**
  * @param {string} asset - asset is a Concatenation of the policy_id and hex-encoded asset_name.

@@ -1,5 +1,5 @@
 import Cardano from "../serialization-lib";
-import { fromHex, toHex } from "../../utils";
+import { fromHex, toHex } from "../../utils/converter";
 
 export const serializeSale = ({ tn, cs, sa, ra, rp, price }) => {
   const fields = Cardano.Instance.PlutusList.new();

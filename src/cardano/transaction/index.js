@@ -3,7 +3,7 @@ import CoinSelection from "./coinSelection";
 import ErrorTypes from "./error.types";
 import { languageViews } from "./languageViews";
 import { getCollateral, signTx, submitTx } from "../wallet";
-import { fromHex, toHex } from "../../utils";
+import { fromHex, toHex } from "../../utils/converter";
 
 export const assetsToValue = (assets) => {
   const multiAsset = Cardano.Instance.MultiAsset.new();
