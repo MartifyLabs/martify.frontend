@@ -41,7 +41,7 @@ import { getLockedUtxosByAsset } from "../../cardano/blockfrost-api";
 import { collections_add_tokens } from "../collection/collectionActions";
 import { fromBech32 } from "../../utils/converter";
 import { createEvent, createDatum } from "../../utils/factory";
-import errorTypes from "../../cardano/blockfrost-api/error.types";
+import { resolveError } from "../../utils/resolver";
 
 export const connectWallet = (isSilent, callback) => async (dispatch) => {
   try {
@@ -71,7 +71,7 @@ export const connectWallet = (isSilent, callback) => async (dispatch) => {
         dispatch(setWalletLoading(false));
         callback({
           success: false,
-          msg: "Switch your Nami Wallet network.",
+          msg: "Please switch your Nami Wallet's Network.",
         });
       }
     }
@@ -80,11 +80,10 @@ export const connectWallet = (isSilent, callback) => async (dispatch) => {
       `Unexpected error in connectWallet. [Message: ${error.message}]`
     );
     dispatch(setWalletLoading(false));
-    callback({ success: false, error });
-    dispatch(set_error({
-      message: "Could not connect wallet.",
-      detail: error,
-    }));
+    callback({
+      success: false,
+      msg: "Wallet Could not Connect, Please try Again.",
+    });
   }
 };
 
@@ -108,10 +107,12 @@ export const loadAssets = (wallet, callback) => async (dispatch) => {
     );
     dispatch(setWalletLoading(false));
     callback({ success: false, error });
-    dispatch(set_error({
-      message: errorTypes.COULD_NOT_RETRIEVE_ASSETS_FROM_DB,
-      detail: error,
-    }));
+    dispatch(
+      set_error({
+        message: resolveError(error.message, "Loading Wallet Assets"),
+        detail: error,
+      })
+    );
   }
 };
 
@@ -176,25 +177,32 @@ export const listToken =
         dispatch(collections_add_tokens(output));
         callback({ success: true, type: MARKET_TYPE.NEW_LISTING });
       } else {
-        console.error("List Failed...");
-        dispatch(setWalletLoading(false));
         callback({ success: false });
+        dispatch(setWalletLoading(false));
+        dispatch(
+          set_error({
+            message: resolveError("TRANSACTION_FAILED", "Listing Asset"),
+            detail: null,
+          })
+        );
       }
     } catch (error) {
       console.error(
         `Unexpected error in listToken. [Message: ${error.message}]`
       );
-      dispatch(setWalletLoading(false));
       callback({ success: false });
-      dispatch(set_error({
-        message: errorTypes.COULD_NOT_RETRIEVE_ASSETS_FROM_DB,
-        detail: error,
-      }));
+      dispatch(setWalletLoading(false));
+      dispatch(
+        set_error({
+          message: resolveError(error.message, "Listing Asset"),
+          detail: error,
+        })
+      );
     }
   };
 
 export const relistToken =
-  (wallet, asset, newPrice, callback) => async (dispatch) => {
+  (wallet, asset, price, callback) => async (dispatch) => {
     try {
       dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
@@ -214,7 +222,7 @@ export const relistToken =
           wallet.data.address,
           asset.status.artistAddress,
           asset.status.datum.rp,
-          newPrice
+          price
         );
         const updateObj = await updateListing(
           asset.status.datum,
@@ -261,25 +269,39 @@ export const relistToken =
           dispatch(collections_add_tokens(output));
           callback({ success: true, type: MARKET_TYPE.PRICE_UPDATE });
         } else {
-          console.error("Update Failed...");
-          dispatch(setWalletLoading(false));
           callback({ success: false });
+          dispatch(setWalletLoading(false));
+          dispatch(
+            set_error({
+              message: resolveError("TRANSACTION_FAILED", "Updating Asset Price"),
+              detail: null,
+            })
+          );
         }
       } else {
-        console.error("Update Failed, Datum Hash not matching...");
-        dispatch(setWalletLoading(false));
         callback({ success: false });
+        dispatch(setWalletLoading(false));
+        dispatch(
+          set_error({
+            message: resolveError(
+              "Listing transaction not fully confirmed yet, Please try again later."
+            ),
+            detail: null,
+          })
+        );
       }
     } catch (error) {
       console.error(
         `Unexpected error in relistToken. [Message: ${error.message}]`
       );
-      dispatch(setWalletLoading(false));
       callback({ success: false });
-      dispatch(set_error({
-        message: errorTypes.COULD_NOT_RETRIEVE_ASSETS_FROM_DB, 
-        detail: error,
-      }));
+      dispatch(setWalletLoading(false));
+      dispatch(
+        set_error({
+          message: resolveError(error.message, "Updating Asset Price"),
+          detail: error,
+        })
+      );
     }
   };
 
@@ -337,25 +359,39 @@ export const delistToken = (wallet, asset, callback) => async (dispatch) => {
         dispatch(collections_add_tokens(output));
         callback({ success: true, type: MARKET_TYPE.DELIST });
       } else {
-        console.error("Cancel Failed...");
-        dispatch(setWalletLoading(false));
         callback({ success: false });
+        dispatch(setWalletLoading(false));
+        dispatch(
+          set_error({
+            message: resolveError("TRANSACTION_FAILED", "Unlisting Asset"),
+            detail: null,
+          })
+        );
       }
     } else {
-      console.error("Cancel Failed, Datum Hash not matching...");
-      dispatch(setWalletLoading(false));
       callback({ success: false });
+      dispatch(setWalletLoading(false));
+      dispatch(
+        set_error({
+          message: resolveError(
+            "Listing transaction not fully confirmed yet, Please try again later."
+          ),
+          detail: null,
+        })
+      );
     }
   } catch (error) {
     console.error(
       `Unexpected error in delistToken. [Message: ${error.message}]`
     );
-    dispatch(setWalletLoading(false));
     callback({ success: false });
-    dispatch(set_error({
-      message: errorTypes.COULD_NOT_RETRIEVE_ASSETS_FROM_DB, 
-      detail: error,
-    }));
+    dispatch(setWalletLoading(false));
+    dispatch(
+      set_error({
+        message: resolveError(error.message, "Unlisting Asset"),
+        detail: error,
+      })
+    );
   }
 };
 
@@ -413,10 +449,7 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
           wallet.data.address
         );
 
-        const delistAsset = await delistWalletAsset(sellerWalletObj, updatedAsset, soldEvent);
-        if (delistAsset) {
-          console.log("asset delisted");
-        }
+        await delistWalletAsset(sellerWalletObj, updatedAsset, soldEvent);
         // ----------------------------------------
 
         const output = {
@@ -431,24 +464,38 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
         dispatch(collections_add_tokens(output));
         callback({ success: true, type: MARKET_TYPE.PURCHASE });
       } else {
-        console.error("Purchase Failed...");
-        dispatch(setWalletLoading(false));
         callback({ success: false });
+        dispatch(setWalletLoading(false));
+        dispatch(
+          set_error({
+            message: resolveError("TRANSACTION_FAILED", "Purchasing Asset"),
+            detail: null,
+          })
+        );
       }
     } else {
-      console.error("Purchase Failed, Datum Hash not matching...");
-      dispatch(setWalletLoading(false));
       callback({ success: false });
+      dispatch(setWalletLoading(false));
+      dispatch(
+        set_error({
+          message: resolveError(
+            "Listing transaction not fully confirmed yet, Please try again later."
+          ),
+          detail: null,
+        })
+      );
     }
   } catch (error) {
     console.error(
       `Unexpected error in purchaseToken. [Message: ${error.message}]`
     );
-    dispatch(setWalletLoading(false));
     callback({ success: false });
-    dispatch(set_error({
-      message: errorTypes.COULD_NOT_PURCHASE_TOKEN, 
-      detail: error,
-    }));
+    dispatch(setWalletLoading(false));
+    dispatch(
+      set_error({
+        message: resolveError(error.message, "Purchasing Asset"),
+        detail: error,
+      })
+    );
   }
 };

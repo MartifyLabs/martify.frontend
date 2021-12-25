@@ -4,10 +4,8 @@ import {
   collections_loading,
   collections_add_assets,
 } from "./collectionActions";
-import {
-  set_error
-} from "../error/errorActions";
-import errorTypes from "../../cardano/blockfrost-api/error.types";
+import { set_error } from "../error/errorActions";
+import { resolveError } from "utils/resolver";
 
 import data_collections from "../../data/collections.json";
 import data_collections_cnft from "../../data/collections-cnft.json";
@@ -52,48 +50,64 @@ export const load_collection = (callback) => async (dispatch) => {
   }
 
   for (let collection_id in all_collections) {
-    all_collections[collection_id].policy_ids = [...new Set(all_collections[collection_id].policy_ids)];
+    all_collections[collection_id].policy_ids = [
+      ...new Set(all_collections[collection_id].policy_ids),
+    ];
   }
 
   dispatch(collections_loaded(all_collections));
   callback({ all_collections });
 };
 
-export const get_listings = (policy_id, page, count, lastVisible, callback) => async (dispatch) => {
-  try {
-    dispatch(collections_loading(true));
+export const get_listings =
+  (policy_id, page, count, lastVisible, callback) => async (dispatch) => {
+    try {
+      dispatch(collections_loading(true));
 
-    let output = {
-      policy_id: policy_id,
-      listing: {},
-    };
+      let output = {
+        policy_id: policy_id,
+        listing: {},
+      };
 
-    const assets = await getCollectionAssets(policy_id, page, count, lastVisible);
+      const assets = await getCollectionAssets(
+        policy_id,
+        page,
+        count,
+        lastVisible
+      );
 
-    if (assets) {
-      output.listing = Object.assign({}, ...assets.map((a) => ({[a.details.asset]: a})));
+      if (assets) {
+        output.listing = assets.reduce((map, asset) => {
+          map[asset.details.asset] = asset;
+          return map;
+        }, {});
 
-      if (output.policy_id && output.listing) {
-        dispatch(collections_add_tokens(output));
+        if (output.policy_id && output.listing) {
+          dispatch(collections_add_tokens(output));
+        }
       }
-    }
 
-    callback(assets);
-  } catch (err) {
-    dispatch(collections_loading(false));
-    console.error(err);
-  }
-};
+      callback({ success: true, data: assets });
+    } catch (error) {
+      callback({ success: false, error });
+      dispatch(collections_loading(false));
+      dispatch(
+        set_error({
+          message: resolveError(error.message, "Retrieving Collection Assets"),
+          detail: error,
+        })
+      );
+    }
+  };
 
 export const get_assets = (assetIds, callback) => async (dispatch) => {
-
   try {
     dispatch(collections_loading(true));
 
     let output = {
-      // this is so to match wallet schema
       assets: {},
     };
+
     let assets = await getAssets(assetIds);
 
     for (let i in assets) {
@@ -107,84 +121,85 @@ export const get_assets = (assetIds, callback) => async (dispatch) => {
 
     dispatch(collections_add_assets(output));
 
-    callback(true);
-  } catch (err) {
+    callback({ success: true });
+  } catch (error) {
+    callback({ success: false, error });
     dispatch(collections_loading(false));
-    dispatch(set_error({
-      message: errorTypes.COULD_NOT_RETRIEVE_ASSETS_FROM_DB,
-      detail: err,
-    }));
+    dispatch(
+      set_error({
+        message: resolveError(error.message, "Retrieving Assets"),
+        detail: error,
+      })
+    );
   }
 };
 
-function add_token(asset, dispatch) {
-  let output = {
-    policy_id: asset.details.policyId,
-    listing: {
-      [asset.details.asset]: asset,
-    },
-  };
-  dispatch(collections_add_tokens(output));
-}
-
 export const get_asset = (asset_id, callback) => async (dispatch) => {
-
   try {
     dispatch(collections_loading(true));
 
     let asset = await getAsset(asset_id);
 
     if (asset) add_token(asset, dispatch);
-    callback(true);
-  } catch (err) {
+
+    callback({ success: true });
+  } catch (error) {
+    callback({ success: false, error });
     dispatch(collections_loading(false));
-    dispatch(set_error({
-      message: errorTypes.COULD_NOT_RETRIEVE_ASSET_FROM_DB,
-      detail: err,
-    }));
+    dispatch(
+      set_error({
+        message: resolveError(error.message, "Retrieving Asset"),
+        detail: error,
+      })
+    );
   }
 };
 
-export const get_listed_assets = (count, lastVisible, callback) => async (dispatch) => {
-  try {
-    let listed_assets = await getLockedAssets(count, lastVisible);
+export const get_listed_assets =
+  (count, lastVisible, callback) => async (dispatch) => {
+    try {
+      let listed_assets = await getLockedAssets(count, lastVisible);
 
-    let listed_assets_by_policy = {};
+      if (listed_assets) {
+        let listed_assets_by_policy = {};
 
-    for (let i in listed_assets) {
-      let asset = listed_assets[i];
+        for (let i in listed_assets) {
+          let asset = listed_assets[i];
 
-      if (asset) {
-        if (asset.details) {
-          if (!(asset.details.policyId in listed_assets_by_policy)) {
-            listed_assets_by_policy[asset.details.policyId] = {
-              policy_id: asset.details.policyId,
-              listing: {},
-            };
+          if (asset) {
+            if (asset.details) {
+              if (!(asset.details.policyId in listed_assets_by_policy)) {
+                listed_assets_by_policy[asset.details.policyId] = {
+                  policy_id: asset.details.policyId,
+                  listing: {},
+                };
+              }
+              listed_assets_by_policy[asset.details.policyId].listing[
+                asset.details.asset
+              ] = asset;
+            }
           }
-          listed_assets_by_policy[asset.details.policyId].listing[
-            asset.details.asset
-          ] = asset;
+        }
+
+        for (let policy_id in listed_assets_by_policy) {
+          dispatch(collections_add_tokens(listed_assets_by_policy[policy_id]));
         }
       }
-    }
 
-    for (let policy_id in listed_assets_by_policy) {
-      dispatch(collections_add_tokens(listed_assets_by_policy[policy_id]));
+      callback({ success: true, data: listed_assets });
+    } catch (error) {
+      callback({ success: false, error });
+      dispatch(
+        set_error({
+          message: resolveError(error.message, "Retrieving Listed Assets"),
+          detail: error,
+        })
+      );
     }
-
-    callback({ success: true, data: listed_assets });
-  } catch (err) {
-    dispatch(set_error({
-      message: errorTypes.COULD_NOT_RETRIEVE_ASSETS_FROM_DB,
-      detail: err,
-    }));
-  }
-};
+  };
 
 export const asset_add_offer =
   (asset_id, price, callback) => async (dispatch) => {
-
     try {
       let asset = await getAsset(asset_id);
 
@@ -206,19 +221,19 @@ export const asset_add_offer =
       add_token(asset, dispatch);
 
       callback({ success: true, type: "offer-success" });
-    } catch (err) {
-      dispatch(set_error({
-        message: errorTypes.COULD_NOT_ADD_OFFER_FOR_THE_ASSET,
-        detail: err,
-      }));
+    } catch (error) {
+      dispatch(
+        set_error({
+          message: resolveError(error.message, "Adding Offer"),
+          detail: error,
+        })
+      );
     }
   };
 
 export const opencnft_get_top_projects =
   (time, callback) => async (dispatch) => {
-    fetch("https://api.opencnft.io/1/rank?window=" + time, {
-
-    })
+    fetch("https://api.opencnft.io/1/rank?window=" + time, {})
       .then((res) => res.json())
       .then((res) => {
         callback({ success: true, data: res.ranking });
@@ -230,9 +245,7 @@ export const opencnft_get_top_projects =
 
 export const opencnft_get_policy =
   (policy_id, callback) => async (dispatch) => {
-    fetch(`https://api.opencnft.io/1/policy/${policy_id}`, {
-
-    })
+    fetch(`https://api.opencnft.io/1/policy/${policy_id}`, {})
       .then((res) => res.json())
       .then((res) => {
         callback({ success: true, data: res });
@@ -244,15 +257,22 @@ export const opencnft_get_policy =
 
 export const opencnft_get_asset_tx =
   (asset_id, callback) => async (dispatch) => {
-    fetch(`https://api.opencnft.io/1/asset/${asset_id}/tx`, {
-
-    })
+    fetch(`https://api.opencnft.io/1/asset/${asset_id}/tx`, {})
       .then((res) => res.json())
       .then((res) => {
-        console.log(res)
         callback({ success: true, data: res });
       })
       .catch((err) => {
         console.error(err);
       });
   };
+
+function add_token(asset, dispatch) {
+  let output = {
+    policy_id: asset.details.policyId,
+    listing: {
+      [asset.details.asset]: asset,
+    },
+  };
+  dispatch(collections_add_tokens(output));
+}

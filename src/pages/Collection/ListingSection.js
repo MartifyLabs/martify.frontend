@@ -75,9 +75,11 @@ const ListingSection = ({ state_collection, policyIds }) => {
           collectionMetadata.page,
           ITEMS_PER_PAGE,
           getLastVisible(),
-          (loadedAssets) => {
-            updateComponentState(collectionMetadata, loadedAssets);
-            setIsFetching(false);
+          (res) => {
+            if (res.success) {
+              updateComponentState(collectionMetadata, res.data);
+              setIsFetching(false);
+            }
           }
         )
       );
