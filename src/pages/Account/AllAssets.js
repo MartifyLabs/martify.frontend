@@ -31,6 +31,10 @@ const AllAssets = () => {
     );
   }, []);
 
+  useEffect(() => {
+    load()
+  }, [state_wallet])
+
   const add_asset = (list_nfts, dict_projects, this_asset) => {
     if (this_asset) {
       list_nfts.push(this_asset);
@@ -50,12 +54,12 @@ const AllAssets = () => {
       let list_projects = [...default_list_projects];
       let dict_projects = {};
 
-      for (var i in state_wallet.data.assets) {
+      for (let i in state_wallet.data.assets) {
         let this_asset = state_wallet.data.assets[i];
         add_asset(list_nfts, dict_projects, this_asset);
       }
 
-      for (var i in state_wallet.data.market) {
+      for (let i in state_wallet.data.market) {
         let this_asset = state_wallet.data.market[i];
         add_asset(list_nfts, dict_projects, this_asset);
       }
