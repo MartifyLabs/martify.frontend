@@ -82,6 +82,8 @@ const About = () => {
           <li>
             <h4>Kazune Takeda</h4>
             <ol>Full-stack Developer</ol>
+            <ol><a href="https://www.linkedin.com/in/kazunetakeda25/">Linkedin</a></ol>
+            <ol><a href="https://github.com/kazunetakeda25">Github</a></ol>
           </li>
         </ul>
       </div>
