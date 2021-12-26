@@ -66,16 +66,23 @@ const Splash = ({ listProjects }) => {
             <div className="columns is-mobile is-multiline is-gapless">
               <span className="logo-text">Martify</span>
               <div className="column is-full has-text-centered">
-                <p
-                  className="is-size-1 slogan"
-                  style={{ color: "#fff", lineHeight: "1" }}
-                >
+                <p className="is-size-1 slogan">
                   Welcome to The Digital Universe.
                 </p>
-                <p className="is-size-5 slogan" style={{ color: "#fff" }}>
-                  The Smoothest Experience for You to Buy & Sell Cardano NFTs
-                  Powered By Smart Contracts.
-                </p>
+                <div className="is-size-4 slogan">
+                  <div className="slogan-container">
+                    <div>The Smoothest Experience for You to</div>
+                    <div className="flip-container">
+                      <ul className="flip-items">
+                        <li>Buy</li>
+                        <li>Sell</li>
+                        <li>Trade</li>
+                        <li>Explore</li>
+                      </ul>
+                    </div>
+                    <div>Cardano NFTs Powered By Smart Contracts.</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -228,7 +235,7 @@ const TopProjects = ({
       setTopProjectData(res.data);
       prepare_data(res.data, show_num_projects_initial);
     });
-  }
+  };
 
   useEffect(() => {
     if (listProjects.length === 0) onchange_window("7d");
