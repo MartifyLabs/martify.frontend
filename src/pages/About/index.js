@@ -23,44 +23,70 @@ const About = () => {
         <ul>
           <li>
             <h4>Q4 2021</h4>
-            <ol>Launch on mainnet with basic functionnalities : List, Buy, Update Price, Cancel Listing, Offers, ...</ol>
+            <ol>Marketplace launch with basic functionnalities : List, Buy, Update Price, Cancel Listing, Offers, ...</ol>
             <ol>Team building</ol>
           </li>
           <li>
             <h4>Q1 2022</h4>
             <ol>Marketing campaign</ol>
-            <ol>New feature : NFT-to-NFT trading</ol>
+            <ol>New feature : NFT Bundle Swaps</ol>
             <ol>New feature : Native Token support for partner projects</ol>
             <ol>UI/UX and branding update</ol>
-            <ol>Tokenomics and whitepaper</ol>
+            <ol>Tokenomics and whitepaper (including governance)</ol>
           </li>
           <li>
             <h4>Q2 2022</h4>
-            <ol>New feature : On-chain Auction system</ol>
+            <ol>New feature : On-chain Auctions</ol>
+            <ol>Martify integration with parner wallets</ol>
             <ol>Seed round and private sales</ol>
-            <ol>Governance Paper</ol>
           </li>
           <li>
             <h4>Q3 2022</h4>
-            <ol>Extend integration features for Gaming/Metaverse projects</ol>
+            <ol>Public API containing all marketplace features</ol>
+            <ol>Back-office for NFT Projects to launch their own marketplace using Martify API</ol>
             <ol>Initial Stake Pool Offering</ol>
             <ol>Marketing Campaign</ol>
           </li>
           <li>
             <h4>Q4 2022</h4>
-            <ol>Martify integration for game engines (Unreal Engine, Unity, ...)</ol>
-            <ol>API including NFT Minting, Forging, Burning, Swapping, Native Token support, ...</ol>
-            <ol>Integrate in wallet (Maybe Genius)</ol>
-            <ol>Governance implementation</ol>
+            <ol>Martify integration with game engines (Unreal Engine, Unity, ...)</ol>
+            <ol>Governance implementation using Martify token</ol>
           </li>
         </ul>
       </div>
      
 
       <div className="content is-large has-text-centered">
-        <h2 className="is-size-2">Team</h2>
-        <p className="subtitle is-4">Work in Progress...</p>
+        <h2 className="is-size-2">Team members</h2>
       </div>
+      <div className="content">
+        <ul>
+          <li>
+            <h4>Alain Magazin</h4>
+            <ol>Co-founder & Plutus Developer</ol>
+            <ol><a href="https://www.linkedin.com/in/alain-magazin-36a403213/">Linkedin</a></ol>
+            <ol><a href="https://github.com/AlainMgz">Github</a></ol>
+          </li>
+          <li>
+            <h4>Abdelkrim Dib</h4>
+            <ol>Co-founder, Full-stack & Plutus Developer</ol>
+            <ol><a href="https://www.linkedin.com/in/abdelkrimdev/">Linkedin</a></ol>
+            <ol><a href="https://github.com/abdelkrimdev">Github</a></ol>
+          </li>
+          <li>
+            <h4>Hong Jing K.</h4>
+            <ol>Full-stack Developer</ol>
+            <ol><a href="https://www.linkedin.com/in/jingles/">Linkedin</a></ol>
+            <ol><a href="https://github.com/jinglescode">Github</a></ol>
+          </li>
+          <li>
+            <h4>Kazune Takeda</h4>
+            <ol>Full-stack Developer</ol>
+          </li>
+        </ul>
+      </div>
+        
+      
     </div>
   );
 };
