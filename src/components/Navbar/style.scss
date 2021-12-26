@@ -1,25 +1,40 @@
 .main-navbar {
   background-color: transparent;
-  background-image: none;  
+  background-image: none;
   .logo-text {
     font-size: 1.68rem;
+    height: 44px;
   }
 }
 
-.main-navbar .the-blur{
+.main-navbar .the-blur {
   position: fixed;
-  top:0;
+  top: 0;
   width: 100%;
   min-height: 61px;
-  
+
   /* background-color: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(20px) saturate(160%) contrast(45%) brightness(140%);
   -webkit-backdrop-filter: blur(20px) saturate(160%) contrast(45%) brightness(140%); */
 
-  background: rgb(221,247,255);
-  background: -moz-linear-gradient(87deg, rgba(221,247,255,1) 0%, rgba(235,215,192,1) 60%, rgba(217,204,242,1) 100%);
-  background: -webkit-linear-gradient(87deg, rgba(221,247,255,1) 0%, rgba(235,215,192,1) 60%, rgba(217,204,242,1) 100%);
-  background: linear-gradient(87deg, rgba(221,247,255,1) 0%, rgba(235,215,192,1) 60%, rgba(217,204,242,1) 100%);
+  background: -moz-linear-gradient(
+    87deg,
+    rgba(221, 247, 255, 1) 0%,
+    rgba(235, 215, 192, 1) 60%,
+    rgba(217, 204, 242, 1) 100%
+  );
+  background: -webkit-linear-gradient(
+    87deg,
+    rgba(221, 247, 255, 1) 0%,
+    rgba(235, 215, 192, 1) 60%,
+    rgba(217, 204, 242, 1) 100%
+  );
+  background: linear-gradient(
+    87deg,
+    rgba(221, 247, 255, 1) 0%,
+    rgba(235, 215, 192, 1) 60%,
+    rgba(217, 204, 242, 1) 100%
+  );
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#ddf7ff",endColorstr="#d9ccf2",GradientType=1);
 }
 
@@ -102,7 +117,11 @@
   opacity: 0.7;
 }
 
-
 .navbar-item .search.control input {
   width: 400px;
+}
+
+.navbar-item {
+  font-size: large;
+  font-weight: 400;
 }

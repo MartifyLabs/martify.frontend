@@ -107,7 +107,7 @@ textarea {
 
 .logo-text {
   width: 100%;
-  font-weight: bold;
+  font-family: 'Pacifico', cursive;
   background: linear-gradient(
     90deg,
     #d1aad7,
@@ -120,9 +120,9 @@ textarea {
   background-clip: border-box;
   background-size: 200% auto;
   background-clip: text;
-  text-fill-color: transparent;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px #bbdef2;
   animation: textclip 2s linear infinite;
   display: inline-block;
 }
