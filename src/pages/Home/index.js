@@ -74,10 +74,18 @@ const Splash = ({ listProjects }) => {
                     <div>The Smoothest Experience for You to</div>
                     <div className="flip-container">
                       <ul className="flip-items">
-                        <li>Buy</li>
-                        <li>Sell</li>
-                        <li>Trade</li>
-                        <li>Explore</li>
+                        <li>
+                          <span class="tag is-primary is-large">Buy</span>
+                        </li>
+                        <li>
+                          <span class="tag is-primary is-large">Sell</span>
+                        </li>
+                        <li>
+                          <span class="tag is-primary is-large">Trade</span>
+                        </li>
+                        <li>
+                          <span class="tag is-primary is-large">Explore</span>
+                        </li>
                       </ul>
                     </div>
                     <div>Cardano NFTs Powered By Smart Contracts.</div>
