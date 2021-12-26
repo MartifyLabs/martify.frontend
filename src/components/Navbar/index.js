@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-import "./style.css";
+import "./style.scss";
 
 import ButtonConnect from "../ButtonConnect";
 import Search from "./Search";
