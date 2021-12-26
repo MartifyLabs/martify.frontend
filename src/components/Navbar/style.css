@@ -28,7 +28,6 @@
   width: 240px;
   height: 30px;
   padding: 10px 20px;
-  font-family: 'Open Sans', sans-serif;
   font-weight: 300;
   font-size: 16px;
   border: 1px solid #aaa;
@@ -59,7 +58,6 @@
   position: absolute;
   border: 1px solid #aaa;
   background-color: #fff;
-  font-family: 'Open Sans', sans-serif;
   font-weight: 300;
   font-size: 16px;
   border-bottom-left-radius: 4px;
@@ -101,24 +99,7 @@
   opacity: 0.7;
 }
 
-.logo-text {
-  font-size: 30px;
-  font-weight: 700;
-  /* background: -webkit-linear-gradient(45deg, #ffffff, #2ec4ff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  -webkit-text-stroke: 1px #DC95CF;
-  filter: drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.3)) */
-  animation: color-change 1s infinite;
-}
 
 .navbar-item .search.control input {
   width: 400px;
-}
-
-@keyframes color-change {
-  0% { color: red; }
-  50% { color: blue; }
-  100% { color: red; }
 }
