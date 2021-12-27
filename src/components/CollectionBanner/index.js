@@ -5,7 +5,7 @@ import {usePalette} from 'react-palette'
 import CollectionLinks from "../CollectionLinks";
 import { numFormatter, get_asset_image_source } from "../../utils/converter";
 
-const CollectionBanner = ({thisCollection, size, asset}) => {
+const CollectionBanner = ({thisCollection, size, asset, is_collection_page}) => {
   
   const [currentId, setCurrentId] = useState(false);
   const [assetImgSrc, setAssetImgSrc] = useState(false);
@@ -42,8 +42,7 @@ const CollectionBanner = ({thisCollection, size, asset}) => {
   //   muted: "#64aa8a"
   //   vibrant: "#b4d43c"
   // }
-  
-
+  console.log("thisCollection", thisCollection, is_collection_page)
   return (
     <section className={"hero collection_name " + (size!==undefined ? size : "is-medium")} 
     style={
@@ -56,7 +55,8 @@ const CollectionBanner = ({thisCollection, size, asset}) => {
       assetColors ? 
         {backgroundImage: `linear-gradient(to bottom right, ${assetColors.darkMuted}, ${assetColors.darkVibrant}`} : 
       {}
-    }>
+    }
+    >
 
       <div className="hero-body">
       

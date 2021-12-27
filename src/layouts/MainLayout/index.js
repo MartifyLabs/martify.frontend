@@ -5,8 +5,8 @@ import { Navbar } from 'components';
 const MainLayout = ({ children }) => {
   return (
     <React.Fragment>
-        <Navbar/>
-        <div>{children}</div>
+      <Navbar/>
+      <div>{children}</div>
     </React.Fragment>
   );
 };
