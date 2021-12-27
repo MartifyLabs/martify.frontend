@@ -22,7 +22,7 @@ const GuideBuy = () => {
           <li><b>Purchase your first NFT</b>: Purchasing your first NFT on <a href="explore">Martify</a>.</li>
         </ol>
 
-        <h2>Step 1: Acquiring cryptocurrency to purchase an NFT</h2>
+        <h2>Step 1: Acquiring Cardano (ADA) cryptocurrency</h2>
         {/* <h3>Overview: Step 1</h3> */}
         <ol>
           <li><b>Join a cryptocurrency marketplace</b>: Join a cryptocurrency marketplace like Coinbase or Binance to purchase, store, and transfer your cryptocurrency. Coinbase recommends a minimum of $50 to get started.</li>
@@ -38,7 +38,6 @@ const GuideBuy = () => {
         <h2>Step 2: Setup a cryptocurrency wallet</h2>
         {/* <h3>Overview: Step 2</h3> */}
         <ol>
-          <li><b>Join a cryptocurrency marketplace</b>: Join a cryptocurrency marketplace like Coinbase or Binance to purchase, store, and transfer your cryptocurrency. Coinbase recommends a minimum of $50 to get started.</li>
           <li><b>Download a cryptocurrency wallet</b>: Download the <a href="https://namiwallet.io/">Nami Wallet</a> browser extension, which will be your own personal "digital wallet". With Nami Wallet, you get to store and use your cryptocurrency and digital assets (like NFTs).</li>
           <li><b>Setup Nami Wallet</b>: Write down and confirm your seed phrase, and input a new password.</li>
           <li><b>Fund your Nami Wallet</b>: Transfer your ADA from Coinbase to Nami Wallet.</li>
@@ -86,6 +85,11 @@ const GuideBuy = () => {
         {/* <figure class="image">
           <img src={image_4_assetpage} />
         </figure> */}
+
+        <ol>
+          <li><b>Browse NFTs</b>: Browse the <a href="explore">explore page</a>.</li>
+          <li><b>Make the transaction</b>: Click on Buy Now to confirm the transaction.</li>
+        </ol>
 
         <p>Start by browsing listed assets on the <a href="explore">explore page</a>, there you can sort the assets by price or filter by the projects you are interested. Click on the the asset will brings you to the asset page, here you can see the asset's metadata, past transactions on all marketplaces, as well as the current listing price. Click on "Buy Now", your Nami Wallet will prompt you for your password. Sign it to approve the transaction and the NFT will be in your Nami Wallet in a few minutes. If your "Buy Now" button is disabled, check you have connected your wallet and added the collateral.</p>
 
