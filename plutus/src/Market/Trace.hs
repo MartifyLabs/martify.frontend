@@ -21,13 +21,13 @@ import           Data.Default (def)
 
 import Utility         (wallet, mp)
 import Market.Offchain (endpoints)
-import Market.Onchain2 (buyValidatorHash)
+import Market.Onchain  (buyValidatorHash)
 import Market.Types    (StartParams(..), BuyParams(..), MarketParams(updateCs, updateTn))
 
 nftEx1 :: StartParams
 nftEx1 = StartParams
     { sPrice = 100
-    , sTn    = "Vendere"
+    , sTn    = "Martify"
     , sCs    = "66"
     } -- This is an example token, 
       -- As these are the parameters of the validator, this info should be provided by the user of the contract
@@ -35,7 +35,7 @@ nftEx1 = StartParams
 nftEx2 :: StartParams
 nftEx2 = StartParams
     { sPrice = 100
-    , sTn    = "Vendere2"
+    , sTn    = "Martify2"
     , sCs    = "66"
     }
 
@@ -77,7 +77,7 @@ test = do
         void $ Emulator.waitNSlots 1
         callEndpoint @"start" h3 nftEx1
         void $ Emulator.waitNSlots 1
-        callEndpoint @"updateContract" h1 (buyValidatorHash mp)
+        callEndpoint @"buy'" h4 (nftEx1', nftEx2')
         void $ Emulator.waitNSlots 1
 
     
