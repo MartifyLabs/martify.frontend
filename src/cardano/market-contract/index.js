@@ -97,6 +97,7 @@ export const updateListing = async (
       utxos,
       outputs,
       changeAddress: seller.address,
+      metadata: deserializeSale(newListingDatum),
       scriptUtxo: assetUtxo,
       plutusScripts: contractScripts(),
       action: UPDATE,
