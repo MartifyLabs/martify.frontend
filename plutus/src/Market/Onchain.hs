@@ -23,13 +23,14 @@ import           Codec.Serialise       ( serialise )
 import           Cardano.Api.Shelley (PlutusScript (..), PlutusScriptV1)
 import qualified PlutusTx
 import PlutusTx.Prelude as Plutus
-    ( Bool(..), Eq((==)), (.), length, (&&), Integer, Maybe(..), (>=), fromInteger, (*), ($), (%), (-), map )
+    ( Bool(..), Eq((==)), (/=), (.), length, (&&), Integer, Maybe(..), (>=), fromInteger, (*), ($), (%), (-), map )
 import Ledger
     ( TokenName,
       PubKeyHash(..),
       ValidatorHash,
       Address(Address),
       validatorHash,
+      pubKeyHashAddress,
       CurrencySymbol,
       DatumHash,
       Datum(..),
@@ -92,7 +93,7 @@ mkBuyValidator mp nfts r ctx = case r of
             [pubKeyHash] -> pubKeyHash
 
     getTokenDatum :: Maybe UpdateVHash
-    getTokenDatum = let is = [ i | i <- map txInInfoResolved (txInfoInputs info), valueOf (txOutValue i) (updateCs mp) (updateTn mp) == 1 ] in
+    getTokenDatum = let is = [ i | i <- map txInInfoResolved (txInfoInputs info), valueOf (txOutValue i) (updateCs mp) (updateTn mp) == 1 && txOutAddress i /= pubKeyHashAddress (feeAddr mp) ] in
                     case is of
                         [i] -> tokenDatum i (`findDatum` info)
 
