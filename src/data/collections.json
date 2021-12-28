@@ -2,7 +2,8 @@
   "thepixelheadsquad": {
     "id": "thepixelheadsquad",
     "policy_ids": [
-      "6c880f643a86d6f5b86871952b36999bbf7e9619ca54953abd2acf62"
+      "57cde26ea73be0c3ab57f4a6f414d612a68fb901cd0f2e7157846b2d",
+      "fec624c17759a1c5040ecb4c0d3ce35fc01465d0b7ab57b266fa2b18"
     ],
     "meta": {
       "name": "The Pixel Head Squad",
@@ -32,6 +33,8 @@
     "style": {
       "logo": "logo.png",
       "banner":"banner.png",
+      "banner_collection_height": "600px",
+      "banner_asset_height": "176px",
       "font_color_title": "#f5f3db"
     },
     "links": {

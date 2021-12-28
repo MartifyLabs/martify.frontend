@@ -84,6 +84,7 @@ const Asset = () => {
           thisCollection={thisCollection}
           size="is-small"
           asset={asset}
+          is_asset_page={true}
         />
       ) : (
         <></>

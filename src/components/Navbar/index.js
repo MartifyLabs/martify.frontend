@@ -22,14 +22,14 @@ const Navbar = () => {
 
           <Link className="navbar-item" to="/explore">Explore</Link>
           
-          {/* <Link className="navbar-item" to="/guide">User Guide</Link> */}
-          <div class="navbar-item has-dropdown is-hoverable">
-            <Link className="navbar-item" to="/guide">User Guide</Link>
+          <div className="navbar-item has-dropdown is-hoverable">
+            <a className="navbar-item">User Guide</a>
+            {/* <Link className="navbar-item" to="/guide">User Guide</Link> */}
 
-            <div class="navbar-dropdown">
+            <div className="navbar-dropdown">
               <Link className="navbar-item" to="/guide-buy">Buying</Link>
               <Link className="navbar-item" to="/guide-sell">Selling</Link>
-              {/* <hr class="navbar-divider"/> */}
+              {/* <hr className="navbar-divider"/> */}
             </div>
           </div>
           
