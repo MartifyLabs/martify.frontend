@@ -1,7 +1,7 @@
 import React from "react";
-import image_3_collateral from './step3-collateral.png';
-import image_3_collateral2 from './step3-collateral2.png';
-import image_4_assetpage from './step4-asset-page.png';
+// import image_3_collateral from './step3-collateral.png';
+// import image_3_collateral2 from './step3-collateral2.png';
+// import image_4_assetpage from './step4-asset-page.png';
 
 const GuideBuy = () => {
   return (
@@ -47,7 +47,7 @@ const GuideBuy = () => {
 
         <p>Go to <a href="https://namiwallet.io/">Nami Wallet</a> to download the browser extension. <b>Important</b>: To avoid any scam, we recommend you to visit their official page and then select the desired browser type to install the application. If you click on Chrome, you will be automatically taken to the Google Chrome web store. Click "Add extension" and it will be downloaded and installed. Once installed, you will be able to view the Nami Wallet icon (a blue "N") in the top right corner of your browser.</p>
 
-        <p>If you open up the Nami Wallet for the first time. Make sure no one is watching your screen and click on "New Wallet". Then, it will show you 24-words sequence, these words are called "seed phrase", these sequence of words are the access to your wallet. Remember, this must be hidden and never shared with anyone. Do not take a picture or screenshot of your seed phrase. Instead, write it down immediately on a piece of paper and put it in a secret and safe location. Even better, write your seed phrase down on 2-3 pieces of paper and store each paper in a separate secure location (like one in a personal safe and one in a bank safety deposit box). Alternatively, you can download the seed phrase and keep it offline on an encrypted hard drive. Having multiple backups of your seed phrase is good practice just in case one copy is ever lost or destroyed. After documenting your seed phrase, click "Next.".</p>
+        <p>If you open up the Nami Wallet for the first time. Make sure no one is watching your screen and click on "New Wallet". Then, it will show you 24-words sequence, these words are called "seed phrase", these sequence of words are the access to your wallet. Remember, this must be hidden and never shared with anyone. Do not take a picture or screenshot of your seed phrase. Instead, write it down immediately on a piece of paper and put it in a secret and safe location. Even better, write your seed phrase down on 2-3 pieces of paper and store each paper in a separate secure location (like one in a personal safe and one in a bank safety deposit box). Alternatively, you can download the seed phrase and keep it offline on an encrypted hard drive. Having multiple backups of your seed phrase is good practice just in case one copy is ever lost or destroyed. After documenting your seed phrase, click "Next".</p>
 
         <p>Nami Wallet will prompt you to input all those words in the next step. You confirm your seed phrase in the correct order of your 24-word sequence. You will also be prompt to input a password, which is needed whenever you have to sign a transaction. You can now access your Nami Wallet via "N" icon in your browser and begin purchasing and receiving crypto. If you already have ADA in your Coinbase, you can use your brand new Cardano address to transfer them over into your Nami Wallet.</p>
 
@@ -63,16 +63,16 @@ const GuideBuy = () => {
 
         <p>You have purchased your ADA coins, and transferred it to your Nami Wallet, now you are ready to browse and purchase some NFTs on the marketplace. Click on "Connect" on the top right corner. It should recognized that you have Nami Wallet installed and it will prompt your for access on the first time. If it does not, you may have to restart your web browser. Click on "Access" to allow Martify to connect to your Nami Wallet. No transaction will take place until you decided to make a purchase and provided your signature.</p>
 
-        <p>The Nami Wallet allows you to deposit a fixed amount (5₳) as collateral to avoid any circumstances that arise due to contract failure. In the event of a contract failure, a collateral is taken  to cover the resources like CPU and memory used by the node to verify the contract. That means collateral aims to secure the network and avoid network failure. When a script runs successfully, the collateral is not taken. The chances of losing the collateral are very low; however, Nami seeks to minimize the risk by only allowing a determined amount (5₳) of collateral to be used. In a worst case scenario, malicious, or poorly built dApps, would only be able to take this amount. To deposit tokens into collateral, go to the Setting tab, and click on Collateral. A window will pop up where you need to enter your wallet’s password to confirm the process. At any time, you can remove from collateral by clicking on the "Remove" button.</p>
+        <p>The Nami Wallet allows you to deposit a fixed amount (5₳) as collateral to avoid any circumstances that arise due to contract failure. In the event of a contract failure, a collateral is taken to cover the blockchain resources used by the node to verify the contract. That means collateral aims to secure the network and avoid network failure. When a script runs successfully, the collateral is not taken. The chances of losing the collateral are very low; however, Nami seeks to minimize the risk by only allowing a determined amount (5₳) of collateral to be used. In a worst case scenario, malicious, or poorly built dApps, would only be able to take this amount. To deposit tokens into collateral, go to the Setting tab, and click on Collateral. A window will pop up where you need to enter your wallet’s password to confirm the process. At any time, you can remove from collateral by clicking on the "Remove" button.</p>
         
-        {/* <div class="columns">
-          <div class="column">
-            <figure class="image">
+        {/* <div className="columns">
+          <div className="column">
+            <figure className="image">
               <img src={image_3_collateral} />
             </figure>
           </div>
-          <div class="column">
-            <figure class="image">
+          <div className="column">
+            <figure className="image">
               <img src={image_3_collateral2} />
             </figure>
           </div>
@@ -82,7 +82,7 @@ const GuideBuy = () => {
 
         {/* <h3>Overview: Step 4</h3> */}
 
-        {/* <figure class="image">
+        {/* <figure className="image">
           <img src={image_4_assetpage} />
         </figure> */}
 
