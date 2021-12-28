@@ -42,7 +42,7 @@ const heros = [
     name: "Mahajna Mahmod",
     picture: "",
     github: "https://github.com/mahajnamahmod",
-    linkedin: "",
+    linkedin: "https://www.linkedin.com/in/mahmod-mahajna-57911789",
     twitter: "",
   },
 ];
