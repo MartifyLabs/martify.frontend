@@ -51,7 +51,7 @@ const GuideSell = () => {
 
         <p>Now that you have your Nami Wallet, you will want to transfer your assets from other wallets into your new Nami Wallet. For that, you need to get your wallet address, by click on the "Recieve" button, you can copy your Cardano address. It would take a few minutes to get your assets transfer from your wallet to your new Nami Wallet.</p>
 
-        <p>Click on Connect if you have not, and click on Account to browse the assets in your Nami Wallet. Click on the the asset will brings you to the asset page, here you can see the asset's metadata. On this page, you can set your listing price, your Nami Wallet will prompt you for your password. Sign it to approve the transaction and the NFT will be transfer to the smart contract address. If you are unable to list the asset, check you have connected your wallet and added the collateral.</p>
+        <p>Click on Connect if you have not, and click on Account to browse the assets in your Nami Wallet. Clicking on an asset will bring you to the asset page, here you can see the asset's metadata. On this page, you can set your listing price, your Nami Wallet will prompt you for your password. Sign it to approve the transaction and the NFT will be transfered to the smart contract. If you are unable to list the asset, check that you have connected your wallet and added the collateral.</p>
 
 
         {/* <h2>How to add royalties?</h2>

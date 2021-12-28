@@ -16,7 +16,7 @@ const GuideBuy = () => {
       <div className="content">
         <h2>Overview</h2>
         <ol>
-          <li><b>Buy cryptocurrency</b>: Join a cryptocurrency marketplace like Coinbase and fund your account with ADA.</li>
+          <li><b>Buy cryptocurrency</b>: Join a cryptocurrency exchange like Coinbase and fund your account with ADA.</li>
           <li><b>Setup a cryptocurrency wallet</b>: Signup for a "Non-custodial" wallet like Nami Wallet, which is where you can store and control your cryptocurrency and digital assets. Transfer your ADA coins from Coinbase to your wallet, which gives you the control to purchase NFTs across the various NFT marketplaces.</li>
           <li><b>Connect Nami Wallet on Martify and add collateral</b>: That is easy!</li>
           <li><b>Purchase your first NFT</b>: Purchasing your first NFT on <a href="explore">Martify</a>.</li>
@@ -25,7 +25,7 @@ const GuideBuy = () => {
         <h2>Step 1: Acquiring Cardano (ADA) cryptocurrency</h2>
         {/* <h3>Overview: Step 1</h3> */}
         <ol>
-          <li><b>Join a cryptocurrency marketplace</b>: Join a cryptocurrency marketplace like Coinbase or Binance to purchase, store, and transfer your cryptocurrency. Coinbase recommends a minimum of $50 to get started.</li>
+          <li><b>Join a cryptocurrency exchange</b>: Join a cryptocurrency exchange like Coinbase or Binance to purchase, store, and transfer your cryptocurrency. Coinbase recommends a minimum of $50 to get started.</li>
           <li><b>Send in required documents</b>: Just like any standard trading platforms, you will need to be approved to begin buying and selling cryptocurrency. Send in your required documents and sync a payment source.</li>
           <li><b>Buy ADA coins</b>: ADA coin is a cryptocurrency that is part of the Cardano blockchain, which is the system and currency used to purchase and store NFTs.</li>
         </ol>
@@ -51,7 +51,7 @@ const GuideBuy = () => {
 
         <p>Nami Wallet will prompt you to input all those words in the next step. You confirm your seed phrase in the correct order of your 24-word sequence. You will also be prompt to input a password, which is needed whenever you have to sign a transaction. You can now access your Nami Wallet via "N" icon in your browser and begin purchasing and receiving crypto. If you already have ADA in your Coinbase, you can use your brand new Cardano address to transfer them over into your Nami Wallet.</p>
 
-        <p>Now that you have your Nami Wallet, you will want to transfer your funds out of Coinbase. You need to get your wallet address, by click on the "Recieve" button, you can copy your Cardano address. If you are using Coinbase on your smartphone, you can also scan the QR code from the Coinbase application. <b>Important</b>: you must send your ADA via the Cardano network. It would take a few minutes to get your ADA transfer from Coinbase to your Nami Wallet.</p>
+        <p>Now that you have your Nami Wallet, you will want to transfer your funds out of Coinbase. You need to get your wallet address, by clicking on the "Receive" button, you can copy your Cardano address. If you are using Coinbase on your smartphone, you can also scan the QR code from the Coinbase application. <b>Important</b>: you must send your ADA via the Cardano network. It would take a few minutes to get your ADA transfer from Coinbase to your Nami Wallet.</p>
 
         <h2>Step 3: Connect Nami Wallet on Martify and add collateral</h2>
 
@@ -63,7 +63,7 @@ const GuideBuy = () => {
 
         <p>You have purchased your ADA coins, and transferred it to your Nami Wallet, now you are ready to browse and purchase some NFTs on the marketplace. Click on "Connect" on the top right corner. It should recognized that you have Nami Wallet installed and it will prompt your for access on the first time. If it does not, you may have to restart your web browser. Click on "Access" to allow Martify to connect to your Nami Wallet. No transaction will take place until you decided to make a purchase and provided your signature.</p>
 
-        <p>The Nami Wallet allows you to deposit a fixed amount (5₳) as collateral to avoid any circumstances that arise due to contract failure. In the event of a contract failure, a collateral is taken to cover the blockchain resources used by the node to verify the contract. That means collateral aims to secure the network and avoid network failure. When a script runs successfully, the collateral is not taken. The chances of losing the collateral are very low; however, Nami seeks to minimize the risk by only allowing a determined amount (5₳) of collateral to be used. In a worst case scenario, malicious, or poorly built dApps, would only be able to take this amount. To deposit tokens into collateral, go to the Setting tab, and click on Collateral. A window will pop up where you need to enter your wallet’s password to confirm the process. At any time, you can remove from collateral by clicking on the "Remove" button.</p>
+        <p>The Nami Wallet allows you to deposit a fixed amount (5₳) as collateral to avoid any circumstances that arise due to contract failure. In the event of a contract failure, a collateral is taken to cover the blockchain resources used by the node to verify the contract. That means collateral aims to secure the network and avoid network failure. When a script runs successfully, the collateral is not taken. The chances of losing the collateral are very low; however, Nami seeks to minimize the risk by only allowing a determined amount (5₳) of collateral to be used. In a worst case scenario, malicious, or poorly built dApps, would only be able to take this amount. To deposit tokens into collateral, go to the Setting tab, and click on Collateral. A window will pop up where you need to enter your wallet’s password to confirm the process. At any time, you can remove the collateral by clicking on the "Remove" button.</p>
         
         {/* <div className="columns">
           <div className="column">
@@ -91,7 +91,7 @@ const GuideBuy = () => {
           <li><b>Make the transaction</b>: Click on Buy Now to confirm the transaction.</li>
         </ol>
 
-        <p>Start by browsing listed assets on the <a href="explore">explore page</a>, there you can sort the assets by price or filter by the projects you are interested. Click on the the asset will brings you to the asset page, here you can see the asset's metadata, past transactions on all marketplaces, as well as the current listing price. Click on "Buy Now", your Nami Wallet will prompt you for your password. Sign it to approve the transaction and the NFT will be in your Nami Wallet in a few minutes. If your "Buy Now" button is disabled, check you have connected your wallet and added the collateral.</p>
+        <p>Start by browsing listed assets on the <a href="explore">explore page</a>, there you can sort the assets by price or filter by the projects you are interested in. Clicking on the the asset will bring you to the asset page, here you can see the asset's metadata, past transactions on all marketplaces, as well as the current listing price. Click on "Buy Now", your Nami Wallet will prompt you for your password. Sign it to approve the transaction and the NFT will be in your Nami Wallet in a few minutes. If your "Buy Now" button is disabled, check that you have connected your wallet and added the collateral.</p>
 
       </div>
     </div>
