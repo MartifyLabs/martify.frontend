@@ -15,13 +15,25 @@ const MainLayout = ({ children }) => {
             Made with <i className="fas fa-heart"></i> By{" "}
             <strong>Martify Labs</strong>, Follow Us on:{" "}
             <span className="social-media">
-              <a href="https://linkedin.com/company/martifylabs">
+              <a
+                href="https://linkedin.com/company/martifylabs"
+                target="_blank"
+                rel="noreferrer"
+              >
                 <i className="fab fa-linkedin"></i>
               </a>
-              <a href="https://github.com/MartifyLabs">
+              <a
+                href="https://github.com/MartifyLabs"
+                target="_blank"
+                rel="noreferrer"
+              >
                 <i className="fab fa-github"></i>
               </a>
-              <a href="https://twitter.com/MartifyLabs">
+              <a
+                href="https://twitter.com/MartifyLabs"
+                target="_blank"
+                rel="noreferrer"
+              >
                 <i className="fab fa-twitter"></i>
               </a>
             </span>
