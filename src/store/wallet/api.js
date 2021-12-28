@@ -20,7 +20,6 @@ import {
   listWalletAsset,
   delistWalletAsset,
   relistWalletAsset,
-  setWalletAssets,
 } from "../../database/wallets";
 import { WALLET_STATE, MARKET_TYPE } from "./walletTypes";
 import {
@@ -97,9 +96,13 @@ export const loadAssets = (wallet, callback) => async (dispatch) => {
       return map;
     }, {});
 
-    const updatedWallet = await setWalletAssets(wallet.data, assets);
+    dispatch(
+      setWalletData({
+        ...wallet.data,
+        assets,
+      })
+    );
 
-    dispatch(setWalletData(updatedWallet));
     callback({ success: true });
   } catch (error) {
     console.error(
@@ -273,7 +276,10 @@ export const relistToken =
           dispatch(setWalletLoading(false));
           dispatch(
             set_error({
-              message: resolveError("TRANSACTION_FAILED", "Updating Asset Price"),
+              message: resolveError(
+                "TRANSACTION_FAILED",
+                "Updating Asset Price"
+              ),
               detail: null,
             })
           );
