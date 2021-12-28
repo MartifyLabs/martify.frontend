@@ -13,10 +13,6 @@
   width: 100%;
   min-height: 61px;
 
-  /* background-color: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(20px) saturate(160%) contrast(45%) brightness(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%) contrast(45%) brightness(140%); */
-
   background: -moz-linear-gradient(
     87deg,
     rgba(221, 247, 255, 1) 0%,
@@ -124,4 +120,8 @@
 .navbar-item {
   font-size: large;
   font-weight: 400;
+  
+  .navbar-dropdown .fas {
+    margin-right: 1rem;
+  }
 }

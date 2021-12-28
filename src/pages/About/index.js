@@ -5,45 +5,51 @@ import "./style.scss";
 const heros = [
   {
     name: "Alain Magazin",
-    picture: "",
+    role: "Co-Founder",
+    picture: "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/alain.magazin.jpg?alt=media&token=b5c3136a-5cb9-4d21-9753-487b7c867401",
     github: "https://github.com/AlainMgz",
     linkedin: "https://www.linkedin.com/in/alain-magazin-36a403213",
     twitter: "https://twitter.com/adotmgz",
   },
   {
     name: "Abdelkrim Dib",
-    photo: "",
+    role: "Co-Founder",
+    picture: "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/abdelkrim.dib.jpg?alt=media&token=bc6b7264-7ba3-4b4e-9d92-96e2c7de7440",
     github: "https://github.com/abdelkrimdev",
     linkedin: "https://www.linkedin.com/in/abdelkrimdev",
     twitter: "https://twitter.com/abdelkrimdev",
   },
   {
     name: "Hong Jing",
-    picture: "",
+    role: "Contributor",
+    picture: "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/hong.jing.jpg?alt=media&token=18f12730-5c1e-46b3-b82c-3cdce3ef95a9",
     github: "https://github.com/jinglescode",
     linkedin: "https://www.linkedin.com/in/jingles",
     twitter: "https://twitter.com/jinglescode",
   },
   {
     name: "Kazune Takeda",
-    picture: "",
+    role: "Contributor",
+    picture: "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/kazune.takeda.jpg?alt=media&token=956ba4e0-2138-475f-9b16-f8c69f8cf903",
     github: "https://github.com/kazunetakeda25",
     linkedin: "https://www.linkedin.com/in/kazunetakeda25",
     twitter: "https://twitter.com/kazunetakeda25",
   },
   {
     name: "John Stewart",
-    picture: "",
+    role: "Contributor",
+    picture: "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/john.stewart.jpg?alt=media&token=34c1a788-f81b-4206-85a6-8ffa5a0705dc",
     github: "https://github.com/johnstewart0820",
     linkedin: "https://www.linkedin.com/in/john-stewart-64b72a219",
-    twitter: "",
+    twitter: "#",
   },
   {
     name: "Mahajna Mahmod",
-    picture: "",
+    role: "Contributor",
+    picture: "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/mahmod.mahajna.jpg?alt=media&token=b7721420-f4ba-48f1-848c-1c1dc1e3c1cd",
     github: "https://github.com/mahajnamahmod",
     linkedin: "https://www.linkedin.com/in/mahmod-mahajna-57911789",
-    twitter: "",
+    twitter: "https://twitter.com/CryptoDreamzNFT",
   },
 ];
 
@@ -73,7 +79,7 @@ const About = () => {
       <div className="timeline">
         <div className="timeline-container warning">
           <div className="timeline-icon">
-            <i class="fas fa-wind"></i>
+            <i className="fas fa-wind"></i>
           </div>
           <div className="timeline-body">
             <h4 className="timeline-title">
@@ -92,7 +98,7 @@ const About = () => {
         </div>
         <div className="timeline-container info">
           <div className="timeline-icon">
-            <i class="fas fa-snowflake"></i>
+            <i className="fas fa-snowflake"></i>
           </div>
           <div className="timeline-body">
             <h4 className="timeline-title">
@@ -111,7 +117,7 @@ const About = () => {
         </div>
         <div className="timeline-container success">
           <div className="timeline-icon">
-            <i class="fas fa-seedling"></i>
+            <i className="fas fa-seedling"></i>
           </div>
           <div className="timeline-body">
             <h4 className="timeline-title">
@@ -128,7 +134,7 @@ const About = () => {
         </div>
         <div className="timeline-container danger">
           <div className="timeline-icon">
-            <i class="fas fa-sun"></i>
+            <i className="fas fa-sun"></i>
           </div>
           <div className="timeline-body">
             <h4 className="timeline-title">
@@ -149,7 +155,7 @@ const About = () => {
         </div>
         <div className="timeline-container warning">
           <div className="timeline-icon">
-            <i class="fas fa-wind"></i>
+            <i className="fas fa-wind"></i>
           </div>
           <div className="timeline-body">
             <h4 className="timeline-title">
@@ -172,51 +178,35 @@ const About = () => {
         <h2 className="is-size-2">The Team Behind</h2>
       </div>
       <div className="people">
-        <div class="columns is-multiline">
+        <div className="columns is-multiline">
           {heros.map((hero) => (
-            <div class="column is-one-third">
-              <div class="card">
-                <div class="card-image">
-                  <figure class="image is-4by3">
+            <div className="column is-one-third" key={hero.name}>
+              <div className="card">
+                <div className="card-image">
+                  <figure className="image is-clipped">
                     <img
-                      src="https://bulma.io/images/placeholders/1280x960.png"
-                      alt="Placeholder image"
+                      src={hero.picture}
+                      alt={hero.name}
                     />
                   </figure>
                 </div>
-                <div class="card-content">
-                  <div class="media">
-                    <div class="media-left">
-                      <figure class="image is-48x48">
-                        <img
-                          src="https://bulma.io/images/placeholders/96x96.png"
-                          alt="Placeholder image"
-                        />
-                      </figure>
+                <div className="card-content">
+                  <div className="media">
+                    <div className="media-content">
+                      <p className="title is-4">{hero.name}</p>
+                      <p className="subtitle is-6">{hero.role}</p>
                     </div>
-                    <div class="media-content">
-                      <p class="title is-4">John Smith</p>
-                      <p class="subtitle is-6">@johnsmith</p>
-                    </div>
-                  </div>
-
-                  <div class="content">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Phasellus nec iaculis mauris. <a>@bulmaio</a>.
-                    <a href="#">#css</a> <a href="#">#responsive</a>
-                    <br />
-                    <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
                   </div>
                 </div>
-                <footer class="card-footer">
-                  <a href="#" class="card-footer-item">
-                    Save
+                <footer className="card-footer">
+                  <a href={hero.github} className="card-footer-item">
+                    <i className="fab fa-github"></i>
                   </a>
-                  <a href="#" class="card-footer-item">
-                    Edit
+                  <a href={hero.linkedin} className="card-footer-item">
+                    <i className="fab fa-linkedin"></i>
                   </a>
-                  <a href="#" class="card-footer-item">
-                    Delete
+                  <a href={hero.twitter} className="card-footer-item">
+                    <i className="fab fa-twitter"></i>
                   </a>
                 </footer>
               </div>
