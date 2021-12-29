@@ -21,6 +21,19 @@ $body-shadow: 1px 3px 9px rgba(0, 0, 0, 0.1);
     box-shadow: $body-shadow;
     margin: 0 0 40px 40px;
     padding: 30px;
+
+    a {
+      color: $primary;
+      
+      :hover {
+        color: $primary;
+      }
+      
+      .fa-discord{
+        margin: 0 4px;
+        color: $body-text;
+      }
+    }
   }
 
   .timeline {

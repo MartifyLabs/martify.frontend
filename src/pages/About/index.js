@@ -68,7 +68,18 @@ const About = () => {
       <div className="description">
         <div className="content is-medium has-text-centered">
           <p>
-            Martify is a community-driven ecosystem for Cardano Non-Fungible Tokens. Our goal is to make NFT trading accessible everywhere you can imagine. Martify Marketplace is your one-stop shop for Cardano NFTs where you can explore your favorite collections and trade assets in a secure manner. Want to get in touch with us? You can write at contact@martify.io, on Twitter @MartifyLabs, or join our Discord discord.gg/Z6AH9dahdH and participate in community discussions about the digital universe and future development.
+            Martify is a community-driven ecosystem for Cardano Non-Fungible
+            Tokens. Our goal is to make NFT trading accessible everywhere you
+            can imagine. Martify Marketplace is your one-stop shop for Cardano
+            NFTs where you can explore your favorite collections and trade
+            assets in a secure manner. Want to get in touch with us? You can
+            write at <a href="mailto:contact@martify.io">contact@martify.io</a>,
+            on Twitter @MartifyLabs, or join our
+            <a href="discord.gg/Z6AH9dahdH" target="_blank" rel="noreferrer">
+              <i class="fab fa-discord"></i>
+            </a>
+            and participate in community discussions about the digital universe
+            and future development.
           </p>
         </div>
       </div>
@@ -112,7 +123,7 @@ const About = () => {
                 <li>Handle Audio & Video Assets.</li>
                 <li>Build The Martify Backend APIs.</li>
                 <li>Implement Trading & Bundle Swaps for NFTs.</li>
-                <li>Add Support to More Wallets (Yoroi, ccvault.io...).</li>
+                <li>Enable Buying & Selling NFTs Using Native Tokens.</li>
                 <li>More Focus on Branding, New Logo, & UI/UX.</li>
                 <li>
                   Establish New Partnerships with Gaming and Metaverse Projects.
@@ -132,7 +143,7 @@ const About = () => {
             <div className="content is-medium">
               <ul>
                 <li>Implement On-Chain Auctions & Bidding.</li>
-                <li>Enable Buying & Selling NFTs Using Native Tokens.</li>
+                <li>Add Support to More Wallets (Yoroi, ccvault.io...).</li>
                 <li>Create & Launch a Stake Pool for Martify.</li>
                 <li>
                   Write a Whitepaper for Smart Contract On-Chain Gouvernance.
