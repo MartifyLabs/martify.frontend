@@ -128,7 +128,7 @@ textarea {
 }
 
 @keyframes textclip {
-  to {
+  from {
     background-position: 200% center;
   }
 }
