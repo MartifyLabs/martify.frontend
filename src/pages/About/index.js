@@ -6,7 +6,8 @@ const heros = [
   {
     name: "Alain Magazin",
     role: "Co-Founder",
-    picture: "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/alain.magazin.jpg?alt=media&token=b5c3136a-5cb9-4d21-9753-487b7c867401",
+    picture:
+      "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/alain.magazin.jpg?alt=media&token=b5c3136a-5cb9-4d21-9753-487b7c867401",
     github: "https://github.com/AlainMgz",
     linkedin: "https://www.linkedin.com/in/alain-magazin-36a403213",
     twitter: "https://twitter.com/adotmgz",
@@ -14,7 +15,8 @@ const heros = [
   {
     name: "Abdelkrim Dib",
     role: "Co-Founder",
-    picture: "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/abdelkrim.dib.jpg?alt=media&token=bc6b7264-7ba3-4b4e-9d92-96e2c7de7440",
+    picture:
+      "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/abdelkrim.dib.jpg?alt=media&token=bc6b7264-7ba3-4b4e-9d92-96e2c7de7440",
     github: "https://github.com/abdelkrimdev",
     linkedin: "https://www.linkedin.com/in/abdelkrimdev",
     twitter: "https://twitter.com/abdelkrimdev",
@@ -22,7 +24,8 @@ const heros = [
   {
     name: "Hong Jing",
     role: "Contributor",
-    picture: "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/hong.jing.jpg?alt=media&token=18f12730-5c1e-46b3-b82c-3cdce3ef95a9",
+    picture:
+      "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/hong.jing.jpg?alt=media&token=18f12730-5c1e-46b3-b82c-3cdce3ef95a9",
     github: "https://github.com/jinglescode",
     linkedin: "https://www.linkedin.com/in/jingles",
     twitter: "https://twitter.com/jinglescode",
@@ -30,7 +33,8 @@ const heros = [
   {
     name: "Kazune Takeda",
     role: "Contributor",
-    picture: "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/kazune.takeda.jpg?alt=media&token=956ba4e0-2138-475f-9b16-f8c69f8cf903",
+    picture:
+      "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/kazune.takeda.jpg?alt=media&token=956ba4e0-2138-475f-9b16-f8c69f8cf903",
     github: "https://github.com/kazunetakeda25",
     linkedin: "https://www.linkedin.com/in/kazunetakeda25",
     twitter: "https://twitter.com/kazunetakeda25",
@@ -38,7 +42,8 @@ const heros = [
   {
     name: "John Stewart",
     role: "Contributor",
-    picture: "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/john.stewart.jpg?alt=media&token=34c1a788-f81b-4206-85a6-8ffa5a0705dc",
+    picture:
+      "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/john.stewart.jpg?alt=media&token=34c1a788-f81b-4206-85a6-8ffa5a0705dc",
     github: "https://github.com/johnstewart0820",
     linkedin: "https://www.linkedin.com/in/john-stewart-64b72a219",
     twitter: "#",
@@ -46,7 +51,8 @@ const heros = [
   {
     name: "Mahajna Mahmod",
     role: "Contributor",
-    picture: "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/mahmod.mahajna.jpg?alt=media&token=b7721420-f4ba-48f1-848c-1c1dc1e3c1cd",
+    picture:
+      "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/mahmod.mahajna.jpg?alt=media&token=b7721420-f4ba-48f1-848c-1c1dc1e3c1cd",
     github: "https://github.com/mahajnamahmod",
     linkedin: "https://www.linkedin.com/in/mahmod-mahajna-57911789",
     twitter: "https://twitter.com/CryptoDreamzNFT",
@@ -57,7 +63,7 @@ const About = () => {
   return (
     <div className="about section container">
       <div className="content has-text-centered">
-        <h2 className="is-size-2">The Martify Marketplace</h2>
+        <h2 className="is-size-2">The Martify Digital Universe</h2>
       </div>
       <div className="description">
         <div className="content is-medium has-text-centered">
@@ -88,10 +94,13 @@ const About = () => {
             <div className="content is-medium">
               <ul>
                 <li>
-                  Marketplace launch with basic functionnalities : List, Buy,
-                  Update Price, Cancel Listing, Offers, ...
+                  Write a Plutus Smart Contract with Essential Market Features.
                 </li>
-                <li>Team building</li>
+                <li>Implement an Initial Version of The Marketplace UI.</li>
+                <li>Nami Wallet Integration.</li>
+                <li>Smart Contract Integration.</li>
+                <li>Fully Open Source The Marketplace Codebase.</li>
+                <li>Mainnet Deployment.</li>
               </ul>
             </div>
           </div>
@@ -106,11 +115,14 @@ const About = () => {
             </h4>
             <div className="content is-medium">
               <ul>
-                <li>Marketing campaign</li>
-                <li>New feature : NFT Bundle Swaps</li>
-                <li>New feature : Native Token support for partner projects</li>
-                <li>UI/UX and branding update</li>
-                <li>Tokenomics and whitepaper (including governance)</li>
+                <li>Handle Audio & Video Assets.</li>
+                <li>Build The Martify Backend APIs.</li>
+                <li>Implement Trading & Bundle Swaps for NFTs.</li>
+                <li>Add Support to More Wallets (Yoroi, ccvault.io...).</li>
+                <li>More Focus on Branding, New Logo, & UI/UX.</li>
+                <li>
+                  Establish New Partnerships with Gaming and Metaverse Projects.
+                </li>
               </ul>
             </div>
           </div>
@@ -125,9 +137,13 @@ const About = () => {
             </h4>
             <div className="content is-medium">
               <ul>
-                <li>New feature : On-chain Auctions</li>
-                <li>Martify integration with parner wallets</li>
-                <li>Seed round and private sales</li>
+                <li>Implement On-Chain Auctions & Bidding.</li>
+                <li>Enable Buying & Selling NFTs Using Native Tokens.</li>
+                <li>Create & Launch a Stake Pool for Martify.</li>
+                <li>
+                  Write a Whitepaper for Smart Contract Upgrade Mechanism.
+                </li>
+                <li>Design the Tokennomics.</li>
               </ul>
             </div>
           </div>
@@ -142,13 +158,10 @@ const About = () => {
             </h4>
             <div className="content is-medium">
               <ul>
-                <li>Public API containing all marketplace features</li>
-                <li>
-                  Back-office for NFT Projects to launch their own marketplace
-                  using Martify API
-                </li>
-                <li>Initial Stake Pool Offering</li>
-                <li>Marketing Campaign</li>
+                <li>Initial Stake Pool Offering.</li>
+                <li>Create a Launchpad for New NFT Projects.</li>
+                <li>Release The Martify Backend APIs as a Service.</li>
+                <li>Improve Projects Findability & Discoverability.</li>
               </ul>
             </div>
           </div>
@@ -163,11 +176,9 @@ const About = () => {
             </h4>
             <div className="content is-medium">
               <ul>
-                <li>
-                  Martify integration with game engines (Unreal Engine, Unity,
-                  ...)
-                </li>
-                <li>Governance implementation using Martify token</li>
+                <li>Martify Integration with Unity Game Engine.</li>
+                <li>Implement the Smart Contract Upgrade Mechanism.</li>
+                <li>Create an Automatic Verification System for Creators.</li>
               </ul>
             </div>
           </div>
@@ -184,10 +195,7 @@ const About = () => {
               <div className="card">
                 <div className="card-image">
                   <figure className="image is-clipped">
-                    <img
-                      src={hero.picture}
-                      alt={hero.name}
-                    />
+                    <img src={hero.picture} alt={hero.name} />
                   </figure>
                 </div>
                 <div className="card-content">
@@ -199,13 +207,28 @@ const About = () => {
                   </div>
                 </div>
                 <footer className="card-footer">
-                  <a href={hero.github} className="card-footer-item">
+                  <a
+                    className="card-footer-item"
+                    href={hero.github}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <i className="fab fa-github"></i>
                   </a>
-                  <a href={hero.linkedin} className="card-footer-item">
+                  <a
+                    className="card-footer-item"
+                    href={hero.linkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <i className="fab fa-linkedin"></i>
                   </a>
-                  <a href={hero.twitter} className="card-footer-item">
+                  <a
+                    className="card-footer-item"
+                    href={hero.twitter}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <i className="fab fa-twitter"></i>
                   </a>
                 </footer>
