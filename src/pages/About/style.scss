@@ -1,0 +1,174 @@
+// colors
+$primary: #1d8cf8;
+$secondary: #4f537b;
+$info: #11cdef;
+$success: #00bf9a;
+$warning: #ff8d72;
+$danger: #fd5d93;
+
+$body-bg: #27293d;
+$body-text: #eee;
+$body-round: 4px;
+$body-shadow: 1px 3px 9px rgba(0, 0, 0, 0.1);
+
+.about {
+  color: $body-bg;
+
+  .description {
+    color: $body-text;
+    background: $body-bg;
+    border-radius: $body-round;
+    box-shadow: $body-shadow;
+    margin: 0 0 40px 40px;
+    padding: 30px;
+
+    a {
+      color: $primary;
+      
+      :hover {
+        color: $primary;
+      }
+      
+      .fa-discord{
+        margin: 0 4px;
+        color: $body-text;
+      }
+    }
+  }
+
+  .timeline {
+    color: $body-text;
+    position: relative;
+    padding-left: 4rem;
+    margin: 0 0 0 40px;
+
+    &:before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 4px;
+      height: 100%;
+      border-radius: $body-round;
+      background: $body-bg;
+    }
+
+    .timeline-container {
+      position: relative;
+      margin-bottom: 2.5rem;
+
+      .timeline-icon {
+        position: absolute;
+        left: -88px;
+        top: 4px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        text-align: center;
+        font-size: 2rem;
+        background: $secondary;
+
+        i {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+        }
+      }
+
+      .timeline-body {
+        background: $body-bg;
+        border-radius: $body-round;
+        padding: 20px;
+        box-shadow: $body-shadow;
+
+        &:before {
+          content: "";
+          background: inherit;
+          width: 20px;
+          height: 20px;
+          display: block;
+          position: absolute;
+          left: -10px;
+          transform: rotate(45deg);
+          border-radius: 0 0 0 2px;
+        }
+
+        .timeline-title {
+          margin-bottom: 1.4rem;
+
+          .badge {
+            background: $secondary;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
+          }
+        }
+
+        .timeline-subtitle {
+          font-weight: 300;
+          font-style: italic;
+          opacity: 0.4;
+          margin-top: 16px;
+          font-size: 11px;
+        }
+      }
+
+      // Primary Timeline
+      &.primary {
+        .badge,
+        .timeline-icon {
+          background: $primary !important;
+        }
+      }
+
+      // Info Timeline
+      &.info {
+        .badge,
+        .timeline-icon {
+          background: $info !important;
+        }
+      }
+
+      // Success Timeline
+      &.success {
+        .badge,
+        .timeline-icon {
+          background: $success !important;
+        }
+      }
+
+      // Warning Timeline
+      &.warning {
+        .badge,
+        .timeline-icon {
+          background: $warning !important;
+        }
+      }
+
+      // Dnager Timeline
+      &.danger {
+        .badge,
+        .timeline-icon {
+          background: $danger !important;
+        }
+      }
+    }
+  }
+
+  .people {
+    color: $body-text;
+    background: $body-bg;
+    border-radius: $body-round;
+    box-shadow: $body-shadow;
+    margin: 0 0 40px 40px;
+    padding: 30px;
+  }
+}

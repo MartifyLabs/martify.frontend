@@ -1,0 +1,123 @@
+.homepage_gallery {
+  position: absolute;
+  top: 0px;
+  margin: 0 auto;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  perspective: 25rem;
+}
+
+.homepage_gallery .overlay {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  z-index: 99;
+  background: linear-gradient(
+    87deg,
+    rgba(221, 247, 255, 1) 0%,
+    rgba(235, 215, 192, 1) 60%,
+    rgba(217, 204, 242, 1) 100%
+  );
+}
+.homepage_gallery .overlay_dark {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.homepage {
+  .slogan {
+    color: #eee;
+    filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.6));
+  }
+}
+
+.homepage .top-project-image {
+  height: 100%;
+}
+
+.homepage .top-project-name {
+  font-size: 1rem;
+}
+
+.homepage .rdt_TableRow {
+  padding: 10px;
+}
+
+.top-project-title {
+  height: 36px;
+
+  @supports (-webkit-line-clamp: 2) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: initial;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+}
+
+.homepage {
+  .columns {
+    text-align: center;
+    .logo-text {
+      font-size: 8rem;
+      height: 220px;
+    }
+  }
+}
+
+.slogan-container {
+  display: flex;
+  justify-content: center;
+}
+
+.flip-container {
+  height: 44px;
+  margin: 0 10px;
+  overflow: hidden;
+  li {
+    text-transform: uppercase;
+    padding: 0 10px;
+    height: 45px;
+    margin-bottom: 45px;
+  }
+}
+
+.flip-items {
+  animation: flip-animation 10s cubic-bezier(0.23, 1, 0.32, 1.2) infinite;
+}
+
+@keyframes flip-animation {
+  0% {
+    margin-top: -360px;
+  }
+  5% {
+    margin-top: -270px;
+  }
+  25% {
+    margin-top: -270px;
+  }
+  30% {
+    margin-top: -180px;
+  }
+  50% {
+    margin-top: -180px;
+  }
+  55% {
+    margin-top: -90px;
+  }
+  75% {
+    margin-top: -90px;
+  }
+  80% {
+    margin-top: 0px;
+  }
+  99.99% {
+    margin-top: 0px;
+  }
+  100% {
+    margin-top: -270px;
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "thepixelheadsquad": {
+    "id": "thepixelheadsquad",
+    "policy_ids": [
+      "57cde26ea73be0c3ab57f4a6f414d612a68fb901cd0f2e7157846b2d",
+      "fec624c17759a1c5040ecb4c0d3ce35fc01465d0b7ab57b266fa2b18"
+    ],
+    "meta": {
+      "name": "The Pixel Head Squad",
+      "description": "The Pixel Head Squad was created by a team of Cardano NFT enthusiasts. After many months in the space, we were spurred to explore new ways to bring an exciting twist to collectable NFT pieces, both in the form of art and tech."
+    },
+    "style": {
+      "logo": "logo.png",
+      "banner": "banner.gif",
+      "font_color_title": "#f5f3db"
+    },
+    "links": {
+      "discord": "http://discord.gg/rpDtw4JTxD",
+      "twitter": "https://twitter.com/PixelHeadSquad",
+      "website": "https://pixelhead.io/"
+    },
+    "asset_attributes": ["Creature Name", "creature name", "Narrative", "narrative", "description", "States", "project"]
+  },
+  "kaizennft": {
+    "id": "kaizennft",
+    "policy_ids": [
+      "788888fd99cb7ef837570ce5bf8808d959697a025adeca03d46349f1"
+    ],
+    "meta": {
+      "name": "Lovelace Saga - Kaizen NFT",
+      "description": "Adventure awaits as the battle for the crypto space unfolds. Play as your favorite characters in several multiplayer battle modes. Level up and earn rewards with blockchain play-to-earn gaming."
+    },
+    "style": {
+      "logo": "logo.png",
+      "banner":"banner.png",
+      "banner_collection_height": "600px",
+      "banner_asset_height": "176px",
+      "font_color_title": "#f5f3db"
+    },
+    "links": {
+      "website": "https://www.lovelacesaga.com/",
+      "twitter": "https://twitter.com/LovelaceSaga",
+      "discord": "https://discord.gg/Trnssx5qTF"
+    }
+  }
+}
