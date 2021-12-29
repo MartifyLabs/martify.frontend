@@ -1036,11 +1036,10 @@ const AssetImage = ({ asset }) => {
   return (
     <div className="block">
       <AssetImageFigure asset={asset} setShow={setShow} show_trigger={true} />
-
       <div className={"modal " + (show ? "is-active" : "")}>
         <div className="modal-background" onClick={() => setShow(false)}></div>
         <div className="modal-content">
-          <AssetImageFigure asset={asset} setShow={setShow} />
+          <AssetImageFigure asset={asset} setShow={setShow} no_figure={true} />
         </div>
         <button
           className="modal-close is-large"

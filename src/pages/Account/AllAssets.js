@@ -53,15 +53,22 @@ const AllAssets = () => {
       let list_nfts = [];
       let list_projects = [...default_list_projects];
       let dict_projects = {};
+      let list_nfts_id = []; // for checking duplicates
+      
+      for (let i in state_wallet.data.market) {
+        let this_asset = state_wallet.data.market[i];
+        if(!list_nfts_id.includes(this_asset.details.asset)){
+          add_asset(list_nfts, dict_projects, this_asset);
+          list_nfts_id.push(this_asset.details.asset);
+        }
+      }
 
       for (let i in state_wallet.data.assets) {
         let this_asset = state_wallet.data.assets[i];
-        add_asset(list_nfts, dict_projects, this_asset);
-      }
-
-      for (let i in state_wallet.data.market) {
-        let this_asset = state_wallet.data.market[i];
-        add_asset(list_nfts, dict_projects, this_asset);
+        if(!list_nfts_id.includes(this_asset.details.asset)){
+          add_asset(list_nfts, dict_projects, this_asset);
+          list_nfts_id.push(this_asset.details.asset);
+        }
       }
 
       setListings(list_nfts);
