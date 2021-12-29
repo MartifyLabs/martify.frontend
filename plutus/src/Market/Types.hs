@@ -12,7 +12,6 @@ module Market.Types
     , StartParams (..)
     , BuyParams (..)
     , NFTSale (..)
-    , UpdateVHash (..)
     , MarketParams (..)
     )
     where
@@ -37,6 +36,7 @@ data MarketParams = MarketParams
 PlutusTx.makeIsDataIndexed ''MarketParams [('MarketParams, 0)]
 PlutusTx.makeLift ''MarketParams
 
+
 data NFTSale = NFTSale
     { nSeller    :: !PubKeyHash
     , nPrice     :: !Plutus.Integer
@@ -58,17 +58,6 @@ instance Eq NFTSale where
 PlutusTx.makeIsDataIndexed ''NFTSale [('NFTSale, 0)]
 PlutusTx.makeLift ''NFTSale
 
-
-newtype UpdateVHash = UpdateVHash
-    { vhash :: ValidatorHash
-    } deriving (Generic, ToJSON, FromJSON)
-
-instance Eq UpdateVHash where
-    {-# INLINABLE (==) #-}
-    a == b = vhash a == vhash b
-
-PlutusTx.makeIsDataIndexed ''UpdateVHash [('UpdateVHash, 0)]
-PlutusTx.makeLift ''UpdateVHash
 
 data SaleAction = Buy | Update | Close | UpdateC
     deriving Show

@@ -22,7 +22,7 @@ import Plutus.Contract as Contract
       logInfo,
       awaitTxConfirmed,
       endpoint,
-      ownPubKey,
+      ownPubKeyHash,
       submitTxConstraintsWith,
       utxosAt,
       utxosTxOutTxAt,
@@ -36,7 +36,7 @@ import PlutusTx.Prelude as Plutus
 import Ledger
     ( scriptAddress,
       pubKeyHash,
-      txId,
+      getCardanoTxId,
       pubKeyHashAddress,
       CurrencySymbol,
       TokenName,
@@ -59,38 +59,39 @@ import Ledger.Value as Value
 import qualified Plutus.V1.Ledger.Ada as Ada (lovelaceValueOf)
 import Plutus.ChainIndex.Tx ( ChainIndexTx(_citxData) )
 
-import           Market.Types               (MarketParams(..), UpdateVHash(..), NFTSale(..), SaleAction(..), SaleSchema, StartParams(..), BuyParams(..))
-import           Market.Onchain             as O1 ( Sale, typedBuyValidator, buyValidator )
-import           Market.Onchain2            as O2 ( Sale, typedBuyValidator, buyValidator, buyValidatorHash, nftDatum )
-import           Utility                    (wallet, walletPubKeyHash, mp)
+import           Market.Types               (MarketParams(..), NFTSale(..), SaleAction(..), SaleSchema, StartParams(..), BuyParams(..))
+import           Market.Onchain             as O2 ( Sale, typedBuyValidator, buyValidator, buyValidatorHash, nftDatum )
+import           Updator.Onchain            as O1 ( Updator, typedUpdateValidator, updateValidator )
+import           Updator.Types              (UpdateVHash(..))
+import           Utility                    (wallet, walletPubKeyHash, mp, mp')
 
 sendToken :: Contract w SaleSchema Text ()
 sendToken = do
-    let val     =  Value.singleton (updateCs mp) (updateTn mp) 1
+    let val     = Value.singleton (updateCs mp) (updateTn mp) 1
         uvh     = UpdateVHash (O2.buyValidatorHash mp)
-        lookups = Constraints.typedValidatorLookups (O1.typedBuyValidator mp)
+        lookups = Constraints.typedValidatorLookups (O1.typedUpdateValidator mp')
         tx      = Constraints.mustPayToTheScript uvh val
-    ledgerTx <- submitTxConstraintsWith @O1.Sale lookups tx
-    void $ awaitTxConfirmed $ txId ledgerTx
+    ledgerTx <- submitTxConstraintsWith @O1.Updator lookups tx
+    void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
     Contract.logInfo @String "sent update token"
 
 startSale :: StartParams -> Contract w SaleSchema Text ()
 startSale sp = do
-    pkh <- pubKeyHash <$> Contract.ownPubKey
+    pkh <- Contract.ownPubKeyHash
     utxos <- utxosAt (pubKeyHashAddress pkh)
     let val     = Value.singleton (sCs sp) (sTn sp) 1
-        nfts    = NFTSale { nSeller = pkh, nToken = sTn sp, nCurrency = sCs sp, nPrice = sPrice sp, nRoyAddr = walletPubKeyHash $ wallet 5, nRoyPrct = 3 }
+        nfts    = NFTSale { nSeller = pkh, nToken = sTn sp, nCurrency = sCs sp, nPrice = sPrice sp, nRoyAddr = walletPubKeyHash $ wallet 5, nRoyPrct = 0 }
         lookups = Constraints.unspentOutputs utxos <>
                   Constraints.typedValidatorLookups (O2.typedBuyValidator mp)
         tx      = Constraints.mustPayToTheScript nfts val
     ledgerTx <- submitTxConstraintsWith @O2.Sale lookups tx
-    void $ awaitTxConfirmed $ txId ledgerTx
+    void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
     Contract.logInfo @String "startSale transaction confirmed"
 
 
 buy :: BuyParams -> Contract w SaleSchema Text ()
 buy bp = do
-    pkh <- pubKeyHash <$> Contract.ownPubKey
+    pkh <- Contract.ownPubKeyHash
     sale <- findSale (bCs bp, bTn bp)
     case sale of
         Nothing -> Contract.logError @String "No sale found"
@@ -108,19 +109,19 @@ buy bp = do
                           Constraints.mustPayToPubKey (feeAddr mp) valAdaF
             if nRoyPrct nfts == 0 then do
                 ledgerTx <- submitTxConstraintsWith lookups tx
-                void $ awaitTxConfirmed $ txId ledgerTx
+                void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
                 Contract.logInfo @String "buy transaction confirmed"
             else do
                let valRoy  = Ada.lovelaceValueOf (ceiling (fromIntegral (nRoyPrct nfts) / 100 Prelude.* fromIntegral (nPrice nfts) :: Float))
                    txFinal = Constraints.mustPayToPubKey (nRoyAddr nfts) valRoy <> tx
                ledgerTx <- submitTxConstraintsWith lookups txFinal
-               void $ awaitTxConfirmed $ txId ledgerTx
+               void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
                Contract.logInfo @String "buy transaction confirmed"
 
 
 buy' :: (BuyParams, BuyParams) -> Contract w SaleSchema Text ()
 buy' (bp1, bp2) = do
-    pkh <- pubKeyHash <$> Contract.ownPubKey
+    pkh <- Contract.ownPubKeyHash
     sale1 <- findSale (bCs bp1, bTn bp1)
     case sale1 of
         Nothing -> Contract.logError @String "No sale found"
@@ -132,8 +133,8 @@ buy' (bp1, bp2) = do
                     let r       = Redeemer $ PlutusTx.toBuiltinData Buy
                         val     = Value.singleton (nCurrency nfts) (nToken nfts) 1
                         val'    = Value.singleton (nCurrency nfts') (nToken nfts') 1
-                        valAdaS = Ada.lovelaceValueOf (ceiling ((1 - 0.02 - (fromIntegral (nRoyPrct nfts) / 100)) Prelude.* fromIntegral (nPrice nfts) :: Float))
-                        valAdaF = Ada.lovelaceValueOf (ceiling (0.02 Prelude.* fromIntegral (nPrice nfts) :: Float))
+                        valAdaS = Ada.lovelaceValueOf (ceiling ((1 - 0.01 - (fromIntegral (nRoyPrct nfts) / 100)) Prelude.* fromIntegral (nPrice nfts) :: Float))
+                        valAdaF = Ada.lovelaceValueOf (ceiling (0.01 Prelude.* fromIntegral (nPrice nfts) :: Float))
                     let lookups = Constraints.typedValidatorLookups (O2.typedBuyValidator mp) <>
                                   Constraints.unspentOutputs (Map.singleton oref o)   <>
                                   Constraints.unspentOutputs (Map.singleton oref' o')   <>
@@ -146,13 +147,13 @@ buy' (bp1, bp2) = do
                                   Constraints.mustPayToPubKey (feeAddr mp) valAdaF
                     if nRoyPrct nfts == 0 then do
                         ledgerTx <- submitTxConstraintsWith lookups tx
-                        void $ awaitTxConfirmed $ txId ledgerTx
+                        void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
                         Contract.logInfo @String "buy transaction confirmed"
                     else do
                         let valRoy  = Ada.lovelaceValueOf (ceiling (fromIntegral (nRoyPrct nfts) / 100 Prelude.* fromIntegral (nPrice nfts) :: Float))
                             txFinal = Constraints.mustPayToPubKey (nRoyAddr nfts) valRoy <> tx
                         ledgerTx <- submitTxConstraintsWith lookups txFinal
-                        void $ awaitTxConfirmed $ txId ledgerTx
+                        void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
                         Contract.logInfo @String "buy transaction confirmed"
 
 
@@ -171,7 +172,7 @@ update (bp, newprice) = do
                 tx      = Constraints.mustSpendScriptOutput oref r <>
                           Constraints.mustPayToTheScript nfts' val
             ledgerTx <- submitTxConstraintsWith lookups tx
-            void $ awaitTxConfirmed $ txId ledgerTx
+            void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
             Contract.logInfo @String "Price updated"
 
 
@@ -189,7 +190,7 @@ close bp = do
                 tx      = Constraints.mustSpendScriptOutput oref r      <>
                           Constraints.mustPayToPubKey (nSeller nfts) val
             ledgerTx <- submitTxConstraintsWith lookups tx
-            void $ awaitTxConfirmed $ txId ledgerTx
+            void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
             Contract.logInfo @String "close transaction confirmed"
 
 
@@ -218,8 +219,8 @@ updateContract vh = do
                 let valToken = Value.singleton (updateCs mp) (updateTn mp) 1
                     uvh      = UpdateVHash vh
                     r        = Redeemer $ PlutusTx.toBuiltinData UpdateC
-                    lookups  = Constraints.typedValidatorLookups (O1.typedBuyValidator mp) <>
-                               Constraints.otherScript (O1.buyValidator mp) <>
+                    lookups  = Constraints.typedValidatorLookups (O1.typedUpdateValidator mp') <>
+                               Constraints.otherScript (O1.updateValidator mp') <>
                                Constraints.otherScript (O2.buyValidator mp) <>
                                mconcat [ Constraints.unspentOutputs (Map.singleton oref' o') | Just (oref', o', _) <- datums ] <>
                                Constraints.unspentOutputs (Map.singleton oref o)
@@ -229,14 +230,14 @@ updateContract vh = do
                                mconcat [ Constraints.mustPayToOtherScript vh (Datum $ PlutusTx.toBuiltinData nfts) (Value.singleton (nCurrency nfts) (nToken nfts) 1) | Just (_, _, nfts) <- datums ]
                 Contract.logInfo @String (show vh)
                 ledgerTx <- submitTxConstraintsWith lookups tx
-                void $ awaitTxConfirmed $ txId ledgerTx
+                void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
                 Contract.logInfo @String "Marketplace updated !"
     else Contract.logError @String "One of the sales has corrupted datum"
 
 
 findToken :: (AsContractError e, ToJSON e) => (CurrencySymbol, TokenName) -> Contract w SaleSchema e (Maybe (TxOutRef, ChainIndexTxOut))
 findToken (cs, tn) = do
-    utxos <- Map.filter f <$> utxosTxOutTxAt (scriptAddress $ O1.buyValidator mp)
+    utxos <- Map.filter f <$> utxosTxOutTxAt (scriptAddress $ O1.updateValidator mp')
     return $ case Map.toList utxos of
         [(oref, (o, _))] -> Just (oref, o)
         _           -> Nothing

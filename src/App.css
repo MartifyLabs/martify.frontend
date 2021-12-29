@@ -3,8 +3,11 @@ body {
   font-family: "Titillium Web", sans-serif;
 }
 
-button, input, optgroup, select, textarea {
-  font-family: "Titillium Web", sans-serif;
+button,
+input,
+optgroup,
+select,
+textarea {
   font-weight: 300;
 }
 
@@ -56,13 +59,13 @@ button, input, optgroup, select, textarea {
 .card.asset_card {
   -webkit-filter: drop-shadow(0 4px 6px #64646f33);
   filter: drop-shadow(0 4px 6px #64646f33);
-  -webkit-transition: .3s ease;
-  transition: .3s ease;
+  -webkit-transition: 0.3s ease;
+  transition: 0.3s ease;
   padding: 1rem;
 }
 
 .card.asset_card .card-image figure {
-  background: #E6E6E6;
+  background: #e6e6e6;
 }
 
 .card.asset_card .card-content {
@@ -78,17 +81,9 @@ button, input, optgroup, select, textarea {
   padding-top: 1rem;
 }
 
-.sweet-alert {
-  padding: 0.625rem 0 1.625rem 0 !important;
-}
-
 .sweet-alert div:first-child {
   transform: scale(0.6);
   margin: 0 auto !important;
-}
-
-.sweet-alert div:nth-child(3) {
-  font-size: 1rem !important;
 }
 
 .sweet-alert h2 {
@@ -103,14 +98,37 @@ button, input, optgroup, select, textarea {
   padding-top: calc(0.5em - 1px);
   text-align: center;
   white-space: nowrap;
-  background-color: #3e8ed0;
+  font-size: 1.2rem;
   border-color: transparent !important;
-  color: #fff;
   border-radius: 9999px;
   padding-left: calc(1em + 0.25em);
   padding-right: calc(1em + 0.25em);
 }
 
-.sweet-alert p a.button:hover {
-  background-color: #3e8ed0;
+.logo-text {
+  width: 100%;
+  font-family: 'Pacifico', cursive;
+  background: linear-gradient(
+    90deg,
+    #d1aad7,
+    #c88bc4 25.17%,
+    #7b8fdd 50%,
+    #86bff2 73.09%,
+    #bbdef2
+  );
+  background-size: auto auto;
+  background-clip: border-box;
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px #bbdef2;
+  animation: textclip 2s linear infinite;
+  display: inline-block;
+}
+
+@keyframes textclip {
+  from {
+    background-position: 200% center;
+  }
 }

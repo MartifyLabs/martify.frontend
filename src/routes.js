@@ -8,6 +8,8 @@ import {
   Account,
   About,
   Guide,
+  GuideBuy,
+  GuideSell,
   Explore
 } from 'pages'
 
@@ -53,6 +55,16 @@ const RenderRoutes = () => {
       <Route exact path="/guide">
         <MainLayout>
           <Guide />
+        </MainLayout>
+      </Route>
+      <Route exact path="/guide-buy">
+        <MainLayout>
+          <GuideBuy />
+        </MainLayout>
+      </Route>
+      <Route exact path="/guide-sell">
+        <MainLayout>
+          <GuideSell />
         </MainLayout>
       </Route>
     </Switch>

@@ -1,14 +1,6 @@
-// .homepage {
-//   background-color: black;
-//   // height: 100vh;
-//   // z-index: -99;
-//   // animation: shrink var(--duration) var(--delay) linear infinite;
-// }
-
 .homepage_gallery {
   position: absolute;
   top: 0px;
-  // background-color: black;
   margin: 0 auto;
   padding: 0;
   width: 100vw;
@@ -23,14 +15,22 @@
   width: 100%;
   position: absolute;
   z-index: 99;
-  background: linear-gradient(87deg, rgba(221,247,255,1) 0%, rgba(235,215,192,1) 60%, rgba(217,204,242,1) 100%);
+  background: linear-gradient(
+    87deg,
+    rgba(221, 247, 255, 1) 0%,
+    rgba(235, 215, 192, 1) 60%,
+    rgba(217, 204, 242, 1) 100%
+  );
 }
 .homepage_gallery .overlay_dark {
   background: rgba(0, 0, 0, 0.3);
 }
 
-.homepage .slogan {
-  filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.6));
+.homepage {
+  .slogan {
+    color: #eee;
+    filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.6));
+  }
 }
 
 .homepage .top-project-image {
@@ -62,15 +62,62 @@
   .columns {
     text-align: center;
     .logo-text {
-      width: 100%;
-      font-size: 100px;
-      font-weight: 700;
-      background: -webkit-linear-gradient(45deg, #ffffff, #2ec4ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      -webkit-text-stroke: 2px #DC95CF;
-      filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.6));
+      font-size: 8rem;
+      height: 220px;
     }
+  }
+}
+
+.slogan-container {
+  display: flex;
+  justify-content: center;
+}
+
+.flip-container {
+  height: 44px;
+  margin: 0 10px;
+  overflow: hidden;
+  li {
+    text-transform: uppercase;
+    padding: 0 10px;
+    height: 45px;
+    margin-bottom: 45px;
+  }
+}
+
+.flip-items {
+  animation: flip-animation 10s cubic-bezier(0.23, 1, 0.32, 1.2) infinite;
+}
+
+@keyframes flip-animation {
+  0% {
+    margin-top: -360px;
+  }
+  5% {
+    margin-top: -270px;
+  }
+  25% {
+    margin-top: -270px;
+  }
+  30% {
+    margin-top: -180px;
+  }
+  50% {
+    margin-top: -180px;
+  }
+  55% {
+    margin-top: -90px;
+  }
+  75% {
+    margin-top: -90px;
+  }
+  80% {
+    margin-top: 0px;
+  }
+  99.99% {
+    margin-top: 0px;
+  }
+  100% {
+    margin-top: -270px;
   }
 }

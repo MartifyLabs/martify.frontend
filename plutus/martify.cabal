@@ -3,9 +3,9 @@ Name:               martify
 Version:            0.1.0.0
 Build-Type:         Simple
 
-Author:              Alain Magazin, Abdelkrim Did
+Author:              Alain Magazin, Abdelkrim Dib
 Maintainer:          alain.magazin@outlook.com, <abdelkrim mail>
-Copyright:           © 2021 Alain Magazin, Abdelkrim Did.
+Copyright:           © 2021 Alain Magazin, Abdelkrim Dib.
 License:             Apache-2.0
 License-files:       LICENSE
 
@@ -29,9 +29,10 @@ common project-config
 library
   exposed-modules:     Market.Types
                      , Market.Onchain
-                     , Market.Onchain2
                      , Market.Offchain
                      , Market.Trace
+                     , Updator.Onchain
+                     , Updator.Types
                      , Utility
                      , SerialiseJSON
   build-depends:       aeson
@@ -80,19 +81,6 @@ executable datum-json
   import:               base, project-config
   hs-source-dirs:       app
   main-is:              datum-json.hs
-  ghc-options:          -threaded -rtsopts "-with-rtsopts=-T"
-
-  build-depends:        martify
-                      , bytestring
-                      , cardano-api
-                      , plutus-tx
-                      , aeson
-
-
-executable update-datum-json
-  import:               base, project-config
-  hs-source-dirs:       app
-  main-is:              update-datum-json.hs
   ghc-options:          -threaded -rtsopts "-with-rtsopts=-T"
 
   build-depends:        martify

@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import Autosuggest from 'react-autosuggest';
 import Fuse from 'fuse.js'
 
-import "./style.css";
+import "./style.scss";
 
 const Search = ({state_collection, size, placeholder}) => {
 

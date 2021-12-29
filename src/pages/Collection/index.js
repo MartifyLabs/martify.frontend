@@ -87,6 +87,7 @@ const Collection = () => {
       <CollectionBanner
         thisCollection={thisCollection}
         size={thisCollection.is_martify_verified ? "is-medium" : "is-small"}
+        is_collection_page={true}
       />
 
       <section className="section">

@@ -84,6 +84,7 @@ const Asset = () => {
           thisCollection={thisCollection}
           size="is-small"
           asset={asset}
+          is_asset_page={true}
         />
       ) : (
         <></>
@@ -361,12 +362,12 @@ const PurchaseAsset = ({
                 >
                   <a>Buy Now</a>
                 </li>
-                {/*<li
+                <li
                   className={showTab === "offer" ? "is-active" : ""}
                   onClick={() => setShowTab("offer")}
                 >
                   <a>Offer</a>
-                </li>*/}
+                </li>
               </ul>
             </div>
           ) : (
@@ -1035,11 +1036,10 @@ const AssetImage = ({ asset }) => {
   return (
     <div className="block">
       <AssetImageFigure asset={asset} setShow={setShow} show_trigger={true} />
-
       <div className={"modal " + (show ? "is-active" : "")}>
         <div className="modal-background" onClick={() => setShow(false)}></div>
         <div className="modal-content">
-          <AssetImageFigure asset={asset} setShow={setShow} />
+          <AssetImageFigure asset={asset} setShow={setShow} no_figure={true} />
         </div>
         <button
           className="modal-close is-large"

@@ -5,11 +5,12 @@ import {usePalette} from 'react-palette'
 import CollectionLinks from "../CollectionLinks";
 import { numFormatter, get_asset_image_source } from "../../utils/converter";
 
-const CollectionBanner = ({thisCollection, size, asset}) => {
+const CollectionBanner = ({thisCollection, size, asset, is_collection_page, is_asset_page}) => {
   
   const [currentId, setCurrentId] = useState(false);
   const [assetImgSrc, setAssetImgSrc] = useState(false);
   const [assetColors, setAssetColors] = useState({});
+  const [bannerHeroStyle, setBannerHeroStyle] = useState({});
 
   useEffect(() => {
     if(asset && currentId!==thisCollection.id){
@@ -28,6 +29,26 @@ const CollectionBanner = ({thisCollection, size, asset}) => {
         }
       }
     }
+
+    let this_style = {};
+    if(thisCollection.style){
+      if(thisCollection.style.banner_path){
+        this_style.backgroundImage = `url(${thisCollection.style.banner_path})`;
+      }else if(assetColors){
+        this_style.backgroundImage = `linear-gradient(to bottom right, ${assetColors.darkMuted}, ${assetColors.darkVibrant}`;
+      }
+
+      if(thisCollection.style.banner_collection_height && is_collection_page){
+        this_style.height = thisCollection.style.banner_collection_height;
+      }
+      if(thisCollection.style.banner_asset_height && is_asset_page){
+        this_style.height = thisCollection.style.banner_asset_height;
+      }
+      
+    }else if(assetColors){
+      this_style.backgroundImage = `linear-gradient(to bottom right, ${assetColors.darkMuted}, ${assetColors.darkVibrant}`;
+    }
+    setBannerHeroStyle(this_style);
   }, [thisCollection]);
 
   const { data, loading, error } = usePalette(assetImgSrc?assetImgSrc:"");
@@ -42,21 +63,21 @@ const CollectionBanner = ({thisCollection, size, asset}) => {
   //   muted: "#64aa8a"
   //   vibrant: "#b4d43c"
   // }
-  
-
   return (
     <section className={"hero collection_name " + (size!==undefined ? size : "is-medium")} 
-    style={
-      thisCollection.style ? 
-        thisCollection.style.banner_path ? 
-          {backgroundImage: `url(${thisCollection.style.banner_path})`} : 
-        assetColors ? 
-          {backgroundImage: `linear-gradient(to bottom right, ${assetColors.darkMuted}, ${assetColors.darkVibrant}`} : 
-        {} : 
-      assetColors ? 
-        {backgroundImage: `linear-gradient(to bottom right, ${assetColors.darkMuted}, ${assetColors.darkVibrant}`} : 
-      {}
-    }>
+    // style={
+    //   thisCollection.style ? 
+    //     thisCollection.style.banner_path ? 
+    //       {backgroundImage: `url(${thisCollection.style.banner_path})`} : 
+    //     assetColors ? 
+    //       {backgroundImage: `linear-gradient(to bottom right, ${assetColors.darkMuted}, ${assetColors.darkVibrant}`} : 
+    //     {} : 
+    //   assetColors ? 
+    //     {backgroundImage: `linear-gradient(to bottom right, ${assetColors.darkMuted}, ${assetColors.darkVibrant}`} : 
+    //   {}
+    // }
+    style={bannerHeroStyle}
+    >
 
       <div className="hero-body">
       

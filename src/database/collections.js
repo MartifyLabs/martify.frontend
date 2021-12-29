@@ -13,7 +13,7 @@ export const getCollection = async (policyId) => {
       } else {
         const collection = { verified: false };
 
-        await saveCollection(collection, policyId);
+        //await saveCollection(collection, policyId);
 
         return collection;
       }

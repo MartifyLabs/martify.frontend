@@ -2,7 +2,8 @@
   "thepixelheadsquad": {
     "id": "thepixelheadsquad",
     "policy_ids": [
-      "6c880f643a86d6f5b86871952b36999bbf7e9619ca54953abd2acf62"
+      "57cde26ea73be0c3ab57f4a6f414d612a68fb901cd0f2e7157846b2d",
+      "fec624c17759a1c5040ecb4c0d3ce35fc01465d0b7ab57b266fa2b18"
     ],
     "meta": {
       "name": "The Pixel Head Squad",
@@ -21,17 +22,19 @@
     "asset_attributes": ["Creature Name", "creature name", "Narrative", "narrative", "description", "States", "project"]
   },
   "kaizennft": {
-    "id": "lovelacesaga",
+    "id": "kaizennft",
     "policy_ids": [
       "788888fd99cb7ef837570ce5bf8808d959697a025adeca03d46349f1"
     ],
     "meta": {
       "name": "Lovelace Saga - Kaizen NFT",
-      "description": "Adventure awaits as the battles for the crypto space unfold!"
+      "description": "Adventure awaits as the battle for the crypto space unfolds. Play as your favorite characters in several multiplayer battle modes. Level up and earn rewards with blockchain play-to-earn gaming."
     },
     "style": {
       "logo": "logo.png",
       "banner":"banner.png",
+      "banner_collection_height": "600px",
+      "banner_asset_height": "176px",
       "font_color_title": "#f5f3db"
     },
     "links": {
