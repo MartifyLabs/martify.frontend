@@ -141,7 +141,7 @@ const About = () => {
                 <li>Enable Buying & Selling NFTs Using Native Tokens.</li>
                 <li>Create & Launch a Stake Pool for Martify.</li>
                 <li>
-                  Write a Whitepaper for Smart Contract Upgrade Mechanism.
+                  Write a Whitepaper for Smart Contract On-Chain Gouvernance.
                 </li>
                 <li>Design the Tokennomics.</li>
               </ul>
@@ -177,7 +177,7 @@ const About = () => {
             <div className="content is-medium">
               <ul>
                 <li>Martify Integration with Unity Game Engine.</li>
-                <li>Implement the Smart Contract Upgrade Mechanism.</li>
+                <li>Implement the Smart Contract On-Chain Gouvernance.</li>
                 <li>Create an Automatic Verification System for Creators.</li>
               </ul>
             </div>
