@@ -68,13 +68,7 @@ const About = () => {
       <div className="description">
         <div className="content is-medium has-text-centered">
           <p>
-            Martify is a marketplace for Cardano Non-Fungible Tokens. Our goal
-            is to make it easy for everyone to trade NFTs in a fast, safe and
-            secure manner. Try us out and you'll fall in love with our simple
-            and intuitive user interface. If you have any ideas to improve user
-            experience, feel free to reach out to us at contact@martify.io, on
-            @MartifyLabs or join us in our to discuss favorite projects, feature
-            suggestions, giveaways and other cool things.
+            Martify is a community-driven ecosystem for Cardano Non-Fungible Tokens. Our goal is to make NFT trading accessible everywhere you can imagine. Martify Marketplace is your one-stop shop for Cardano NFTs where you can explore your favorite collections and trade assets in a secure manner. Want to get in touch with us? You can write at contact@martify.io, on Twitter @MartifyLabs, or join our Discord discord.gg/Z6AH9dahdH and participate in community discussions about the digital universe and future development.
           </p>
         </div>
       </div>
