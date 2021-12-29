@@ -362,12 +362,12 @@ const PurchaseAsset = ({
                 >
                   <a>Buy Now</a>
                 </li>
-                {/*<li
+                <li
                   className={showTab === "offer" ? "is-active" : ""}
                   onClick={() => setShowTab("offer")}
                 >
                   <a>Offer</a>
-                </li>*/}
+                </li>
               </ul>
             </div>
           ) : (
