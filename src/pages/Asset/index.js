@@ -1034,22 +1034,25 @@ const AssetRawMetaData = ({ asset }) => {
 const AssetImage = ({ asset }) => {
   const [show, setShow] = useState(false);
   const [contentType, setContentType] = useState("image");
-  const [contentSource, setContentSource] = useState("image");
+  const [contentSource, setContentSource] = useState(null);
 
   useEffect(() => {
     // detect html, require cleaning
-    if(asset){
+    if(asset&&show&&contentSource==null){
+      setContentSource(false);
       let ipfs_root = "https://infura-ipfs.io/ipfs/";
       if(asset.details.onchainMetadata.files){
         if(asset.details.onchainMetadata.files.length){
+          let thisContentType = false;
           if(asset.details.onchainMetadata.files[0].mediaType == "text/html"){
-            setContentType("html");
+            thisContentType = "html";
           }
           else if(asset.details.onchainMetadata.files[0].mediaType == "audio/mpeg"){
-            setContentType("audio");
+            thisContentType = "audio";
           }
 
-          if(contentType!="image"){
+          if(thisContentType!="image"){
+            setContentType(thisContentType);
             // prepare src link
             if(asset.details.onchainMetadata.files[0].src.includes("ipfs://")){
               let s = ipfs_root + asset.details.onchainMetadata.files[0].src.split("ipfs://")[1];
@@ -1059,13 +1062,12 @@ const AssetImage = ({ asset }) => {
               setContentSource(s);
             }
           }
-          
         }  
       }
     }
     
-  }, [asset]);
-
+  }, [asset, show]);
+  
   return (
     <div className="block">
       <AssetImageFigure asset={asset} setShow={setShow} show_trigger={true} />
@@ -1073,10 +1075,10 @@ const AssetImage = ({ asset }) => {
         <div className="modal-background" onClick={() => setShow(false)}></div>
         <div className="modal-content">
           {
-            contentType == "html" ? 
+            contentType == "html" && contentSource ? 
               <iframe src={contentSource} height="500px" width="100%"></iframe>
             :
-            contentType == "audio" ? 
+            contentType == "audio" && contentSource ? 
               <audio controls="" preload="none" style="max-width: 697px; max-height: 387px;">
                 <source src={contentSource} type="audio/mpeg"/>
               </audio>
