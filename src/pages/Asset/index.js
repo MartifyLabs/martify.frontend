@@ -1078,11 +1078,11 @@ const AssetImage = ({ asset }) => {
             contentType == "html" && contentSource ? 
               <iframe src={contentSource} height="500px" width="100%"></iframe>
             :
-            contentType == "audio" && contentSource ? 
-              <audio controls="" preload="none" style="max-width: 697px; max-height: 387px;">
-                <source src={contentSource} type="audio/mpeg"/>
-              </audio>
-            :
+            // contentType == "audio" && contentSource ? 
+            //   <audio controls="" preload="none" style="max-width: 697px; max-height: 387px;">
+            //     <source src={contentSource} type="audio/mpeg"/>
+            //   </audio>
+            // :
             <AssetImageFigure asset={asset} setShow={setShow} no_figure={true} />
           }
         </div>
