@@ -1,5 +1,4 @@
 import Cardano from "../serialization-lib";
-const BigInt = typeof window !== "undefined" && window.BigInt;
 
 /**
  * BerryPool implementation of the __Random-Improve__ coin selection algorithm.
@@ -219,10 +218,10 @@ const CoinSelection = {
    * @param {int} limit - A limit on the number of inputs that can be selected.
    * @return {SelectionResult} - Coin Selection algorithm return
    */
-  randomImprove: async (inputs, outputs, limit) => {
+  randomImprove: (inputs, outputs, limit) => {
     if (!protocolParameters)
       throw new Error(
-        'Protocol parameters not set. Use setProtocolParameters().'
+        "Protocol parameters not set. Use setProtocolParameters()."
       );
 
     /** @type {UTxOSelection} */
@@ -253,12 +252,12 @@ const CoinSelection = {
 
       let range = {};
       range.ideal = Cardano.Instance.Value.new(
-        Cardano.Instance.BigNum.from_str('0')
+        Cardano.Instance.BigNum.from_str("0")
       )
         .checked_add(splitOutputsAmounts[i])
         .checked_add(splitOutputsAmounts[i]);
       range.maximum = Cardano.Instance.Value.new(
-        Cardano.Instance.BigNum.from_str('0')
+        Cardano.Instance.BigNum.from_str("0")
       )
         .checked_add(range.ideal)
         .checked_add(splitOutputsAmounts[i]);
@@ -278,7 +277,6 @@ const CoinSelection = {
       let minAmount = Cardano.Instance.Value.new(
         Cardano.Instance.min_ada_required(
           change,
-          false,
           Cardano.Instance.BigNum.from_str(protocolParameters.coinsPerUtxoWord)
         )
       );
@@ -323,7 +321,7 @@ function select(utxoSelection, outputAmount, limit) {
       limit - utxoSelection.selection.length
     );
   } catch (e) {
-    if (e.message === 'INPUT_LIMIT_EXCEEDED') {
+    if (e.message === "INPUT_LIMIT_EXCEEDED") {
       // Limit reached : Fallback on DescOrdAlgo
       utxoSelection = descSelect(utxoSelection, outputAmount);
     } else {
@@ -356,11 +354,11 @@ function randomSelect(utxoSelection, outputAmount, limit) {
   }
 
   if (limit <= 0) {
-    throw new Error('INPUT_LIMIT_EXCEEDED');
+    throw new Error("INPUT_LIMIT_EXCEEDED");
   }
 
   if (nbFreeUTxO <= 0) {
-    throw new Error('INPUTS_EXHAUSTED');
+    throw new Error("INPUTS_EXHAUSTED");
   }
 
   /** @type {TransactionUnspentOutput} utxo */
@@ -395,7 +393,7 @@ function descSelect(utxoSelection, outputAmount) {
 
   do {
     if (utxoSelection.subset.length <= 0) {
-      throw new Error('INPUTS_EXHAUSTED');
+      throw new Error("INPUTS_EXHAUSTED");
     }
 
     /** @type {TransactionUnspentOutput} utxo */
@@ -455,7 +453,7 @@ function improve(utxoSelection, outputAmount, limit, range) {
     .pop();
 
   const newAmount = Cardano.Instance.Value.new(
-    Cardano.Instance.BigNum.from_str('0')
+    Cardano.Instance.BigNum.from_str("0")
   )
     .checked_add(utxo.output().amount())
     .checked_add(outputAmount);
@@ -485,7 +483,7 @@ function improve(utxoSelection, outputAmount, limit, range) {
  */
 function mergeOutputsAmounts(outputs) {
   let compiledAmountList = Cardano.Instance.Value.new(
-    Cardano.Instance.BigNum.from_str('0')
+    Cardano.Instance.BigNum.from_str("0")
   );
 
   for (let i = 0; i < outputs.len(); i++) {
@@ -539,7 +537,7 @@ function splitAmounts(amounts) {
           _assets
         );
         let _value = Cardano.Instance.Value.new(
-          Cardano.Instance.BigNum.from_str('0')
+          Cardano.Instance.BigNum.from_str("0")
         );
         _value.set_multiasset(_multiasset);
 
@@ -549,7 +547,7 @@ function splitAmounts(amounts) {
   }
 
   // Order assets by qty DESC
-  splitAmounts = sortAmountList(splitAmounts, 'DESC');
+  splitAmounts = sortAmountList(splitAmounts, "DESC");
 
   // Insure lovelace is last to account for min ada requirement
   splitAmounts.push(
@@ -567,9 +565,9 @@ function splitAmounts(amounts) {
  * @param {string} [sortOrder=ASC] - Order
  * @return {AmountList} - The sorted AmountList
  */
-function sortAmountList(amountList, sortOrder = 'ASC') {
+function sortAmountList(amountList, sortOrder = "ASC") {
   return amountList.sort((a, b) => {
-    let sortInt = sortOrder === 'DESC' ? BigInt(-1) : BigInt(1);
+    let sortInt = sortOrder === "DESC" ? BigInt(-1) : BigInt(1);
     return Number((getAmountValue(a) - getAmountValue(b)) * sortInt);
   });
 }
@@ -663,7 +661,6 @@ function isQtyFulfilled(outputAmount, cumulatedAmount, nbFreeUTxO) {
     let minAmount = Cardano.Instance.Value.new(
       Cardano.Instance.min_ada_required(
         cumulatedAmount,
-        false,
         Cardano.Instance.BigNum.from_str(protocolParameters.coinsPerUtxoWord)
       )
     );
@@ -718,7 +715,8 @@ const cloneUTxOList = (utxoList) =>
  * @param {Value} value
  * @return {Value} Cone - Deep copy
  */
-const cloneValue = (value) => Cardano.Instance.Value.from_bytes(value.to_bytes());
+const cloneValue = (value) =>
+  Cardano.Instance.Value.from_bytes(value.to_bytes());
 
 // Helper
 function abs(big) {
@@ -766,7 +764,9 @@ function compare(group, candidate) {
  * @return {Value} - Initialized empty value
  */
 function createEmptyValue() {
-  const value = Cardano.Instance.Value.new(Cardano.Instance.BigNum.from_str('0'));
+  const value = Cardano.Instance.Value.new(
+    Cardano.Instance.BigNum.from_str("0")
+  );
   const multiasset = Cardano.Instance.MultiAsset.new();
   value.set_multiasset(multiasset);
   return value;
