@@ -76,7 +76,7 @@ const About = () => {
             write at <a href="mailto:contact@martify.io">contact@martify.io</a>,
             on Twitter @MartifyLabs, or join our
             <a href="discord.gg/Z6AH9dahdH" target="_blank" rel="noreferrer">
-              <i class="fab fa-discord"></i>
+              <i className="fab fa-discord"></i>
             </a>
             and participate in community discussions about the digital universe
             and future development.

@@ -91,7 +91,7 @@ export const finalizeTx = async ({
     inputs.push(scriptUtxo);
   }
 
-  let { input, change } = CoinSelection.randomImprove(inputs, outputs, 128);
+  let { input, change } = CoinSelection.randomImprove(inputs, outputs, 32);
 
   input.forEach((utxo) => {
     txBuilder.add_input(

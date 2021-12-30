@@ -30,17 +30,17 @@ const Connected = ({state_wallet, state_collection}) => {
 
   const TABS = {
     ALL_ASSETS: {
-      label: "All Assets",
+      label: "Assets",
       icon: "far fa-images",
     },
-    HOLDINGS: {
+    /*HOLDINGS: {
       label: "Holdings",
       icon: "far fa-images",
     },
     LISTINGS: {
       label: "Listings",
       icon: "far fa-images",
-    },
+    },*/
     EVENTS: {
       label: "Events",
       icon: "far fa-envelope",
@@ -68,8 +68,8 @@ const Connected = ({state_wallet, state_collection}) => {
       </div>
 
       { displayTab === "ALL_ASSETS" ? <AllAssets state_wallet={state_wallet} state_collection={state_collection} /> : <></> }
-      { displayTab === "HOLDINGS" ? <Holdings state_wallet={state_wallet} state_collection={state_collection} /> : <></> }
-      { displayTab === "LISTINGS" ? <Listings state_wallet={state_wallet} state_collection={state_collection} /> : <></> }
+      {/* displayTab === "HOLDINGS" ? <Holdings state_wallet={state_wallet} state_collection={state_collection} /> : <></> }
+      { displayTab === "LISTINGS" ? <Listings state_wallet={state_wallet} state_collection={state_collection} /> : <></> */}
       { displayTab === "EVENTS" ? <Events state_wallet={state_wallet} state_collection={state_collection} /> : <></> }
 
     </section>

@@ -19,7 +19,7 @@ const Explore = () => {
   const [hasMore, sethasMore] = useState(true);
 
   useEffect(() => {
-    if (!isFetching) {
+    if (!isFetching && listings.length === 0) {
       loadNext();
     }
   });
