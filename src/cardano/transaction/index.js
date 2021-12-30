@@ -80,18 +80,18 @@ export const finalizeTx = async ({
   const transactionWitnessSet = Cardano.Instance.TransactionWitnessSet.new();
 
   CoinSelection.setProtocolParameters(
-    Parameters.minUtxo,
+    Parameters.coinsPerUtxoWord,
     Parameters.linearFee.minFeeA,
     Parameters.linearFee.minFeeB,
     Parameters.maxTxSize.toString()
   );
 
-  let { input, change } = CoinSelection.randomImprove(
-    utxos,
-    outputs,
-    8,
-    scriptUtxo ? [scriptUtxo] : []
-  );
+  const inputs = [...utxos];
+  if (scriptUtxo) {
+    inputs.push(scriptUtxo);
+  }
+
+  let { input, change } = CoinSelection.randomImprove(inputs, outputs, 128);
 
   input.forEach((utxo) => {
     txBuilder.add_input(
@@ -326,6 +326,7 @@ const getProtocolParameters = () => {
         maxTxSize: 16384,
         priceMem: 0.0577,
         priceStep: 0.0000721,
+        coinsPerUtxoWord: "34482",
       }
     : {
         linearFee: {
@@ -339,6 +340,7 @@ const getProtocolParameters = () => {
         maxTxSize: 16384,
         priceMem: 0.0577,
         priceStep: 0.0000721,
+        coinsPerUtxoWord: "34482",
       };
 };
 
