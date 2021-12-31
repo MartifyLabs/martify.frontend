@@ -86,37 +86,24 @@ export const finalizeTx = async ({
     Parameters.maxTxSize.toString()
   );
 
-  const inputs = utxos.filter(
+  // search for lovelace utxos
+  let inputs = utxos.filter(
     (utxo) => utxo.output().amount().multiasset() === undefined
   );
+
+  // use native assets if no lovelace utxo was found
+  if (inputs.length === 0) {
+    inputs = [...utxos];
+  }
 
   if (assetUtxo) {
     inputs.push(assetUtxo);
   }
 
-  inputs.forEach((nn, index) => {
-    valueToAssets(nn.output().amount()).forEach((nnn) => {
-      console.log(
-        `ALL Utxos ${index} - unit: ${nnn.unit}, quantity: ${nnn.quantity}`
-      );
-    });
-  });
+  // remove duplicates
+  inputs = [...new Set(inputs)];
 
   let { input, change } = CoinSelection.randomImprove(inputs, outputs, 16);
-
-  input.forEach((nn, index) => {
-    valueToAssets(nn.output().amount()).forEach((nnn) => {
-      console.log(
-        `Tx Input ${index} - unit: ${nnn.unit}, quantity: ${nnn.quantity}`
-      );
-    });
-  });
-
-  valueToAssets(change).forEach((nnn) => {
-    console.log(
-      `Change - unit: ${nnn.unit}, quantity: ${nnn.quantity}`
-    );
-  });
 
   input.forEach((utxo) => {
     txBuilder.add_input(

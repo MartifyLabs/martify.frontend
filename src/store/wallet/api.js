@@ -91,13 +91,13 @@ export const loadAssets = (wallet, callback) => async (dispatch) => {
     dispatch(setWalletLoading(WALLET_STATE.GETTING_ASSETS));
 
     const ownedAssets = await getOwnedAssets();
-    const walletAssets = Object.keys(wallet.data.assets);
+    const loadedAssets = Object.keys(wallet.data.assets);
 
     const assets = (
       await getAssets(
-        ownedAssets.filter((oa) => {
-          return walletAssets.indexOf(oa) !== -1;
-        })
+        ownedAssets.filter((oa) =>
+          loadedAssets.length > 0 ? loadedAssets.indexOf(oa) !== -1 : true
+        )
       )
     ).reduce((map, asset) => {
       map[asset.details.asset] = asset;
