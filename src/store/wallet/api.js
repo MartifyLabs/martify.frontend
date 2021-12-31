@@ -91,18 +91,20 @@ export const loadAssets = (wallet, callback) => async (dispatch) => {
     dispatch(setWalletLoading(WALLET_STATE.GETTING_ASSETS));
 
     const ownedAssets = await getOwnedAssets();
-    const loadedAssets = Object.keys(wallet.data.assets);
+    // const loadedAssets = Object.keys(wallet.data.assets); // abdelkrimdev TODO to double check this
 
     const assets = (
       await getAssets(
-        ownedAssets.filter((oa) =>
-          loadedAssets.length > 0 ? loadedAssets.indexOf(oa) !== -1 : true
-        )
+        ownedAssets // abdelkrimdev TODO to double check this too
+        // ownedAssets.filter((oa) =>
+        //   loadedAssets.length > 0 ? loadedAssets.indexOf(oa) === -1 : true
+        // )
       )
     ).reduce((map, asset) => {
       map[asset.details.asset] = asset;
       return map;
     }, {});
+    
 
     dispatch(
       setWalletData({
@@ -298,8 +300,8 @@ export const relistToken =
         dispatch(
           set_error({
             message: resolveError(
-              "Listing transaction not fully confirmed yet, Please try again later."
-            ),
+            "TRANSACTION_NOT_CONFIRMED", "Updating Asset Price"
+          ),
             detail: null,
           })
         );
@@ -388,7 +390,7 @@ export const delistToken = (wallet, asset, callback) => async (dispatch) => {
       dispatch(
         set_error({
           message: resolveError(
-            "Listing transaction not fully confirmed yet, Please try again later."
+            "TRANSACTION_NOT_CONFIRMED", "Unlisting Asset"
           ),
           detail: null,
         })
