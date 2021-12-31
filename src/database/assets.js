@@ -111,7 +111,7 @@ export const getCollectionAssets = async (
 
       const snapshot = await getDocs(reference);
 
-      if (snapshot.empty) {
+      if (snapshot.empty || snapshot.docs.length < count) {
         const assetIds = await getMintedAssets(policyId, { page, count });
         return await getAssets(assetIds);
       } else {
