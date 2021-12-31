@@ -72,8 +72,8 @@ export const finalizeTx = async ({
   outputs,
   datums,
   metadata,
-  scriptUtxo,
   action,
+  assetUtxo,
   plutusScripts,
 }) => {
   const Parameters = getProtocolParameters();
@@ -86,12 +86,15 @@ export const finalizeTx = async ({
     Parameters.maxTxSize.toString()
   );
 
-  const inputs = [...utxos];
-  if (scriptUtxo) {
-    inputs.push(scriptUtxo);
+  const inputs = utxos.filter(
+    (utxo) => utxo.output().amount().multiasset() === undefined
+  );
+
+  if (assetUtxo) {
+    inputs.push(assetUtxo);
   }
 
-  let { input, change } = CoinSelection.randomImprove(inputs, outputs, 32);
+  let { input, change } = CoinSelection.randomImprove(inputs, outputs, 16);
 
   input.forEach((utxo) => {
     txBuilder.add_input(
@@ -105,10 +108,10 @@ export const finalizeTx = async ({
     txBuilder.add_output(outputs.get(i));
   }
 
-  if (scriptUtxo) {
+  if (plutusScripts) {
     const redeemers = Cardano.Instance.Redeemers.new();
     const redeemerIndex = txBuilder
-      .index_of_input(scriptUtxo.input())
+      .index_of_input(assetUtxo.input())
       .toString();
     redeemers.add(action(redeemerIndex));
     txBuilder.set_redeemers(
