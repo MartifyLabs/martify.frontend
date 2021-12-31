@@ -210,7 +210,7 @@ export const purchaseAsset = async (
 };
 
 const handleError = (error, source) => {
-  console.error(`Unexpected error in ${source}. [Message: ${error.message}]`);
+  // console.error(`Unexpected error in ${source}. [Message: ${error.message}]`);
 
   switch (error.message) {
     case "INPUT_LIMIT_EXCEEDED":
