@@ -94,7 +94,29 @@ export const finalizeTx = async ({
     inputs.push(assetUtxo);
   }
 
+  inputs.forEach((nn, index) => {
+    valueToAssets(nn.output().amount()).forEach((nnn) => {
+      console.log(
+        `ALL Utxos ${index} - unit: ${nnn.unit}, quantity: ${nnn.quantity}`
+      );
+    });
+  });
+
   let { input, change } = CoinSelection.randomImprove(inputs, outputs, 16);
+
+  input.forEach((nn, index) => {
+    valueToAssets(nn.output().amount()).forEach((nnn) => {
+      console.log(
+        `Tx Input ${index} - unit: ${nnn.unit}, quantity: ${nnn.quantity}`
+      );
+    });
+  });
+
+  valueToAssets(change).forEach((nnn) => {
+    console.log(
+      `Change - unit: ${nnn.unit}, quantity: ${nnn.quantity}`
+    );
+  });
 
   input.forEach((utxo) => {
     txBuilder.add_input(
@@ -190,7 +212,7 @@ export const finalizeTx = async ({
     partialChange.set_multiasset(partialMultiAssets);
     const minAda = Cardano.Instance.min_ada_required(
       partialChange,
-      Cardano.Instance.BigNum.from_str(Parameters.minUtxo)
+      Cardano.Instance.BigNum.from_str(Parameters.coinsPerUtxoWord)
     );
     partialChange.set_coin(minAda);
 
@@ -238,7 +260,7 @@ export const finalizeTx = async ({
 export const createTxOutput = (address, value, { datum } = {}) => {
   const minAda = Cardano.Instance.min_ada_required(
     value,
-    Cardano.Instance.BigNum.from_str(getProtocolParameters().minUtxo),
+    Cardano.Instance.BigNum.from_str(getProtocolParameters().coinsPerUtxoWord),
     datum && Cardano.Instance.hash_plutus_data(datum)
   );
 
@@ -329,7 +351,7 @@ const getProtocolParameters = () => {
         maxTxSize: 16384,
         priceMem: 0.0577,
         priceStep: 0.0000721,
-        coinsPerUtxoWord: "34482",
+        coinsPerUtxoWord: "1000000",
       }
     : {
         linearFee: {
@@ -343,7 +365,7 @@ const getProtocolParameters = () => {
         maxTxSize: 16384,
         priceMem: 0.0577,
         priceStep: 0.0000721,
-        coinsPerUtxoWord: "34482",
+        coinsPerUtxoWord: "1000000",
       };
 };
 
