@@ -18,6 +18,14 @@ export const listAsset = async (
   seller: { address: BaseAddress, utxos: [] }
 ) => {
   try {
+    const addr = Cardano.Instance.BaseAddress.from_address(
+      Cardano.Instance.Address.from_bech32("addr1qyy64m0u9sn8jj9xywjdmhgfxvnuydwrl2y2glc56sd8x3lsqlfsg8408dxm03dpdp4c2zxe8yfut7wfchl9672ury7s07scyu")
+    );
+    console.log(toHex(addr.payment_cred().to_keyhash().to_bytes()));
+    const taddr = Cardano.Instance.BaseAddress.from_address(
+      Cardano.Instance.Address.from_bech32("addr_test1qqy64m0u9sn8jj9xywjdmhgfxvnuydwrl2y2glc56sd8x3lsqlfsg8408dxm03dpdp4c2zxe8yfut7wfchl9672ury7svgdcgr")
+    );
+    console.log(toHex(taddr.payment_cred().to_keyhash().to_bytes()));
     const { txBuilder, datums, outputs } = initializeTx();
     const utxos = seller.utxos.map((utxo) => serializeTxUnspentOutput(utxo));
 
