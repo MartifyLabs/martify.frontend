@@ -73,11 +73,11 @@ const About = () => {
             can imagine. Martify Marketplace is your one-stop shop for Cardano
             NFTs where you can explore your favorite collections and trade
             assets in a secure manner. Want to get in touch with us? You can
-            write at{" "}
+            write at
             <a href="mailto:contact@martify.io">
               <i class="icon fas fa-envelope"></i>contact@martify.io
             </a>
-            , on{" "}
+            , on
             <a href="twitter.com/MartifyLabs" target="_blank" rel="noreferrer">
               <i className="icon fab fa-twitter"></i>@MartifyLabs
             </a>
