@@ -91,16 +91,8 @@ export const loadAssets = (wallet, callback) => async (dispatch) => {
     dispatch(setWalletLoading(WALLET_STATE.GETTING_ASSETS));
 
     const ownedAssets = await getOwnedAssets();
-    // const loadedAssets = Object.keys(wallet.data.assets); // abdelkrimdev TODO to double check this
 
-    const assets = (
-      await getAssets(
-        ownedAssets // abdelkrimdev TODO to double check this too
-        // ownedAssets.filter((oa) =>
-        //   loadedAssets.length > 0 ? loadedAssets.indexOf(oa) === -1 : true
-        // )
-      )
-    ).reduce((map, asset) => {
+    const assets = (await getAssets(ownedAssets)).reduce((map, asset) => {
       map[asset.details.asset] = asset;
       return map;
     }, {});
@@ -299,8 +291,9 @@ export const relistToken =
         dispatch(
           set_error({
             message: resolveError(
-            "TRANSACTION_NOT_CONFIRMED", "Updating Asset Price"
-          ),
+              "TRANSACTION_NOT_CONFIRMED",
+              "Updating Asset Price"
+            ),
             detail: null,
           })
         );
@@ -388,9 +381,7 @@ export const delistToken = (wallet, asset, callback) => async (dispatch) => {
       dispatch(setWalletLoading(false));
       dispatch(
         set_error({
-          message: resolveError(
-            "TRANSACTION_NOT_CONFIRMED", "Unlisting Asset"
-          ),
+          message: resolveError("TRANSACTION_NOT_CONFIRMED", "Unlisting Asset"),
           detail: null,
         })
       );

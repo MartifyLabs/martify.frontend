@@ -86,22 +86,11 @@ export const finalizeTx = async ({
     Parameters.maxTxSize.toString()
   );
 
-  // search for lovelace utxos
-  let inputs = [...utxos] /*utxos.filter(
-    (utxo) => utxo.output().amount().multiasset() === undefined
-  );
-
-  // use native assets if no lovelace utxo was found
-  if (inputs.length === 0) {
-    inputs = [...utxos];
-  }*/
+  let inputs = [...utxos];
 
   if (assetUtxo) {
     inputs.push(assetUtxo);
   }
-
-  // remove duplicates
-  //inputs = [...new Set(inputs)];
 
   let { input, change } = CoinSelection.randomImprove(inputs, outputs, 16);
 
@@ -211,7 +200,11 @@ export const finalizeTx = async ({
     );
   }
 
-  txBuilder.add_change_if_needed(changeAddress.to_address());
+  try {
+    txBuilder.add_change_if_needed(changeAddress.to_address());
+  } catch (error) {
+    throw new Error("INPUTS_EXHAUSTED");
+  }
 
   const txBody = txBuilder.build();
 
