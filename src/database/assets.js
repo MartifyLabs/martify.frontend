@@ -59,6 +59,11 @@ export const getAsset = async (assetId) => {
         const assetDetails = await getAssetDetails(assetId);
         if (assetDetails === undefined) return undefined;
 
+        if("Name" in assetDetails.onchainMetadata){
+          assetDetails.onchainMetadata.name = assetDetails.onchainMetadata.Name;
+          delete assetDetails.onchainMetadata.Name;
+        }
+
         const asset = {
           details: assetDetails,
           events: [],

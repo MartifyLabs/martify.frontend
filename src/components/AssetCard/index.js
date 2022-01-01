@@ -34,9 +34,28 @@ const AssetCard = ({ state_collection, asset, column_className, show_offer }) =>
                             </p>
                             <p className="subtitle is-size-7 clipped">
                               {collection ? collection.is_martify_verified ? collection.meta.name :
-                                collection.is_cnft_verified ? collection.is_cnft_verified :
+                                collection.is_cnft_verified ? collection.meta.name :
                                   asset.details.policyId : asset.details.policyId
                               }
+                              {collection ? collection.is_martify_verified ? (
+                                <span className="icon" data-tooltip="Martify Verified">
+                                  <i
+                                    className="fas fa-check-circle"
+                                    style={{ color: "gold" }}
+                                  ></i>
+                                </span>
+                              ) : collection.is_cnft_verified ? (
+                                <span className="icon" data-tooltip="CNFT Verified">
+                                  <i
+                                    className="fas fa-check-circle"
+                                    style={{ color: "green" }}
+                                  ></i>
+                                </span>
+                              ) : (
+                                <></>
+                              ) : (
+                                <></>
+                              )}
                             </p>
                             <div className="title is-size-5 tag-price">
                               {
