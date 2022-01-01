@@ -126,6 +126,7 @@ const TopProjects = ({
   const [window, setWindow] = useState("7d");
   const [showLimit, setShowLimit] = useState(show_num_projects_initial);
   const [topProjectData, setTopProjectData] = useState([]);
+  const [CNFTLoaded, setCNFTLoaded] = useState(false);
 
   const window_options = [
     { value: "24h", label: "Last 24 hours" },
@@ -246,6 +247,7 @@ const TopProjects = ({
     }
     setListProjects(list);
     setPending(false);
+    setCNFTLoaded(true);
   }
 
   const onchange_window = (win) => {
@@ -280,7 +282,7 @@ const TopProjects = ({
   return (
     <>
     {
-      listProjects.length > 0 ? (
+      CNFTLoaded ? (
         <section className="section top-project">
           <div className="container">
             <div className="columns">
