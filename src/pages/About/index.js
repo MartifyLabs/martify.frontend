@@ -78,11 +78,11 @@ const About = () => {
               <i class="icon fas fa-envelope"></i>contact@martify.io
             </a>
             , on
-            <a href="twitter.com/MartifyLabs" target="_blank" rel="noreferrer">
+            <a href="https://twitter.com/MartifyLabs" target="_blank" rel="noreferrer">
               <i className="icon fab fa-twitter"></i>@MartifyLabs
             </a>
             , or join our
-            <a href="discord.gg/Z6AH9dahdH" target="_blank" rel="noreferrer">
+            <a href="https://discord.gg/Z6AH9dahdH" target="_blank" rel="noreferrer">
               <i className="icon fab fa-discord"></i>Discord
             </a>{" "}
             and participate in community discussions about the digital universe
