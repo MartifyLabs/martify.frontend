@@ -48,7 +48,7 @@ export const initializeTx = () => {
       Cardano.Instance.BigNum.from_str(Parameters.linearFee.minFeeA),
       Cardano.Instance.BigNum.from_str(Parameters.linearFee.minFeeB)
     ),
-    Cardano.Instance.BigNum.from_str(Parameters.minUtxo),
+    Cardano.Instance.BigNum.from_str(Parameters.coinsPerUtxoWord),
     Cardano.Instance.BigNum.from_str(Parameters.poolDeposit),
     Cardano.Instance.BigNum.from_str(Parameters.keyDeposit),
     Parameters.maxValSize,
@@ -87,21 +87,21 @@ export const finalizeTx = async ({
   );
 
   // search for lovelace utxos
-  let inputs = utxos.filter(
+  let inputs = [...utxos] /*utxos.filter(
     (utxo) => utxo.output().amount().multiasset() === undefined
   );
 
   // use native assets if no lovelace utxo was found
   if (inputs.length === 0) {
     inputs = [...utxos];
-  }
+  }*/
 
   if (assetUtxo) {
     inputs.push(assetUtxo);
   }
 
   // remove duplicates
-  inputs = [...new Set(inputs)];
+  //inputs = [...new Set(inputs)];
 
   let { input, change } = CoinSelection.randomImprove(inputs, outputs, 16);
 
