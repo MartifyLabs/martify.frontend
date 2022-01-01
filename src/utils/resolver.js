@@ -37,7 +37,7 @@ export const resolveError = (errorType, eventName) => {
       return `An error occurred during ${eventName}. The transaction could not be submitted [Please try again].`;
     
     case "TRANSACTION_NOT_CONFIRMED":
-      return `Listing transaction not fully confirmed yet. Please try again later.`;
+      return `Transaction not fully confirmed yet. Please try again later.`;
 
     default:
       return `An error occurred during ${eventName}. Please try again later.`;
