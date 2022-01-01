@@ -149,6 +149,9 @@ $badge-color: #00d1b2;
 .badges {
   width: 200px;
   height: 200px;
+  position: absolute;
+  top: 100px;
+  right: 50px;
   color: #eee;
   background: $badge-color;
   border-radius: 100%;
