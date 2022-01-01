@@ -9,7 +9,7 @@ import {
   finalizeTx,
   initializeTx,
   serializeTxUnspentOutput,
-  valueToAssets,
+  //valueToAssets,
 } from "../transaction";
 import { toHex } from "../../utils/converter";
 
@@ -21,7 +21,7 @@ export const listAsset = async (
     const { txBuilder, datums, outputs } = initializeTx();
     const utxos = seller.utxos.map((utxo) => serializeTxUnspentOutput(utxo));
 
-    const assetUtxo = utxos
+    /*const assetUtxo = utxos
       .filter((utxo) => utxo.output().amount().multiasset() !== undefined)
       .find((utxo) => {
         return (
@@ -29,7 +29,7 @@ export const listAsset = async (
             (asset) => asset.unit === `${datum.cs}${datum.tn}`
           ) !== undefined
         );
-      });
+      });*/
 
     const lockAssetDatum = serializeSale(datum);
     datums.add(lockAssetDatum);
@@ -59,7 +59,7 @@ export const listAsset = async (
       outputs,
       changeAddress: seller.address,
       metadata: deserializeSale(lockAssetDatum),
-      assetUtxo,
+      //assetUtxo,
     });
     return {
       datumHash,
@@ -210,7 +210,7 @@ export const purchaseAsset = async (
 };
 
 const handleError = (error, source) => {
-  // console.error(`Unexpected error in ${source}. [Message: ${error.message}]`);
+  console.error(`Unexpected error in ${source}. [Message: ${error.message}]`);
 
   switch (error.message) {
     case "INPUT_LIMIT_EXCEEDED":

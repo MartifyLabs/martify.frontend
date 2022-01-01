@@ -104,7 +104,6 @@ export const loadAssets = (wallet, callback) => async (dispatch) => {
       map[asset.details.asset] = asset;
       return map;
     }, {});
-    
 
     dispatch(
       setWalletData({
