@@ -121,3 +121,161 @@
     margin-top: -270px;
   }
 }
+
+.firstLine {
+  font-size: 36px;
+}
+
+.secondLine {
+  font-size: 42px;
+  line-height: 32px;
+  font-weight: bolder;
+}
+
+.thirdLine {
+  font-size: 36px;
+  line-height: 28px;
+}
+
+.fourthLine {
+  position: relative;
+  font-size: 16px;
+  font-weight: bold;
+  top: -10px;
+}
+
+$badge-color: #00d1b2;
+
+.badges {
+  width: 200px;
+  height: 200px;
+  color: #eee;
+  background: $badge-color;
+  border-radius: 100%;
+  line-height: 32px;
+  text-align: center;
+  text-transform: uppercase;
+  -webkit-animation: 3s ease-in-out 0s normal none infinite running swing;
+  -moz-animation: 3s ease-in-out 0s normal none infinite running swing;
+  -o-animation: 3s ease-in-out 0s normal none infinite running swing;
+  animation: 3s ease-in-out 0s normal none infinite running swing;
+
+  -webkit-transform-origin: 100px -71px;
+  -moz-transform-origin: 100px -71px;
+  -o-transform-origin: 100px -71px;
+  transform-origin: 100px -71px;
+}
+.badges:before {
+  content: "";
+  position: absolute;
+  top: 90px;
+  left: 90px;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+  -webkit-box-shadow: 0px -82px 0px -2px #eee, 0px -100px $badge-color,
+    20px -98px $badge-color, 39px -94px $badge-color, 56px -85px $badge-color,
+    71px -72px $badge-color, 83px -57px $badge-color, 93px -40px $badge-color,
+    98px -20px $badge-color, 100px 0px $badge-color, -20px -98px $badge-color,
+    -39px -94px $badge-color, -71px -72px $badge-color, -56px -85px $badge-color,
+    -83px -57px $badge-color, -93px -40px $badge-color, -98px -20px $badge-color,
+    -100px 0px $badge-color, 0px 100px $badge-color, -20px 98px $badge-color,
+    -39px 94px $badge-color, -56px 85px $badge-color, -71px 72px $badge-color,
+    -83px 57px $badge-color, -93px -40px $badge-color, -98px 20px $badge-color,
+    -93px 40px $badge-color, 20px 98px $badge-color, 39px 94px $badge-color,
+    56px 85px $badge-color, 71px 72px $badge-color, 83px 57px $badge-color,
+    93px 40px $badge-color, 98px 20px $badge-color;
+
+  -moz-box-shadow: 0px -82px 0px -2px #eee, 0px -100px $badge-color,
+    20px -98px $badge-color, 39px -94px $badge-color, 56px -85px $badge-color,
+    71px -72px $badge-color, 83px -57px $badge-color, 93px -40px $badge-color,
+    98px -20px $badge-color, 100px 0px $badge-color, -20px -98px $badge-color,
+    -39px -94px $badge-color, -71px -72px $badge-color, -56px -85px $badge-color,
+    -83px -57px $badge-color, -93px -40px $badge-color, -98px -20px $badge-color,
+    -100px 0px $badge-color, 0px 100px $badge-color, -20px 98px $badge-color,
+    -39px 94px $badge-color, -56px 85px $badge-color, -71px 72px $badge-color,
+    -83px 57px $badge-color, -93px -40px $badge-color, -98px 20px $badge-color,
+    -93px 40px $badge-color, 20px 98px $badge-color, 39px 94px $badge-color,
+    56px 85px $badge-color, 71px 72px $badge-color, 83px 57px $badge-color,
+    93px 40px $badge-color, 98px 20px $badge-color;
+
+  -o-box-shadow: 0px -82px 0px -2px #eee, 0px -100px $badge-color,
+    20px -98px $badge-color, 39px -94px $badge-color, 56px -85px $badge-color,
+    71px -72px $badge-color, 83px -57px $badge-color, 93px -40px $badge-color,
+    98px -20px $badge-color, 100px 0px $badge-color, -20px -98px $badge-color,
+    -39px -94px $badge-color, -71px -72px $badge-color, -56px -85px $badge-color,
+    -83px -57px $badge-color, -93px -40px $badge-color, -98px -20px $badge-color,
+    -100px 0px $badge-color, 0px 100px $badge-color, -20px 98px $badge-color,
+    -39px 94px $badge-color, -56px 85px $badge-color, -71px 72px $badge-color,
+    -83px 57px $badge-color, -93px -40px $badge-color, -98px 20px $badge-color,
+    -93px 40px $badge-color, 20px 98px $badge-color, 39px 94px $badge-color,
+    56px 85px $badge-color, 71px 72px $badge-color, 83px 57px $badge-color,
+    93px 40px $badge-color, 98px 20px $badge-color;
+
+  box-shadow: 0px -82px 0px -2px #eee, 0px -100px $badge-color,
+    20px -98px $badge-color, 39px -94px $badge-color, 56px -85px $badge-color,
+    71px -72px $badge-color, 83px -57px $badge-color, 93px -40px $badge-color,
+    98px -20px $badge-color, 100px 0px $badge-color, -20px -98px $badge-color,
+    -39px -94px $badge-color, -71px -72px $badge-color, -56px -85px $badge-color,
+    -83px -57px $badge-color, -93px -40px $badge-color, -98px -20px $badge-color,
+    -100px 0px $badge-color, 0px 100px $badge-color, -20px 98px $badge-color,
+    -39px 94px $badge-color, -56px 85px $badge-color, -71px 72px $badge-color,
+    -83px 57px $badge-color, -93px -40px $badge-color, -98px 20px $badge-color,
+    -93px 40px $badge-color, 20px 98px $badge-color, 39px 94px $badge-color,
+    56px 85px $badge-color, 71px 72px $badge-color, 83px 57px $badge-color,
+    93px 40px $badge-color, 98px 20px $badge-color;
+}
+.badges:after {
+  content: "";
+  position: absolute;
+  top: -70px;
+  left: 99px;
+  width: 2px;
+  height: 81px;
+  border-radius: 0%;
+  background: #eee;
+}
+@-webkit-keyframes swing {
+  0% {
+    -webkit-transform: rotate(5deg);
+  }
+  50% {
+    -webkit-transform: rotate(-5deg);
+  }
+  100% {
+    -webkit-transform: rotate(5deg);
+  }
+}
+@-moz-keyframes swing {
+  0% {
+    -moz-transform: rotate(5deg);
+  }
+  50% {
+    -moz-transform: rotate(-5deg);
+  }
+  100% {
+    -moz-transform: rotate(5deg);
+  }
+}
+@-o-keyframes swing {
+  0% {
+    -o-transform: rotate(5deg);
+  }
+  50% {
+    -o-transform: rotate(-5deg);
+  }
+  100% {
+    -o-transform: rotate(5deg);
+  }
+}
+@keyframes swing {
+  0% {
+    transform: rotate(5deg);
+  }
+  50% {
+    transform: rotate(-5deg);
+  }
+  100% {
+    transform: rotate(5deg);
+  }
+}

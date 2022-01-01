@@ -64,8 +64,8 @@ const Splash = ({ listProjects }) => {
         <div className="hero-body">
           <div className="container">
             <div className="columns is-mobile is-multiline is-gapless">
-              <span className="logo-text">Martify</span>
               <div className="column is-full has-text-centered">
+                <span className="logo-text">Martify</span>
                 <p className="is-size-1 slogan">
                   Welcome to The Digital Universe.
                 </p>
@@ -84,7 +84,9 @@ const Splash = ({ listProjects }) => {
                           <span className="tag is-primary is-large">Trade</span>
                         </li>
                         <li>
-                          <span className="tag is-primary is-large">Explore</span>
+                          <span className="tag is-primary is-large">
+                            Explore
+                          </span>
                         </li>
                       </ul>
                     </div>
@@ -93,6 +95,18 @@ const Splash = ({ listProjects }) => {
                 </div>
               </div>
             </div>
+          </div>
+          <div className="badges">
+            <br />
+            <p>
+              <span className="firstLine">Only</span>
+              <br />
+              <span className="secondLine">1%</span>
+              <br />
+              <span className="thirdLine">Fees</span>
+              <br />
+              <span className="fourthLine">100% Open Source</span>
+            </p>
           </div>
         </div>
       </section>
