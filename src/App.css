@@ -132,3 +132,7 @@ textarea {
     background-position: 200% center;
   }
 }
+
+span[data-tooltip]{
+  border-bottom: none !important; /* this is to override the little underline in bulma-tooltip */
+}

@@ -1,15 +1,16 @@
 import Cardano from "../serialization-lib";
 import ErrorTypes from "./error.types";
 import { serializeSale, deserializeSale } from "./datums";
-import { BUY, CANCEL, UPDATE } from "./redeemers";
+import { BUYER, SELLER } from "./redeemers";
 import { contractAddress, contractScripts } from "./validator";
 import {
   assetsToValue,
   createTxOutput,
   finalizeTx,
   initializeTx,
+  serializeTxUnspentOutput,
 } from "../transaction";
-import { fromHex, toHex } from "../../utils/converter";
+import { toHex } from "../../utils/converter";
 
 export const listAsset = async (
   datum,
@@ -17,9 +18,7 @@ export const listAsset = async (
 ) => {
   try {
     const { txBuilder, datums, outputs } = initializeTx();
-    const utxos = seller.utxos.map((utxo) =>
-      Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
-    );
+    const utxos = seller.utxos.map((utxo) => serializeTxUnspentOutput(utxo));
 
     const lockAssetDatum = serializeSale(datum);
     datums.add(lockAssetDatum);
@@ -41,6 +40,7 @@ export const listAsset = async (
     const datumHash = toHex(
       Cardano.Instance.hash_plutus_data(lockAssetDatum).to_bytes()
     );
+
     const txHash = await finalizeTx({
       txBuilder,
       datums,
@@ -66,10 +66,7 @@ export const updateListing = async (
 ) => {
   try {
     const { txBuilder, datums, outputs } = initializeTx();
-
-    const utxos = seller.utxos.map((utxo) =>
-      Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
-    );
+    const utxos = seller.utxos.map((utxo) => serializeTxUnspentOutput(utxo));
 
     const currentListingDatum = serializeSale(currentDatum);
     datums.add(currentListingDatum);
@@ -98,9 +95,9 @@ export const updateListing = async (
       outputs,
       changeAddress: seller.address,
       metadata: deserializeSale(newListingDatum),
-      scriptUtxo: assetUtxo,
+      assetUtxo,
       plutusScripts: contractScripts(),
-      action: UPDATE,
+      action: SELLER,
     });
 
     return {
@@ -119,10 +116,7 @@ export const cancelListing = async (
 ) => {
   try {
     const { txBuilder, datums, outputs } = initializeTx();
-
-    const utxos = seller.utxos.map((utxo) =>
-      Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
-    );
+    const utxos = seller.utxos.map((utxo) => serializeTxUnspentOutput(utxo));
 
     const cancelListingDatum = serializeSale(datum);
     datums.add(cancelListingDatum);
@@ -141,9 +135,9 @@ export const cancelListing = async (
       utxos,
       outputs,
       changeAddress: seller.address,
-      scriptUtxo: assetUtxo,
+      assetUtxo,
       plutusScripts: contractScripts(),
-      action: CANCEL,
+      action: SELLER,
     });
 
     return txHash;
@@ -164,10 +158,7 @@ export const purchaseAsset = async (
 ) => {
   try {
     const { txBuilder, datums, outputs } = initializeTx();
-
-    const utxos = buyer.utxos.map((utxo) =>
-      Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
-    );
+    const utxos = buyer.utxos.map((utxo) => serializeTxUnspentOutput(utxo));
 
     const purchaseAssetDatum = serializeSale(datum);
     datums.add(purchaseAssetDatum);
@@ -195,9 +186,9 @@ export const purchaseAsset = async (
       outputs,
       datums,
       changeAddress: buyer.address,
-      scriptUtxo: assetUtxo,
+      assetUtxo,
       plutusScripts: contractScripts(),
-      action: BUY,
+      action: BUYER,
     });
 
     return txHash;

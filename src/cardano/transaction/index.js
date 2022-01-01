@@ -48,7 +48,7 @@ export const initializeTx = () => {
       Cardano.Instance.BigNum.from_str(Parameters.linearFee.minFeeA),
       Cardano.Instance.BigNum.from_str(Parameters.linearFee.minFeeB)
     ),
-    Cardano.Instance.BigNum.from_str(Parameters.minUtxo),
+    Cardano.Instance.BigNum.from_str(Parameters.coinsPerUtxoWord),
     Cardano.Instance.BigNum.from_str(Parameters.poolDeposit),
     Cardano.Instance.BigNum.from_str(Parameters.keyDeposit),
     Parameters.maxValSize,
@@ -72,26 +72,27 @@ export const finalizeTx = async ({
   outputs,
   datums,
   metadata,
-  scriptUtxo,
   action,
+  assetUtxo,
   plutusScripts,
 }) => {
   const Parameters = getProtocolParameters();
   const transactionWitnessSet = Cardano.Instance.TransactionWitnessSet.new();
 
   CoinSelection.setProtocolParameters(
-    Parameters.minUtxo,
+    Parameters.coinsPerUtxoWord,
     Parameters.linearFee.minFeeA,
     Parameters.linearFee.minFeeB,
     Parameters.maxTxSize.toString()
   );
 
-  let { input, change } = CoinSelection.randomImprove(
-    utxos,
-    outputs,
-    8,
-    scriptUtxo ? [scriptUtxo] : []
-  );
+  let inputs = [...utxos];
+
+  if (assetUtxo) {
+    inputs.push(assetUtxo);
+  }
+
+  let { input, change } = CoinSelection.randomImprove(inputs, outputs, 16);
 
   input.forEach((utxo) => {
     txBuilder.add_input(
@@ -105,10 +106,10 @@ export const finalizeTx = async ({
     txBuilder.add_output(outputs.get(i));
   }
 
-  if (scriptUtxo) {
+  if (plutusScripts) {
     const redeemers = Cardano.Instance.Redeemers.new();
     const redeemerIndex = txBuilder
-      .index_of_input(scriptUtxo.input())
+      .index_of_input(assetUtxo.input())
       .toString();
     redeemers.add(action(redeemerIndex));
     txBuilder.set_redeemers(
@@ -187,7 +188,7 @@ export const finalizeTx = async ({
     partialChange.set_multiasset(partialMultiAssets);
     const minAda = Cardano.Instance.min_ada_required(
       partialChange,
-      Cardano.Instance.BigNum.from_str(Parameters.minUtxo)
+      Cardano.Instance.BigNum.from_str(Parameters.coinsPerUtxoWord)
     );
     partialChange.set_coin(minAda);
 
@@ -199,7 +200,11 @@ export const finalizeTx = async ({
     );
   }
 
-  txBuilder.add_change_if_needed(changeAddress.to_address());
+  try {
+    txBuilder.add_change_if_needed(changeAddress.to_address());
+  } catch (error) {
+    throw new Error("INPUTS_EXHAUSTED");
+  }
 
   const txBody = txBuilder.build();
 
@@ -235,7 +240,7 @@ export const finalizeTx = async ({
 export const createTxOutput = (address, value, { datum } = {}) => {
   const minAda = Cardano.Instance.min_ada_required(
     value,
-    Cardano.Instance.BigNum.from_str(getProtocolParameters().minUtxo),
+    Cardano.Instance.BigNum.from_str(getProtocolParameters().coinsPerUtxoWord),
     datum && Cardano.Instance.hash_plutus_data(datum)
   );
 
@@ -326,6 +331,7 @@ const getProtocolParameters = () => {
         maxTxSize: 16384,
         priceMem: 0.0577,
         priceStep: 0.0000721,
+        coinsPerUtxoWord: "1000000",
       }
     : {
         linearFee: {
@@ -339,6 +345,7 @@ const getProtocolParameters = () => {
         maxTxSize: 16384,
         priceMem: 0.0577,
         priceStep: 0.0000721,
+        coinsPerUtxoWord: "1000000",
       };
 };
 

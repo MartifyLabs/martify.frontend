@@ -2,8 +2,7 @@
   "thepixelheadsquad": {
     "id": "thepixelheadsquad",
     "policy_ids": [
-      "57cde26ea73be0c3ab57f4a6f414d612a68fb901cd0f2e7157846b2d",
-      "fec624c17759a1c5040ecb4c0d3ce35fc01465d0b7ab57b266fa2b18"
+      "57cde26ea73be0c3ab57f4a6f414d612a68fb901cd0f2e7157846b2d"
     ],
     "meta": {
       "name": "The Pixel Head Squad",
@@ -20,6 +19,27 @@
       "website": "https://pixelhead.io/"
     },
     "asset_attributes": ["Creature Name", "creature name", "Narrative", "narrative", "description", "States", "project"]
+  },
+  "thepixelheadsquadaccessories": {
+    "id": "thepixelheadsquadaccessories",
+    "policy_ids": [
+      "fec624c17759a1c5040ecb4c0d3ce35fc01465d0b7ab57b266fa2b18"
+    ],
+    "meta": {
+      "name": "The Pixel Head Squad - Accessories",
+      "description": "The Pixel Head Squad was created by a team of Cardano NFT enthusiasts. After many months in the space, we were spurred to explore new ways to bring an exciting twist to collectable NFT pieces, both in the form of art and tech."
+    },
+    "style": {
+      "logo": "logo.png",
+      "banner": "banner.gif",
+      "font_color_title": "#f5f3db"
+    },
+    "links": {
+      "discord": "http://discord.gg/rpDtw4JTxD",
+      "twitter": "https://twitter.com/PixelHeadSquad",
+      "website": "https://pixelhead.io/"
+    },
+    "asset_attributes": ["Item Name", "Description", "Category"]
   },
   "kaizennft": {
     "id": "kaizennft",

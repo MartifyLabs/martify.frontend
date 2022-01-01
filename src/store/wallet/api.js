@@ -91,6 +91,7 @@ export const loadAssets = (wallet, callback) => async (dispatch) => {
     dispatch(setWalletLoading(WALLET_STATE.GETTING_ASSETS));
 
     const ownedAssets = await getOwnedAssets();
+
     const assets = (await getAssets(ownedAssets)).reduce((map, asset) => {
       map[asset.details.asset] = asset;
       return map;
@@ -290,7 +291,8 @@ export const relistToken =
         dispatch(
           set_error({
             message: resolveError(
-              "Listing transaction not fully confirmed yet, Please try again later."
+              "TRANSACTION_NOT_CONFIRMED",
+              "Updating Asset Price"
             ),
             detail: null,
           })
@@ -379,9 +381,7 @@ export const delistToken = (wallet, asset, callback) => async (dispatch) => {
       dispatch(setWalletLoading(false));
       dispatch(
         set_error({
-          message: resolveError(
-            "Listing transaction not fully confirmed yet, Please try again later."
-          ),
+          message: resolveError("TRANSACTION_NOT_CONFIRMED", "Unlisting Asset"),
           detail: null,
         })
       );
@@ -484,9 +484,7 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
       dispatch(setWalletLoading(false));
       dispatch(
         set_error({
-          message: resolveError(
-            "Listing transaction not fully confirmed yet, Please try again later."
-          ),
+          message: resolveError("TRANSACTION_NOT_CONFIRMED", "Purchasing Asset"),
           detail: null,
         })
       );

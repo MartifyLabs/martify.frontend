@@ -24,17 +24,8 @@ const AllAssets = () => {
   const [filterAsset, setFilterAsset] = useState("all");
 
   useEffect(() => {
-    dispatch(
-      loadAssets(state_wallet, (res) => {
-        load();
-      })
-    );
-  }, []);
-
-  useEffect(() => {
-    load()
-  }, [state_wallet])
-
+    load();
+  }, [state_wallet]);
   const add_asset = (list_nfts, dict_projects, this_asset) => {
     if (this_asset) {
       list_nfts.push(this_asset);
