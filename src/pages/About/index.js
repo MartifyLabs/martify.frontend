@@ -22,7 +22,7 @@ const heros = [
     twitter: "https://twitter.com/abdelkrimdev",
   },
   {
-    name: "Hong Jing",
+    name: "Jingles",
     role: "Co-Founder",
     picture:
       "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/hong.jing.jpg?alt=media&token=18f12730-5c1e-46b3-b82c-3cdce3ef95a9",
