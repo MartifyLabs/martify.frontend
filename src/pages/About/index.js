@@ -23,7 +23,7 @@ const heros = [
   },
   {
     name: "Hong Jing",
-    role: "Contributor",
+    role: "Co-Founder",
     picture:
       "https://firebasestorage.googleapis.com/v0/b/martify-bc2f5.appspot.com/o/hong.jing.jpg?alt=media&token=18f12730-5c1e-46b3-b82c-3cdce3ef95a9",
     github: "https://github.com/jinglescode",
@@ -73,11 +73,18 @@ const About = () => {
             can imagine. Martify Marketplace is your one-stop shop for Cardano
             NFTs where you can explore your favorite collections and trade
             assets in a secure manner. Want to get in touch with us? You can
-            write at <a href="mailto:contact@martify.io">contact@martify.io</a>,
-            on Twitter @MartifyLabs, or join our
-            <a href="discord.gg/Z6AH9dahdH" target="_blank" rel="noreferrer">
-              <i className="fab fa-discord"></i>
+            write at{" "}
+            <a href="mailto:contact@martify.io">
+              <i class="icon fas fa-envelope"></i>contact@martify.io
             </a>
+            , on{" "}
+            <a href="twitter.com/MartifyLabs" target="_blank" rel="noreferrer">
+              <i className="icon fab fa-twitter"></i>@MartifyLabs
+            </a>
+            , or join our
+            <a href="discord.gg/Z6AH9dahdH" target="_blank" rel="noreferrer">
+              <i className="icon fab fa-discord"></i>Discord
+            </a>{" "}
             and participate in community discussions about the digital universe
             and future development.
           </p>
@@ -124,7 +131,7 @@ const About = () => {
                 <li>Build The Martify Backend APIs.</li>
                 <li>Implement Trading & Bundle Swaps for NFTs.</li>
                 <li>Enable Buying & Selling NFTs Using Native Tokens.</li>
-                <li>More Focus on Branding, New Logo, & UI/UX.</li>
+                <li>Focus on Branding, New Logo, & UI/UX.</li>
                 <li>
                   Establish New Partnerships with Gaming and Metaverse Projects.
                 </li>
