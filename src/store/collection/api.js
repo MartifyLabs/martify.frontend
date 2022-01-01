@@ -100,7 +100,7 @@ export const get_listings =
     }
   };
 
-export const get_assets = (assetIds, callback) => async (dispatch) => {
+export const get_assets = (assetIds, callback) => async (dispatch, state) => {
   try {
     dispatch(collections_loading(true));
 
@@ -108,7 +108,17 @@ export const get_assets = (assetIds, callback) => async (dispatch) => {
       assets: {},
     };
 
-    let assets = await getAssets(assetIds);
+    let assets = await getAssets(
+      assetIds.filter((assetId) => {
+        let policyId = assetId.slice(0, 56);
+        if (policyId in state().collection.policies_assets) {
+          if (assetId in state().collection.policies_assets[policyId]) {
+            return false;
+          }
+        }
+        return true;
+      })
+    );
 
     for (let i in assets) {
       let asset = assets[i];

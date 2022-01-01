@@ -13,9 +13,9 @@ const Events = ({state_wallet, state_collection, get_assets}) => {
 
   useEffect(() => {
     setEvents([]);
-    var list_events = [];
-    var assetIds = [];
-    for(var i in state_wallet.data.events){
+    let list_events = [];
+    let assetIds = [];
+    for(let i in state_wallet.data.events){
       let this_event = state_wallet.data.events[i];
       list_events.push(this_event);
       assetIds.push(this_event.datum.cs+this_event.datum.tn);

@@ -1,7 +1,7 @@
 import Cardano from "../serialization-lib";
 import ErrorTypes from "./error.types";
 import { serializeSale, deserializeSale } from "./datums";
-import { BUY, UPDATE } from "./redeemers";
+import { BUYER, SELLER } from "./redeemers";
 import { contractAddress, contractScripts } from "./validator";
 import {
   assetsToValue,
@@ -9,7 +9,6 @@ import {
   finalizeTx,
   initializeTx,
   serializeTxUnspentOutput,
-  //valueToAssets,
 } from "../transaction";
 import { toHex } from "../../utils/converter";
 
@@ -20,16 +19,6 @@ export const listAsset = async (
   try {
     const { txBuilder, datums, outputs } = initializeTx();
     const utxos = seller.utxos.map((utxo) => serializeTxUnspentOutput(utxo));
-
-    /*const assetUtxo = utxos
-      .filter((utxo) => utxo.output().amount().multiasset() !== undefined)
-      .find((utxo) => {
-        return (
-          valueToAssets(utxo.output().amount()).find(
-            (asset) => asset.unit === `${datum.cs}${datum.tn}`
-          ) !== undefined
-        );
-      });*/
 
     const lockAssetDatum = serializeSale(datum);
     datums.add(lockAssetDatum);
@@ -59,7 +48,6 @@ export const listAsset = async (
       outputs,
       changeAddress: seller.address,
       metadata: deserializeSale(lockAssetDatum),
-      //assetUtxo,
     });
     return {
       datumHash,
@@ -109,7 +97,7 @@ export const updateListing = async (
       metadata: deserializeSale(newListingDatum),
       assetUtxo,
       plutusScripts: contractScripts(),
-      action: UPDATE,
+      action: SELLER,
     });
 
     return {
@@ -149,7 +137,7 @@ export const cancelListing = async (
       changeAddress: seller.address,
       assetUtxo,
       plutusScripts: contractScripts(),
-      action: UPDATE,
+      action: SELLER,
     });
 
     return txHash;
@@ -200,7 +188,7 @@ export const purchaseAsset = async (
       changeAddress: buyer.address,
       assetUtxo,
       plutusScripts: contractScripts(),
-      action: BUY,
+      action: BUYER,
     });
 
     return txHash;
