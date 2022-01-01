@@ -22,10 +22,6 @@ const Navbar = () => {
             Explore
           </Link>
 
-          <Link className="navbar-item" to="/about">
-            About Us
-          </Link>
-
           <div className="navbar-item has-dropdown is-hoverable">
             <a className="navbar-link">How to</a>
             <div className="navbar-dropdown">
@@ -37,6 +33,11 @@ const Navbar = () => {
               </Link>
             </div>
           </div>
+
+          <Link className="navbar-item" to="/about">
+            About Us
+          </Link>
+          
         </div>
 
         <div className="navbar-end">

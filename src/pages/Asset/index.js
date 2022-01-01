@@ -1033,13 +1033,58 @@ const AssetRawMetaData = ({ asset }) => {
 
 const AssetImage = ({ asset }) => {
   const [show, setShow] = useState(false);
+  const [contentType, setContentType] = useState("image");
+  const [contentSource, setContentSource] = useState(null);
+
+  useEffect(() => {
+    // detect html, require cleaning
+    if(asset&&show&&contentSource==null){
+      setContentSource(false);
+      let ipfs_root = "https://infura-ipfs.io/ipfs/";
+      if(asset.details.onchainMetadata.files){
+        if(asset.details.onchainMetadata.files.length){
+          let thisContentType = false;
+          if(asset.details.onchainMetadata.files[0].mediaType == "text/html"){
+            thisContentType = "html";
+          }
+          else if(asset.details.onchainMetadata.files[0].mediaType == "audio/mpeg"){
+            thisContentType = "audio";
+          }
+
+          if(thisContentType!="image"){
+            setContentType(thisContentType);
+            // prepare src link
+            if(asset.details.onchainMetadata.files[0].src.includes("ipfs://")){
+              let s = ipfs_root + asset.details.onchainMetadata.files[0].src.split("ipfs://")[1];
+              setContentSource(s);
+            }else{
+              let s = ipfs_root + asset.details.onchainMetadata.files[0].src;
+              setContentSource(s);
+            }
+          }
+        }  
+      }
+    }
+    
+  }, [asset, show]);
+  
   return (
     <div className="block">
       <AssetImageFigure asset={asset} setShow={setShow} show_trigger={true} />
       <div className={"modal " + (show ? "is-active" : "")}>
         <div className="modal-background" onClick={() => setShow(false)}></div>
         <div className="modal-content">
-          <AssetImageFigure asset={asset} setShow={setShow} no_figure={true} />
+          {
+            contentType == "html" && contentSource ? 
+              <iframe src={contentSource} height="500px" width="100%"></iframe>
+            :
+            // contentType == "audio" && contentSource ? 
+            //   <audio controls="" preload="none" style="max-width: 697px; max-height: 387px;">
+            //     <source src={contentSource} type="audio/mpeg"/>
+            //   </audio>
+            // :
+            <AssetImageFigure asset={asset} setShow={setShow} no_figure={true} />
+          }
         </div>
         <button
           className="modal-close is-large"
