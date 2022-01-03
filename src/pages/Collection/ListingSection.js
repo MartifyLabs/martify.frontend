@@ -41,7 +41,9 @@ const ListingSection = ({ state_collection, policyIds }) => {
       [collectionMetadata.policyId]: {
         ...collectionMetadata,
         page: collectionMetadata.page + 1,
-        hasMore: ITEMS_PER_PAGE === loadedAssets.length,
+        hasMore:
+          ITEMS_PER_PAGE * collectionMetadata.page <
+          collectionMetadata.itemsMinted,
       },
     });
   };

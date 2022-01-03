@@ -110,7 +110,6 @@ export const getCollectionAssets = async (
       const reference = await query(
         collection(firestore, "assets"),
         where("details.policyId", "==", policyId),
-        orderBy("status.locked", "desc"),
         orderBy("details.readableAssetName"),
         startAfter(lastVisible),
         limit(count)
