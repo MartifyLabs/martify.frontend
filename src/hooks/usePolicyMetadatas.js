@@ -9,14 +9,19 @@ export const usePolicyMetadatas = (policyIds) => {
     const fetchMetadatas = async (policyIds) => {
       try {
         const metadatas = await Promise.all(
-          policyIds.map(
-            async (policyId) =>{
-              const response = await fetch(`https://api.opencnft.io/1/policy/${policyId}`);
-              return await response.json();
-            }
-          )
+          policyIds.map(async (policyId) => {
+            const response = await fetch(
+              `https://api.opencnft.io/1/policy/${policyId}`
+            );
+            return await response.json();
+          })
         );
-        setPolicyMetadatas(metadatas);
+
+        const validMetadatas = metadatas.filter(
+          (metadata) => metadata.policy !== undefined
+        );
+
+        setPolicyMetadatas(validMetadatas);
       } catch (error) {
         console.error(
           `Unexpected error in usePolicyMetadatas. [Message: ${error.message}]`
