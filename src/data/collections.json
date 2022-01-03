@@ -62,5 +62,24 @@
       "twitter": "https://twitter.com/LovelaceSaga",
       "discord": "https://discord.gg/Trnssx5qTF"
     }
+  },
+  "theoscapemusic": {
+    "id": "theoscapemusic",
+    "policy_ids": [
+      "ca71015b527f06e101e35e113bce2872ecddb8001fd7e823b4d1c334"
+    ],
+    "meta": {
+      "name": "Theo Scape Music",
+      "description": "Quality electronic music productions on the Cardano blockchain. Deep house, progressive and trancy vibes with a retro twist. Every track comes as a rich media cnft with a dedicated 3D video art."
+    },
+    "style": {
+      "logo": "logo.png",
+      "banner": "banner.png",
+      "font_color_title": "#f5f3db"
+    },
+    "links": {
+      "website": "https://www.theoscapemusic.com/",
+      "twitter": "https://twitter.com/TheoScape"
+    }
   }
 }
