@@ -10,7 +10,7 @@ export const getAssetDetails = async (asset) => {
   try {
     const response = await cardano(`assets/${asset}`);
 
-    if (parseInt(response.quantity) === 1) {
+    if (parseInt(response.quantity) === 1 && response.onchain_metadata) {
       return {
         asset: response.asset,
         policyId: response.policy_id,
