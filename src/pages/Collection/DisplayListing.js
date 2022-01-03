@@ -39,14 +39,20 @@ const DisplayListing = ({ listings }) => {
   const filtered_listing = matchedtokens
     .sort((a, b) => {
       
-      let a_price = a.status.locked ? a.status.datum.price !== undefined ? a.status.datum.price : 999999 : 999999;
-      let b_price = b.status.locked ? b.status.datum.price !== undefined ? b.status.datum.price : 999999 : 999999;
-
-      if (sortby === "lowtohigh") {
-        return a_price - b_price;
-      } else {
-        return b_price - a_price;
+      if(a.status.locked && b.status.locked){
+        let a_price = a.status.datum.price;
+        let b_price = b.status.datum.price;
+        if (sortby === "lowtohigh") {
+          return a_price - b_price;
+        } else {
+          return b_price - a_price;
+        }
+      }else if(a.status.locked || b.status.locked){
+        return a.status.locked > b.status.locked ? -1 : 1;
+      }else{
+        return a.details.onchainMetadata.name < b.details.onchainMetadata.name ? -1 : 1;
       }
+      
     })
     .map((this_nft, i) => {
       return <AssetCard asset={this_nft} key={i} />;

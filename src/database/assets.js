@@ -59,10 +59,27 @@ export const getAsset = async (assetId) => {
         const assetDetails = await getAssetDetails(assetId);
         if (assetDetails === undefined) return undefined;
 
+        // add `Name` to `name`
         if("Name" in assetDetails.onchainMetadata){
           assetDetails.onchainMetadata.name = assetDetails.onchainMetadata.Name;
-          delete assetDetails.onchainMetadata.Name;
         }
+        // clean up empty keys
+        function findKeyAndDelete(object, key) {
+          var value;
+          Object.keys(object).some(function(k) {
+            if (k === key) {
+              value = object[k];
+              delete object[k];
+              return true;
+            }
+            if (object[k] && typeof object[k] === 'object') {
+              value = findKeyAndDelete(object[k], key);
+              return value !== undefined;
+            }
+          });
+          return value;
+        }
+        findKeyAndDelete(assetDetails, '');
 
         const asset = {
           details: assetDetails,
