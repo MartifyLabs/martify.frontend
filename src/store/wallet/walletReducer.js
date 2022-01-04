@@ -38,7 +38,7 @@ export default function walletReducer(state = walletobj, { type, payload }) {
         connected: true,
         loading: false,
         data: payload.data,
-        nami: payload.nami,
+        provider: payload.provider,
         // events: payload.database.events,
         // offers: payload.database.offers,
       };

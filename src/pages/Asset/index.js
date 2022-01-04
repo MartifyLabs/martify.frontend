@@ -70,8 +70,8 @@ const Asset = () => {
   const purchase_token = (wallet, asset, callback) => {
     dispatch(purchaseToken(wallet, asset, callback));
   };
-  const asset_add_offer = (asset_id, price, callback) => {
-    dispatch(assetAddOffer(asset_id, price, callback));
+  const asset_add_offer = (wallet, asset, price, callback) => {
+    dispatch(assetAddOffer(wallet, asset, price, callback));
   };
   const opencnft_get_asset_tx = (asset_id, callback) => {
     dispatch(opencnftGetAssetTx(asset_id, callback));
@@ -310,7 +310,7 @@ const PurchaseAsset = ({
   }
 
   function list_this_token(price) {
-    asset_add_offer(asset.details.asset, price, (res) => {
+    asset_add_offer(state_wallet, asset, price, (res) => {
       successful_transaction(res);
     });
   }
@@ -399,7 +399,7 @@ const PurchaseAsset = ({
                   </div>
                 </nav>
                 {state_wallet.connected ? (
-                  state_wallet.nami.collateral.length === 0 ? (
+                  state_wallet.provider.collateral.length === 0 ? (
                     <p className="help">
                       Fund the wallet and add collateral (option in Nami).
                     </p>
@@ -569,7 +569,7 @@ const ButtonBuy = ({ state_wallet, purchase_this_token }) => {
         disabled={
           state_wallet.loading ||
           !state_wallet.connected ||
-          state_wallet.nami.collateral.length === 0
+          state_wallet.provider.collateral.length === 0
         }
         onClick={begin_buy_process}
       >
@@ -762,7 +762,7 @@ const OwnerListAsset = ({
               }
             />
             <span className="icon is-medium is-left">₳</span>
-            {state_wallet.nami.collateral.length === 0 ? (
+            {state_wallet.provider.collateral.length === 0 ? (
               <p className="help">
                 Fund the wallet and add collateral (option in Nami).
               </p>
@@ -1075,7 +1075,7 @@ const AssetImage = ({ asset }) => {
         <div className="modal-background" onClick={() => setShow(false)}></div>
         <div className="modal-content">
           {
-            contentType == "html" && contentSource ? 
+            contentType === "html" && contentSource ? 
               <iframe src={contentSource} height="500px" width="100%"></iframe>
             :
             // contentType == "audio" && contentSource ? 

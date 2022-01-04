@@ -1,59 +1,55 @@
 import Cardano from "../serialization-lib";
-import { serializeTxUnspentOutput, valueToAssets } from "../transaction";
 import { fromHex } from "../../utils/converter";
 
-export const enableWallet = async () => {
-  return await window.cardano.enable();
-};
+class Wallet {
+  async enable(name) {
+    if (name === "ccvault") {
+      const instance = await window.cardano.ccvault.enable();
+      if (instance) {
+        this._provider = instance;
+        return true;
+      }
+    } else {
+      const isEnabled = await window.cardano.enable();
+      if (isEnabled) {
+        this._provider = window.cardano;
+        return true;
+      }
+    }
+    return false;
+  }
 
-export const getBalance = async () => {
-  return await window.cardano.getBalance();
-};
+  async getBalance() {
+    return await this._provider.getBalance();
+  };
 
-export const getCollateral = async () => {
-  return await window.cardano.getCollateral();
-};
+  async getCollateral() {
+    return await this._provider.getCollateral();
+  };
 
-export const getNetworkId = async () => {
-  return await window.cardano.getNetworkId();
-};
+  async getNetworkId() {
+    return await this._provider.getNetworkId();
+  };
 
-export const getOwnedAssets = async () => {
-  const usedAddress = await getUsedAddress();
-  const utxos = await getUtxos();
+  async getUsedAddresses() {
+    const usedAddresses = await this._provider.getUsedAddresses();
 
-  const ownedAssets = utxos
-    .map((utxo) => serializeTxUnspentOutput(utxo).output())
-    .filter(
-      (txOut) =>
-        txOut.amount().multiasset() !== undefined &&
-        txOut.address().to_bech32() === usedAddress
-    )
-    .map((txOut) => valueToAssets(txOut.amount()))
-    .flatMap((assets) =>
-      assets
-        .filter((asset) => asset.unit !== "lovelace")
-        .map((asset) => asset.unit)
+    return usedAddresses.map((address) =>
+      Cardano.Instance.Address.from_bytes(fromHex(address)).to_bech32()
     );
+  };
 
-  return [...new Set(ownedAssets)];
-};
+  async getUtxos() {
+    return await this._provider.getUtxos();
+  };
 
-export const getUsedAddress = async () => {
-  const usedAddresses = await window.cardano.getUsedAddresses();
-  return Cardano.Instance.Address.from_bytes(
-    fromHex(usedAddresses[0])
-  ).to_bech32();
-};
+  async signTx(tx, partialSign = true) {
+    return await this._provider.signTx(tx, partialSign);
+  };
 
-export const getUtxos = async () => {
-  return await window.cardano.getUtxos();
-};
+  async submitTx(tx) {
+    return await this._provider.submitTx(tx);
+  };
+}
 
-export const signTx = async (tx, partialSign = true) => {
-  return await window.cardano.signTx(tx, partialSign);
-};
-
-export const submitTx = async (tx) => {
-  return await window.cardano.submitTx(tx);
-};
+export default new Wallet();

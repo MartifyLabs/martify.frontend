@@ -1,12 +1,5 @@
 import Cardano from "../../cardano/serialization-lib";
-import {
-  enableWallet,
-  getCollateral,
-  getNetworkId,
-  getOwnedAssets,
-  getUsedAddress,
-  getUtxos,
-} from "../../cardano/wallet";
+import Wallet from "../../cardano/wallet";
 import {
   getAssets,
   lockAsset,
@@ -20,6 +13,7 @@ import {
   listWalletAsset,
   delistWalletAsset,
   relistWalletAsset,
+  walletExists,
 } from "../../database/wallets";
 import { WALLET_STATE, MARKET_TYPE } from "./walletTypes";
 import {
@@ -35,30 +29,37 @@ import {
   purchaseAsset,
 } from "../../cardano/market-contract/";
 import { contractAddress } from "../../cardano/market-contract/validator";
-import { createTxUnspentOutput } from "../../cardano/transaction";
+import {
+  createTxUnspentOutput,
+  serializeTxUnspentOutput,
+  valueToAssets,
+} from "../../cardano/transaction";
 import { getLockedUtxosByAsset } from "../../cardano/blockfrost-api";
 import { collections_add_tokens } from "../collection/collectionActions";
 import { fromBech32 } from "../../utils/converter";
 import { createEvent, createDatum } from "../../utils/factory";
 import { resolveError } from "../../utils/resolver";
 
-export const connectWallet = (isSilent, callback) => async (dispatch) => {
+export const connectWallet = (provider, callback) => async (dispatch) => {
   try {
-    if (!isSilent) dispatch(setWalletLoading(WALLET_STATE.CONNECTING));
+    dispatch(setWalletLoading(WALLET_STATE.CONNECTING));
 
-    if (await enableWallet()) {
+    if (await Wallet.enable(provider)) {
       await Cardano.load();
 
-      const namiNetworkId = await getNetworkId();
       const usedNetworkId = parseInt(process.env.REACT_APP_CARDANO_NETWORK_ID);
+      const walletNetworkId = await Wallet.getNetworkId();
 
-      if (usedNetworkId === namiNetworkId) {
+      if (usedNetworkId === walletNetworkId) {
+        const usedAddresses = await Wallet.getUsedAddresses();
+        const walletAddress = await getWalletAddress(usedAddresses);
+
         const connectedWallet = {
-          nami: {
-            network: namiNetworkId,
-            collateral: await getCollateral(),
+          provider: {
+            network: walletNetworkId,
+            collateral: await Wallet.getCollateral(),
           },
-          data: await getWallet(await getUsedAddress()),
+          data: await getWallet(walletAddress),
         };
 
         dispatch(walletConnected(connectedWallet));
@@ -90,9 +91,9 @@ export const loadAssets = (wallet, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.GETTING_ASSETS));
 
-    const ownedAssets = await getOwnedAssets();
+    const walletAssets = await getWalletAssets();
 
-    const assets = (await getAssets(ownedAssets)).reduce((map, asset) => {
+    const assets = (await getAssets(walletAssets)).reduce((map, asset) => {
       map[asset.details.asset] = asset;
       return map;
     }, {});
@@ -126,7 +127,7 @@ export const listToken =
       dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
       const collectionDetails = await getCollection(asset.details.policyId);
-      const walletUtxos = await getUtxos();
+      const walletUtxos = await Wallet.getUtxos();
 
       const royaltiesAddress =
         collectionDetails?.royalties?.address ?? wallet.data.address;
@@ -210,7 +211,7 @@ export const relistToken =
     try {
       dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
-      const walletUtxos = await getUtxos();
+      const walletUtxos = await Wallet.getUtxos();
 
       const assetUtxo = (
         await getLockedUtxosByAsset(
@@ -317,7 +318,7 @@ export const delistToken = (wallet, asset, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
-    const walletUtxos = await getUtxos();
+    const walletUtxos = await Wallet.getUtxos();
 
     const assetUtxo = (
       await getLockedUtxosByAsset(
@@ -405,7 +406,7 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
-    const walletUtxos = await getUtxos();
+    const walletUtxos = await Wallet.getUtxos();
 
     const assetUtxo = (
       await getLockedUtxosByAsset(
@@ -484,7 +485,10 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
       dispatch(setWalletLoading(false));
       dispatch(
         set_error({
-          message: resolveError("TRANSACTION_NOT_CONFIRMED", "Purchasing Asset"),
+          message: resolveError(
+            "TRANSACTION_NOT_CONFIRMED",
+            "Purchasing Asset"
+          ),
           detail: null,
         })
       );
@@ -502,4 +506,30 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
       })
     );
   }
+};
+
+const getWalletAddress = async (usedAddresses) => {
+  if (usedAddresses.length > 1) {
+    for (const address of usedAddresses) {
+      if (await walletExists(address)) return address;
+    }
+  }
+
+  return usedAddresses[0];
+};
+
+const getWalletAssets = async () => {
+  const utxos = await Wallet.getUtxos();
+
+  const nativeAssets = utxos
+    .map((utxo) => serializeTxUnspentOutput(utxo).output())
+    .filter((txOut) => txOut.amount().multiasset() !== undefined)
+    .map((txOut) => valueToAssets(txOut.amount()))
+    .flatMap((assets) =>
+      assets
+        .filter((asset) => asset.unit !== "lovelace")
+        .map((asset) => asset.unit)
+    );
+
+  return [...new Set(nativeAssets)];
 };
