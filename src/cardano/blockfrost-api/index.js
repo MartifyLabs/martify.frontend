@@ -11,7 +11,7 @@ export const getAssetDetails = async (asset) => {
     const response = await cardano(`assets/${asset}`);
 
     if (parseInt(response.quantity) === 1 && response.onchain_metadata) {
-      return {
+      const assetDetails = {
         asset: response.asset,
         policyId: response.policy_id,
         assetName: response.asset_name,
@@ -20,9 +20,14 @@ export const getAssetDetails = async (asset) => {
         quantity: parseInt(response.quantity),
         initialMintTxHash: response.initial_mint_tx_hash,
         mintOrBurnCount: parseInt(response.mint_or_burn_count),
-        onchainMetadata: response.onchain_metadata,
+        onchainMetadata: renameObjectKey(
+          response.onchain_metadata,
+          "Name",
+          "name"
+        ),
         metadata: response.metadata,
       };
+      return deleteObjectKey(assetDetails, "");
     }
 
     return undefined;
@@ -192,4 +197,33 @@ const request = async (base, endpoint, headers, body) => {
     }
     return response.json();
   });
+};
+
+const renameObjectKey = (object, oldKey, newKey) => {
+  let newObject = { ...object };
+  if (oldKey in newObject) {
+    newObject[newKey] = newObject[oldKey];
+    delete newObject[oldKey];
+  }
+  return newObject;
+};
+
+const deleteObjectKey = (object, key) => {
+  let newObject = {};
+  if (object) {
+    Object.keys(object).forEach((objectKey) => {
+      if (typeof object[objectKey] === "object") {
+        newObject = {
+          ...newObject,
+          [objectKey]: deleteObjectKey(object[objectKey], key),
+        };
+      } else if (objectKey !== key) {
+        newObject = {
+          ...newObject,
+          [objectKey]: object[objectKey],
+        };
+      }
+    });
+  }
+  return newObject;
 };

@@ -59,14 +59,8 @@ export const getAsset = async (assetId) => {
         const assetDetails = await getAssetDetails(assetId);
         if (assetDetails === undefined) return undefined;
 
-        assetDetails.onchainMetadata = renameObjectKey(
-          assetDetails.onchainMetadata,
-          "Name",
-          "name"
-        );
-
         const asset = {
-          details: deleteObjectKey(assetDetails, ""),
+          details: assetDetails,
           events: [],
           offers: [],
           status: { locked: false },
@@ -241,33 +235,4 @@ export const saveAssets = async (assets) => {
       })
     );
   }
-};
-
-const renameObjectKey = (object, oldKey, newKey) => {
-  let newObject = { ...object };
-  if (oldKey in newObject) {
-    newObject[newKey] = newObject[oldKey];
-    delete newObject[oldKey];
-  }
-  return newObject;
-};
-
-const deleteObjectKey = (object, key) => {
-  let newObject = {};
-  if (object) {
-    Object.keys(object).forEach((objectKey) => {
-      if (typeof object[objectKey] === "object") {
-        newObject = {
-          ...newObject,
-          [objectKey]: deleteObjectKey(object[objectKey], key),
-        };
-      } else if (objectKey !== key) {
-        newObject = {
-          ...newObject,
-          [objectKey]: object[objectKey],
-        };
-      }
-    });
-  }
-  return newObject;
 };
