@@ -9,6 +9,12 @@ class Wallet {
         this._provider = instance;
         return true;
       }
+    } else if (name === "gerowallet") {
+      const instance = await window.cardano?.gerowallet?.enable();
+      if (instance) {
+        this._provider = instance;
+        return true;
+      }
     } else {
       const isEnabled = await window.cardano?.enable();
       if (isEnabled) {
