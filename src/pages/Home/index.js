@@ -8,6 +8,7 @@ import "./style.scss";
 import { opencnft_get_top_projects as opencnftGetTopProjects } from "store/collection/api";
 import { get_asset_image_source, numFormatter } from "utils/converter";
 import Image from "components/Image";
+import { FadeImg } from "components/Fades";
 
 import "react-loading-skeleton/dist/skeleton.css";
 
@@ -31,6 +32,10 @@ const Home = () => {
   );
 };
 
+// const MemoImg = React.memo((props) => {
+//   return <FadeImg {...props} />;
+// });
+
 const Splash = ({ listProjects }) => {
   return (
     <>
@@ -50,7 +55,7 @@ const Splash = ({ listProjects }) => {
                 <div className="card">
                   <div className="card-image">
                     <figure className="image is-square">
-                      <img src={project.image} alt={project.name} />
+                      <FadeImg src={project.image} alt={project.name} />
                     </figure>
                   </div>
                 </div>
@@ -281,8 +286,7 @@ const TopProjects = ({
 
   return (
     <>
-    {
-      CNFTLoaded ? (
+      {CNFTLoaded ? (
         <section className="section top-project">
           <div className="container">
             <div className="columns">
@@ -292,7 +296,8 @@ const TopProjects = ({
                   Top Cardano NFTs Projects
                 </p>
                 <p className="has-text-centered">
-                  The top CNFTs, ranked by volume, floor price and other statistics.
+                  The top CNFTs, ranked by volume, floor price and other
+                  statistics.
                 </p>
               </div>
               <div className="column is-2">
@@ -403,14 +408,18 @@ const TopProjects = ({
                 defaultSortAsc={false}
                 progressPending={pending}
                 progressComponent={
-                  <progress className="progress is-primary" max="100"></progress>
+                  <progress
+                    className="progress is-primary"
+                    max="100"
+                  ></progress>
                 }
               />
             )}
           </div>
         </section>
-      ) : <></>
-    }
+      ) : (
+        <></>
+      )}
     </>
   );
 };
