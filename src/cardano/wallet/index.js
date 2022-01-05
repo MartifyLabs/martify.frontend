@@ -4,13 +4,13 @@ import { fromHex } from "../../utils/converter";
 class Wallet {
   async enable(name) {
     if (name === "ccvault") {
-      const instance = await window.cardano.ccvault.enable();
+      const instance = await window.cardano?.ccvault?.enable();
       if (instance) {
         this._provider = instance;
         return true;
       }
     } else {
-      const isEnabled = await window.cardano.enable();
+      const isEnabled = await window.cardano?.enable();
       if (isEnabled) {
         this._provider = window.cardano;
         return true;
