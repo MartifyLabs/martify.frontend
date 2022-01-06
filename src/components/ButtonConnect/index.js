@@ -3,24 +3,47 @@ import { compose } from "redux";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
-import { connectWallet, loadAssets, checkWalletAvailable } from "../../store/wallet/api";
+import {
+  availableWallets,
+  connectWallet,
+  loadAssets,
+} from "../../store/wallet/api";
 import { WALLET_STATE } from "../../store/wallet/walletTypes";
 
-const ButtonConnect = ({ state_wallet, connectWallet, loadAssets, checkWalletAvailable }) => {
+const wallets = {
+  ccvault: {
+    title: "ccvault.io",
+    image: "/images/wallets/ccvault.png",
+  },
+  gerowallet: {
+    title: "GeroWallet",
+    image: "/images/wallets/gero.png",
+  },
+  nami: {
+    title: "Nami",
+    image: "/images/wallets/nami.svg",
+  },
+};
+
+const ButtonConnect = ({
+  state_wallet,
+  availableWallets,
+  connectWallet,
+  loadAssets,
+}) => {
   const [showNotification, setShowNotification] = useState(false);
   const [showNotificationMessage, setShowNotificationMessage] = useState(false);
   const [showWallets, setShowWallets] = useState(false);
 
   function onclick_connect_wallet() {
-    checkWalletAvailable((res) => {
-      if(res.wallets.length==0){
+    availableWallets((res) => {
+      if (res.wallets.length === 0) {
         setShowNotification("no-wallet");
-      }else if(res.wallets.length==1){
+      } else if (res.wallets.length === 1) {
         connect_wallet(res.wallets[0]);
-      }else if(res.wallets.length>1){
+      } else if (res.wallets.length > 1) {
         setShowWallets(res.wallets);
       }
-
     });
   }
 
@@ -114,45 +137,39 @@ const ButtonConnect = ({ state_wallet, connectWallet, loadAssets, checkWalletAva
       )}
 
       <div className={"modal " + (showWallets ? "is-active" : "")}>
-        <div className="modal-background" onClick={() => setShowWallets(false)}></div>
-        <div className="modal-content has-text-centered">
-          <section className="modal-card-body">
-            <h1 className="is-size-3">Select Wallet</h1>
-            <div className="columns ">
-              <div className="column">
-                <center>
-                  <button className="button is-large"
-                      disabled={state_wallet.loading}
-                      onClick={() => connect_wallet('nami')}
-                    >
-                    <figure className="image is-32x32">
-                      <img src="/images/wallet-nami.svg"/>
-                    </figure>
-                    Nami
-                  </button>
-                </center>
-              </div>
-              <div className="column">
-                <center>
-                  <button className="button is-large"
-                    disabled={state_wallet.loading}
-                    onClick={() => connect_wallet('ccvault')}
-                  >
-                    <figure className="image is-32x32">
-                      <img src="/images/wallet-ccvault.png"/>
-                    </figure>
-                    CCVault
-                  </button>
-                </center>
-              </div>
-            </div>
-          </section>
-        </div>
-        <button
-          className="modal-close is-large"
-          aria-label="close"
+        <div
+          className="modal-background"
           onClick={() => setShowWallets(false)}
-        ></button>
+        ></div>
+        <div className="modal-card">
+          <header className="modal-card-head">
+            <p className="modal-card-title has-text-centered">
+              Connect a Wallet
+            </p>
+            <button
+              className="delete"
+              aria-label="close"
+              onClick={() => setShowWallets(false)}
+            ></button>
+          </header>
+          <section className="modal-card-body">
+            {showWallets &&
+              showWallets.map((name) => (
+                <button
+                  key={name}
+                  className="block button is-info is-light is-large is-fullwidth"
+                  disabled={state_wallet.loading}
+                  onClick={() => connect_wallet(name)}
+                >
+                  <figure className="image is-32x32 is-clipped">
+                    <img alt={name} src={wallets[name].image} />
+                  </figure>
+                  {wallets[name].title}
+                </button>
+              ))}
+          </section>
+          <footer className="modal-card-foot"></footer>
+        </div>
       </div>
     </>
   );
@@ -166,10 +183,10 @@ function mapStateToProps(state, props) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    availableWallets: (callback) => dispatch(availableWallets(callback)),
     connectWallet: (is_silent, callback) =>
       dispatch(connectWallet(is_silent, callback)),
     loadAssets: (wallet, callback) => dispatch(loadAssets(wallet, callback)),
-    checkWalletAvailable: (callback) => dispatch(checkWalletAvailable(callback)),
   };
 }
 

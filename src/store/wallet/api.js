@@ -40,13 +40,12 @@ import { fromBech32 } from "../../utils/converter";
 import { createEvent, createDatum } from "../../utils/factory";
 import { resolveError } from "../../utils/resolver";
 
-
-export const checkWalletAvailable = (callback) => async (dispatch) => {
+export const availableWallets = (callback) => async (dispatch) => {
   await Cardano.load();
-  let walletsAvailable = await Wallet.checkAvailable();
+
   callback({
     success: true,
-    wallets: walletsAvailable,
+    wallets: await Wallet.getAvailableWallets(),
     msg: "",
   });
 };
@@ -56,7 +55,6 @@ export const connectWallet = (provider, callback) => async (dispatch) => {
     dispatch(setWalletLoading(WALLET_STATE.CONNECTING));
 
     if (await Wallet.enable(provider)) {
-
       const usedNetworkId = parseInt(process.env.REACT_APP_CARDANO_NETWORK_ID);
       const walletNetworkId = await Wallet.getNetworkId();
 
