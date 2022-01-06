@@ -13,7 +13,6 @@ const ButtonConnect = ({ state_wallet, connectWallet, loadAssets, checkWalletAva
 
   function onclick_connect_wallet() {
     checkWalletAvailable((res) => {
-      console.log("checkWalletAvailable", res);
       if(res.wallets.length==0){
         setShowNotification("no-wallet");
       }else if(res.wallets.length==1){

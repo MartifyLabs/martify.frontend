@@ -12,10 +12,14 @@ class Wallet {
     if (instance_gerowallet) {
       wallets.push("gerowallet");
     }
-    let instance_nami = await window.cardano?.enable();
-    if (instance_nami) {
-      wallets.push("nami");
+    try {
+      let instance_nami = await window.cardano?.enable();
+      if (instance_nami) {
+        wallets.push("nami");
+      }
+    } catch (error) {
     }
+    
     return wallets;
   }
 
