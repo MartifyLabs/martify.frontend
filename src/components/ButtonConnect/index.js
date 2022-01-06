@@ -3,15 +3,31 @@ import { compose } from "redux";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
-import { connectWallet, loadAssets } from "../../store/wallet/api";
+import { connectWallet, loadAssets, checkWalletAvailable } from "../../store/wallet/api";
 import { WALLET_STATE } from "../../store/wallet/walletTypes";
 
-const ButtonConnect = ({ state_wallet, connectWallet, loadAssets }) => {
+const ButtonConnect = ({ state_wallet, connectWallet, loadAssets, checkWalletAvailable }) => {
   const [showNotification, setShowNotification] = useState(false);
   const [showNotificationMessage, setShowNotificationMessage] = useState(false);
+  const [showWallets, setShowWallets] = useState(false);
 
-  function connect_wallet() {
-    connectWallet(false, (res) => {
+  function onclick_connect_wallet() {
+    checkWalletAvailable((res) => {
+      console.log("checkWalletAvailable", res);
+      if(res.wallets.length==0){
+        setShowNotification("no-wallet");
+      }else if(res.wallets.length==1){
+        connect_wallet(res.wallets[0]);
+      }else if(res.wallets.length>1){
+        setShowWallets(res.wallets);
+      }
+
+    });
+  }
+
+  function connect_wallet(wallet_name) {
+    setShowWallets(false);
+    connectWallet(wallet_name, (res) => {
       if (!res.success) {
         setShowNotificationMessage(res.msg);
       }
@@ -22,7 +38,7 @@ const ButtonConnect = ({ state_wallet, connectWallet, loadAssets }) => {
     if (state_wallet.loading) {
       if (
         [
-          "no-nami",
+          "no-wallet",
           "no-accept",
           "connected",
           WALLET_STATE.CONNECTING,
@@ -57,7 +73,7 @@ const ButtonConnect = ({ state_wallet, connectWallet, loadAssets }) => {
             (state_wallet.loading ? " is-loading" : "")
           }
           disabled={state_wallet.loading}
-          onClick={() => connect_wallet()}
+          onClick={() => onclick_connect_wallet()}
         >
           <span>Connect</span>
         </button>
@@ -72,20 +88,20 @@ const ButtonConnect = ({ state_wallet, connectWallet, loadAssets }) => {
             className="delete"
             onClick={() => clear_notification()}
           ></button>
-          {showNotification === "no-nami" ? (
+          {showNotification === "no-wallet" ? (
             <p>
-              Nami Wallet not installed.{" "}
+              No wallet installed.{" "}
               <a href="https://namiwallet.io/" target="_blank" rel="noreferrer">
-                Get it
+                Get it now
               </a>
               .
             </p>
           ) : showNotification === "no-accept" ? (
-            <p>You need to allow Nami access.</p>
+            <p>You need to allow wallet access.</p>
           ) : showNotification === "connected" ? (
-            <p>Nami Wallet connected</p>
+            <p>Wallet connected</p>
           ) : showNotification === WALLET_STATE.CONNECTING ? (
-            <p>Connecting to Nami wallet...</p>
+            <p>Connecting wallet...</p>
           ) : showNotification === WALLET_STATE.GETTING_ASSETS ? (
             <p>Getting assets in your wallet...</p>
           ) : showNotificationMessage !== false ? (
@@ -97,6 +113,48 @@ const ButtonConnect = ({ state_wallet, connectWallet, loadAssets }) => {
       ) : (
         <></>
       )}
+
+      <div className={"modal " + (showWallets ? "is-active" : "")}>
+        <div className="modal-background" onClick={() => setShowWallets(false)}></div>
+        <div className="modal-content has-text-centered">
+          <section className="modal-card-body">
+            <h1 className="is-size-3">Select Wallet</h1>
+            <div className="columns ">
+              <div className="column">
+                <center>
+                  <button className="button is-large"
+                      disabled={state_wallet.loading}
+                      onClick={() => connect_wallet('nami')}
+                    >
+                    <figure className="image is-32x32">
+                      <img src="/images/wallet-nami.svg"/>
+                    </figure>
+                    Nami
+                  </button>
+                </center>
+              </div>
+              <div className="column">
+                <center>
+                  <button className="button is-large"
+                    disabled={state_wallet.loading}
+                    onClick={() => connect_wallet('ccvault')}
+                  >
+                    <figure className="image is-32x32">
+                      <img src="/images/wallet-ccvault.png"/>
+                    </figure>
+                    CCVault
+                  </button>
+                </center>
+              </div>
+            </div>
+          </section>
+        </div>
+        <button
+          className="modal-close is-large"
+          aria-label="close"
+          onClick={() => setShowWallets(false)}
+        ></button>
+      </div>
     </>
   );
 };
@@ -112,6 +170,7 @@ function mapDispatchToProps(dispatch) {
     connectWallet: (is_silent, callback) =>
       dispatch(connectWallet(is_silent, callback)),
     loadAssets: (wallet, callback) => dispatch(loadAssets(wallet, callback)),
+    checkWalletAvailable: (callback) => dispatch(checkWalletAvailable(callback)),
   };
 }
 

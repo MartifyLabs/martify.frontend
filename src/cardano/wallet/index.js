@@ -2,6 +2,23 @@ import Cardano from "../serialization-lib";
 import { fromHex } from "../../utils/converter";
 
 class Wallet {
+  async checkAvailable() {
+    let wallets = [];
+    let instance_ccvault = await window.cardano?.ccvault?.enable();
+    if (instance_ccvault) {
+      wallets.push("ccvault");
+    }
+    let instance_gerowallet = await window.cardano?.gerowallet?.enable();
+    if (instance_gerowallet) {
+      wallets.push("gerowallet");
+    }
+    let instance_nami = await window.cardano?.enable();
+    if (instance_nami) {
+      wallets.push("nami");
+    }
+    return wallets;
+  }
+
   async enable(name) {
     if (name === "ccvault") {
       const instance = await window.cardano?.ccvault?.enable();
@@ -15,7 +32,7 @@ class Wallet {
         this._provider = instance;
         return true;
       }
-    } else {
+    } else if (name === "nami" || name==false) {
       const isEnabled = await window.cardano?.enable();
       if (isEnabled) {
         this._provider = window.cardano;
