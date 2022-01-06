@@ -1130,7 +1130,7 @@ const NoAssetFound = ({ state_collection, policy_id, asset_id }) => {
                 </span>
               </h1>
               <p className="title">Getting asset meta</p>
-              <p className="subtitle">Fetching from da blockchain yea</p>
+              <p className="subtitle"></p>
             </>
           ) : (
             <></>

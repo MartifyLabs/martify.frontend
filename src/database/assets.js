@@ -54,12 +54,15 @@ export const getAsset = async (assetId) => {
       const snapshot = await getDoc(reference);
 
       if (snapshot.exists()) {
-        return snapshot.data();
+        let asset = snapshot.data();
+        asset.details.onchainMetadata = cleanProblematicMetadata(asset.details.onchainMetadata)
+        return asset;
       } else {
         const assetDetails = await getAssetDetails(assetId);
         if (assetDetails === undefined) return undefined;
+        console.log(assetDetails)
 
-        const asset = {
+        let asset = {
           details: assetDetails,
           events: [],
           offers: [],
@@ -236,3 +239,13 @@ export const saveAssets = async (assets) => {
     );
   }
 };
+
+function cleanProblematicMetadata(onchainMetadata){
+
+  // images - ipfs/hash
+  if(onchainMetadata.image.includes("ipfs/")){
+    onchainMetadata.image = "ipfs://"+onchainMetadata.image.split("ipfs/")[1];
+  }
+
+  return onchainMetadata;
+}
