@@ -82,6 +82,47 @@
       "twitter": "https://twitter.com/TheoScape"
     }
   },
+  "wonderwhale": {
+    "id": "wonderwhale",
+    "policy_ids": [
+      "d25043eaddf37a69d3b8bd647a003476635cdca912a4a2d2fc2e6a73"
+    ],
+    "meta": {
+      "name": "Wonder Whale",
+      "description": "Wonder Whale is a unique 7,777 NFT collection with Community Funds, Staking Rewards, Private Events, and DApp as utilities, designed to build values for our long-term holders so we can realize our mission - to preserve marine & coastal ecosystems."
+    },
+    "style": {
+      "logo": "logo.png",
+      "banner": "banner.jpg",
+      "font_color_title": "#f5f3db"
+    },
+    "links": {
+      "website": "https://www.wonderwhale.io/",
+      "twitter": "https://twitter.com/WonderWhaleNFT",
+      "discord": "https://discord.gg/thssfTYdeb"
+    }
+  },
+  "manosolo": {
+    "id": "manosolo",
+    "policy_ids": [
+      "6da7d8ff503547d4d07a5dff1f539ec2778f9920f91299cb8e4163ed"
+    ],
+    "meta": {
+      "name": "Mano Solo",
+      "description": "One day, I hitchhiked in the Sahara. This experience taught me more than any book I have read. It's hard to be different from a desert grain of sand."
+    },
+    "style": {
+      "logo":"logo.jpg",
+      "banner":"banner_b.jpg",
+      "banner_collection_height": "500px",
+      "banner_asset_height": "250px",
+      "font_color_title": "#f5f3db"
+    },
+    "links": {
+      
+      "twitter": "https://twitter.com/Manno_Sollo"
+    }
+  },
   "cryptodino": {
     "id": "cryptodino",
     "policy_ids": [
@@ -96,7 +137,7 @@
       "logo":"logo.png",
       "banner":"banner.png",
       "banner_collection_height": "500px",
-      "banner_asset_height": "1920px",
+      "banner_asset_height": "250px",
       "font_color_title": "#f5f3db"
     },
     "links": {
