@@ -23,9 +23,9 @@ export const usePolicyMetadatas = (policyIds) => {
 
         setPolicyMetadatas(validMetadatas);
       } catch (error) {
-        console.error(
-          `Unexpected error in usePolicyMetadatas. [Message: ${error.message}]`
-        );
+        // console.error(
+        //   `Unexpected error in usePolicyMetadatas. [Message: ${error.message}]`
+        // );
         setLoadingData(false);
         setErrorMessage(error.message);
       }
