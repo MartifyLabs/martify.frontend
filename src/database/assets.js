@@ -55,12 +55,13 @@ export const getAsset = async (assetId) => {
 
       if (snapshot.exists()) {
         let asset = snapshot.data();
-        asset.details.onchainMetadata = cleanProblematicMetadata(asset.details.onchainMetadata)
+        asset.details.onchainMetadata = cleanProblematicMetadata(
+          asset.details.onchainMetadata
+        );
         return asset;
       } else {
         const assetDetails = await getAssetDetails(assetId);
         if (assetDetails === undefined) return undefined;
-        console.log(assetDetails)
 
         let asset = {
           details: assetDetails,
@@ -136,7 +137,7 @@ export const getCollectionAssets = async (
  */
 export const lockAsset = async (
   asset,
-  { datum, datumHash, txHash, address, artistAddress, contractAddress }
+  { datum, datumHash, txHash, address, artistAddress, contractVersion }
 ) => {
   if (
     asset &&
@@ -145,7 +146,7 @@ export const lockAsset = async (
     txHash &&
     address &&
     artistAddress &&
-    contractAddress
+    contractVersion
   ) {
     const assetUpdated = {
       ...asset,
@@ -155,7 +156,7 @@ export const lockAsset = async (
         locked: true,
         txHash,
         artistAddress,
-        contractAddress,
+        contractVersion,
         submittedBy: address,
         submittedOn: new Date().getTime(),
       },
@@ -240,12 +241,13 @@ export const saveAssets = async (assets) => {
   }
 };
 
-function cleanProblematicMetadata(onchainMetadata){
-
+function cleanProblematicMetadata(onchainMetadata) {
   // images - ipfs/hash
-  if(onchainMetadata.image.includes("ipfs/")){
-    onchainMetadata.image = "ipfs://"+onchainMetadata.image.split("ipfs/")[1];
+  if (onchainMetadata?.image) {
+    if (onchainMetadata.image.includes("ipfs/")) {
+      onchainMetadata.image =
+        "ipfs://" + onchainMetadata.image.split("ipfs/")[1];
+    }
   }
-
   return onchainMetadata;
 }

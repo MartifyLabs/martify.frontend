@@ -10,6 +10,8 @@ import {
 } from "../../store/wallet/api";
 import { WALLET_STATE } from "../../store/wallet/walletTypes";
 
+import "./style.scss";
+
 const wallets = {
   ccvault: {
     title: "ccvault.io",
@@ -154,17 +156,18 @@ const ButtonConnect = ({
           </header>
           <section className="modal-card-body">
             {showWallets &&
+              showWallets.length > 0 &&
               showWallets.map((name) => (
                 <button
                   key={name}
-                  className="block button is-info is-light is-large is-fullwidth"
+                  className="block button wallet-button is-large is-fullwidth"
                   disabled={state_wallet.loading}
                   onClick={() => connect_wallet(name)}
                 >
-                  <figure className="image is-32x32 is-clipped">
+                  <figure className="image is-clipped">
                     <img alt={name} src={wallets[name].image} />
                   </figure>
-                  {wallets[name].title}
+                  <span className="wallet-name">{wallets[name].title}</span>
                 </button>
               ))}
           </section>

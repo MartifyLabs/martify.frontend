@@ -14,7 +14,8 @@ import { toHex } from "../../utils/converter";
 
 export const listAsset = async (
   datum,
-  seller: { address: BaseAddress, utxos: [] }
+  seller: { address: BaseAddress, utxos: [] },
+  version
 ) => {
   try {
     const { txBuilder, datums, outputs } = initializeTx();
@@ -25,7 +26,7 @@ export const listAsset = async (
 
     outputs.add(
       createTxOutput(
-        contractAddress(),
+        contractAddress(version),
         assetsToValue([
           {
             unit: `${datum.cs}${datum.tn}`,
@@ -62,7 +63,8 @@ export const updateListing = async (
   currentDatum,
   newDatum,
   seller: { address: BaseAddress, utxos: [] },
-  assetUtxo
+  assetUtxo,
+  version
 ) => {
   try {
     const { txBuilder, datums, outputs } = initializeTx();
@@ -75,7 +77,7 @@ export const updateListing = async (
     datums.add(newListingDatum);
 
     outputs.add(
-      createTxOutput(contractAddress(), assetUtxo.output().amount(), {
+      createTxOutput(contractAddress(version), assetUtxo.output().amount(), {
         datum: newListingDatum,
       })
     );
@@ -96,7 +98,7 @@ export const updateListing = async (
       changeAddress: seller.address,
       metadata: deserializeSale(newListingDatum),
       assetUtxo,
-      plutusScripts: contractScripts(),
+      plutusScripts: contractScripts(version),
       action: SELLER,
     });
 
@@ -112,7 +114,8 @@ export const updateListing = async (
 export const cancelListing = async (
   datum,
   seller: { address: BaseAddress, utxos: [] },
-  assetUtxo
+  assetUtxo,
+  version
 ) => {
   try {
     const { txBuilder, datums, outputs } = initializeTx();
@@ -136,7 +139,7 @@ export const cancelListing = async (
       outputs,
       changeAddress: seller.address,
       assetUtxo,
-      plutusScripts: contractScripts(),
+      plutusScripts: contractScripts(version),
       action: SELLER,
     });
 
@@ -154,7 +157,8 @@ export const purchaseAsset = async (
     artist: BaseAddress,
     market: BaseAddress,
   },
-  assetUtxo
+  assetUtxo,
+  version
 ) => {
   try {
     const { txBuilder, datums, outputs } = initializeTx();
@@ -187,7 +191,7 @@ export const purchaseAsset = async (
       datums,
       changeAddress: buyer.address,
       assetUtxo,
-      plutusScripts: contractScripts(),
+      plutusScripts: contractScripts(version),
       action: BUYER,
     });
 

@@ -150,10 +150,16 @@ export const listToken =
         price
       );
 
-      const listObj = await listAsset(datum, {
-        address: fromBech32(wallet.data.address),
-        utxos: walletUtxos,
-      });
+      const contractVersion = process.env.REACT_APP_MARTIFY_CONTRACT_VERSION;
+
+      const listObj = await listAsset(
+        datum,
+        {
+          address: fromBech32(wallet.data.address),
+          utxos: walletUtxos,
+        },
+        contractVersion
+      );
 
       if (listObj && listObj.datumHash && listObj.txHash) {
         const updatedAsset = await lockAsset(asset, {
@@ -162,7 +168,7 @@ export const listToken =
           txHash: listObj.txHash,
           address: wallet.data.address,
           artistAddress: royaltiesAddress,
-          contractAddress: contractAddress().to_bech32(),
+          contractVersion,
         });
 
         const event = createEvent(
@@ -220,10 +226,11 @@ export const relistToken =
       dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
       const walletUtxos = await Wallet.getUtxos();
+      const contractVersion = resolveContractVersion(asset);
 
       const assetUtxo = (
         await getLockedUtxosByAsset(
-          contractAddress().to_bech32(),
+          contractAddress(contractVersion).to_bech32(),
           asset.details.asset
         )
       ).find((utxo) => utxo.data_hash === asset.status.datumHash);
@@ -244,7 +251,8 @@ export const relistToken =
             address: fromBech32(wallet.data.address),
             utxos: walletUtxos,
           },
-          createTxUnspentOutput(contractAddress(), assetUtxo)
+          createTxUnspentOutput(contractAddress(contractVersion), assetUtxo),
+          contractVersion
         );
 
         if (updateObj && updateObj.datumHash && updateObj.txHash) {
@@ -254,7 +262,7 @@ export const relistToken =
             txHash: updateObj.txHash,
             address: wallet.data.address,
             artistAddress: asset.status.artistAddress,
-            contractAddress: contractAddress().to_bech32(),
+            contractVersion,
           });
 
           const event = createEvent(
@@ -327,10 +335,11 @@ export const delistToken = (wallet, asset, callback) => async (dispatch) => {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
     const walletUtxos = await Wallet.getUtxos();
+    const contractVersion = resolveContractVersion(asset);
 
     const assetUtxo = (
       await getLockedUtxosByAsset(
-        contractAddress().to_bech32(),
+        contractAddress(contractVersion).to_bech32(),
         asset.details.asset
       )
     ).find((utxo) => utxo.data_hash === asset.status.datumHash);
@@ -342,7 +351,8 @@ export const delistToken = (wallet, asset, callback) => async (dispatch) => {
           address: fromBech32(wallet.data.address),
           utxos: walletUtxos,
         },
-        createTxUnspentOutput(contractAddress(), assetUtxo)
+        createTxUnspentOutput(contractAddress(contractVersion), assetUtxo),
+        contractVersion
       );
 
       if (txHash) {
@@ -415,10 +425,11 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
     const walletUtxos = await Wallet.getUtxos();
+    const contractVersion = resolveContractVersion(asset);
 
     const assetUtxo = (
       await getLockedUtxosByAsset(
-        contractAddress().to_bech32(),
+        contractAddress(contractVersion).to_bech32(),
         asset.details.asset
       )
     ).find((utxo) => utxo.data_hash === asset.status.datumHash);
@@ -435,7 +446,8 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
           artist: fromBech32(asset.status.artistAddress),
           market: fromBech32(process.env.REACT_APP_MARTIFY_ADDRESS),
         },
-        createTxUnspentOutput(contractAddress(), assetUtxo)
+        createTxUnspentOutput(contractAddress(contractVersion), assetUtxo),
+        contractVersion
       );
 
       if (txHash) {
@@ -540,4 +552,11 @@ const getWalletAssets = async () => {
     );
 
   return [...new Set(nativeAssets)];
+};
+
+const resolveContractVersion = (asset) => {
+  if (asset.status.contractVersion) {
+    return asset.status.contractVersion;
+  }
+  return "v1";
 };
