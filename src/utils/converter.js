@@ -69,6 +69,9 @@ export const get_asset_image_source = (image) => {
   // return "";
 
   if (image) {
+    if (image.includes("ipfs/")) {
+      image = "ipfs://" + image.split("ipfs/")[1];
+    }
     return linkToSrc(convertMetadataPropToString(image));
   }
 };
