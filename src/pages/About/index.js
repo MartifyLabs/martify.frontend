@@ -75,7 +75,7 @@ const About = () => {
             assets in a secure manner. Want to get in touch with us? You can
             write at
             <a href="mailto:contact@martify.io">
-              <i class="icon fas fa-envelope"></i>contact@martify.io
+              <i className="icon fas fa-envelope"></i>contact@martify.io
             </a>
             , on
             <a href="https://twitter.com/MartifyLabs" target="_blank" rel="noreferrer">

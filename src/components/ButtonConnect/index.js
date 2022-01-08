@@ -155,7 +155,7 @@ const ButtonConnect = ({
             ></button>
           </header>
           <section className="modal-card-body">
-            <div class="columns">
+            <div className="columns">
               {showWallets &&
                 showWallets.length > 0 &&
                 showWallets.map((name) => (
