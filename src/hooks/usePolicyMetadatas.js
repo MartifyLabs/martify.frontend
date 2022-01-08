@@ -17,17 +17,19 @@ export const usePolicyMetadatas = (policyIds) => {
           })
         );
 
-        if(metadatas.length==1){
-          if(metadatas[0].statusCode==404){
-            console.log("usePolicyMetadatas: this collection is not in opencnft", policyIds)
+        if (metadatas.length === 1) {
+          if (metadatas[0].statusCode === 404) {
+            console.log(
+              "usePolicyMetadatas: this collection is not in opencnft",
+              policyIds
+            );
           }
         }
-        
+
         const validMetadatas = metadatas.filter(
           (metadata) => metadata.policy !== undefined
         );
         setPolicyMetadatas(validMetadatas);
-      
       } catch (error) {
         // console.error(
         //   `Unexpected error in usePolicyMetadatas. [Message: ${error.message}]`
@@ -36,6 +38,7 @@ export const usePolicyMetadatas = (policyIds) => {
         setErrorMessage(error.message);
       }
     };
+
     if (policyIds?.length > 0) {
       setLoadingData(true);
       fetchMetadatas(policyIds);

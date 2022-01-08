@@ -48,7 +48,6 @@ const Collection = () => {
           ...default_meta,
           id: collection_id,
           policy_id: collection_id,
-          policy_ids: [collection_id],
         };
         policy_ids = [collection_id];
       }
@@ -56,13 +55,14 @@ const Collection = () => {
       if (currentCollectionIterator.hasOwnProperty("policy_ids")) {
         setPolicyIds(currentCollectionIterator.policy_ids);
       }
+
       if (currentCollectionIterator.id !== thisCollection.id) {
+        setThisCollection({ ...currentCollectionIterator });
+
         if (currentCollectionIterator.hasOwnProperty("policy_id")) {
           setPolicyIds([currentCollectionIterator.policy_id]);
         }
 
-        setThisCollection({ ...currentCollectionIterator });
-        
         for (let policyIdx in policy_ids) {
           let policy_id = policy_ids[policyIdx];
           dispatch(

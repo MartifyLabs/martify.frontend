@@ -19,7 +19,7 @@ const NoAssetFound = ({ state_collection, policyIds }) => {
           ) : (
             <></>
           )}
-          {/* {!state_collection.loading && policyIds ? (
+          {!state_collection.loading && policyIds ? (
             policyIds.some(
               (r) =>
                 Object.keys(state_collection.policies_collections).indexOf(r) >=
@@ -44,7 +44,7 @@ const NoAssetFound = ({ state_collection, policyIds }) => {
             )
           ) : (
             <></>
-          )} */}
+          )}
         </div>
       </div>
     </section>
