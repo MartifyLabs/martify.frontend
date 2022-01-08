@@ -64,7 +64,8 @@ export const updateListing = async (
   newDatum,
   seller: { address: BaseAddress, utxos: [] },
   assetUtxo,
-  version
+  currentVersion,
+  latestVersion
 ) => {
   try {
     const { txBuilder, datums, outputs } = initializeTx();
@@ -77,7 +78,7 @@ export const updateListing = async (
     datums.add(newListingDatum);
 
     outputs.add(
-      createTxOutput(contractAddress(version), assetUtxo.output().amount(), {
+      createTxOutput(contractAddress(latestVersion), assetUtxo.output().amount(), {
         datum: newListingDatum,
       })
     );
@@ -98,7 +99,7 @@ export const updateListing = async (
       changeAddress: seller.address,
       metadata: deserializeSale(newListingDatum),
       assetUtxo,
-      plutusScripts: contractScripts(version),
+      plutusScripts: contractScripts(currentVersion),
       action: SELLER,
     });
 

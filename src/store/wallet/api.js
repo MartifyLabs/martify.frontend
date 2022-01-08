@@ -226,11 +226,12 @@ export const relistToken =
       dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
       const walletUtxos = await Wallet.getUtxos();
-      const contractVersion = resolveContractVersion(asset);
+      const currentVersion = resolveContractVersion(asset);
+      const latestVersion = process.env.REACT_APP_MARTIFY_CONTRACT_VERSION;
 
       const assetUtxo = (
         await getLockedUtxosByAsset(
-          contractAddress(contractVersion).to_bech32(),
+          contractAddress(currentVersion).to_bech32(),
           asset.details.asset
         )
       ).find((utxo) => utxo.data_hash === asset.status.datumHash);
@@ -251,8 +252,9 @@ export const relistToken =
             address: fromBech32(wallet.data.address),
             utxos: walletUtxos,
           },
-          createTxUnspentOutput(contractAddress(contractVersion), assetUtxo),
-          contractVersion
+          createTxUnspentOutput(contractAddress(currentVersion), assetUtxo),
+          currentVersion,
+          latestVersion
         );
 
         if (updateObj && updateObj.datumHash && updateObj.txHash) {
@@ -262,7 +264,7 @@ export const relistToken =
             txHash: updateObj.txHash,
             address: wallet.data.address,
             artistAddress: asset.status.artistAddress,
-            contractVersion,
+            latestVersion,
           });
 
           const event = createEvent(
