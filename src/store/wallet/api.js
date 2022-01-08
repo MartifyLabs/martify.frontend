@@ -264,7 +264,7 @@ export const relistToken =
             txHash: updateObj.txHash,
             address: wallet.data.address,
             artistAddress: asset.status.artistAddress,
-            latestVersion,
+            currentVersion: latestVersion,
           });
 
           const event = createEvent(

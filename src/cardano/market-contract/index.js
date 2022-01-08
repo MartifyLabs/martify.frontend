@@ -78,9 +78,13 @@ export const updateListing = async (
     datums.add(newListingDatum);
 
     outputs.add(
-      createTxOutput(contractAddress(latestVersion), assetUtxo.output().amount(), {
-        datum: newListingDatum,
-      })
+      createTxOutput(
+        contractAddress(latestVersion),
+        assetUtxo.output().amount(),
+        {
+          datum: newListingDatum,
+        }
+      )
     );
 
     const requiredSigners = Cardano.Instance.Ed25519KeyHashes.new();
