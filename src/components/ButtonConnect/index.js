@@ -155,21 +155,34 @@ const ButtonConnect = ({
             ></button>
           </header>
           <section className="modal-card-body">
-            {showWallets &&
-              showWallets.length > 0 &&
-              showWallets.map((name) => (
-                <button
-                  key={name}
-                  className="block button wallet-button is-large is-fullwidth"
-                  disabled={state_wallet.loading}
-                  onClick={() => connect_wallet(name)}
-                >
-                  <figure className="image is-clipped">
-                    <img alt={name} src={wallets[name].image} />
-                  </figure>
-                  <span className="wallet-name">{wallets[name].title}</span>
-                </button>
-              ))}
+            <div class="columns">
+              {showWallets &&
+                showWallets.length > 0 &&
+                showWallets.map((name) => (
+                  <div
+                    key={name}
+                    className="card column wallet-button"
+                    disabled={state_wallet.loading}
+                    onClick={() => connect_wallet(name)}
+                  >
+                    <div className="card-image">
+                      <figure className="image">
+                        <img
+                          alt={name}
+                          src={wallets[name].image}
+                        />
+                      </figure>
+                    </div>
+                    <div className="card-content">
+                      <div className="content">
+                        <span className="wallet-title">
+                          {wallets[name].title}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
           </section>
           <footer className="modal-card-foot"></footer>
         </div>
