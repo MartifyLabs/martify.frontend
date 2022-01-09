@@ -123,6 +123,28 @@
       "twitter": "https://twitter.com/Manno_Sollo"
     }
   },
+  "cardanobits": {
+    "id": "cardanobits",
+    "policy_ids": [
+      "1131301ad4b3cb7deaddbc8f03f77189082a5738c0167e1772233097"
+    ],
+    "meta": {
+      "name": "CardanoBits",
+      "description": "The first 8-bit pixel art collection on Cardano!"
+    },
+    "style": {
+      "logo":"logo.png",
+      "banner":"banner.jpg",
+      "banner_collection_height": "500px",
+      "banner_asset_height": "250px",
+      "font_color_title": "#f5f3db"
+    },
+    "links": {
+      "website": "https://cardanobits.art",
+      "twitter": "https://twitter.com/CardanoBits",
+      "discord": "https://discord.gg/prKRY8ZTtn"
+    }
+  },
   "cryptodino": {
     "id": "cryptodino",
     "policy_ids": [
