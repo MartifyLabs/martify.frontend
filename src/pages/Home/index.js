@@ -32,10 +32,6 @@ const Home = () => {
   );
 };
 
-// const MemoImg = React.memo((props) => {
-//   return <FadeImg {...props} />;
-// });
-
 const Splash = ({ listProjects }) => {
   return (
     <>
@@ -156,7 +152,6 @@ const TopProjects = ({
             {row.thumbnail ? (
               <figure className="media-left">
                 <p className="image is-64x64" style={{ overflow: "hidden" }}>
-                  {/* <img className="is-rounded top-project-image" src={row.image}/> */}
                   <Image
                     className="is-rounded top-project-image"
                     src={row.image}
@@ -334,7 +329,7 @@ const TopProjects = ({
                               {/* <Skeleton height="100%"/> */}
                               <div className="card-image">
                                 <figure className="image is-square">
-                                  <img
+                                  <FadeImg
                                     className="top-project-image"
                                     src={project.image}
                                     alt={project.name}

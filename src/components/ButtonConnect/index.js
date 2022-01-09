@@ -9,6 +9,7 @@ import {
   loadAssets,
 } from "../../store/wallet/api";
 import { WALLET_STATE } from "../../store/wallet/walletTypes";
+import { FadeImg } from "components/Fades";
 
 import "./style.scss";
 
@@ -167,7 +168,7 @@ const ButtonConnect = ({
                   >
                     <div className="card-image">
                       <figure className="image">
-                        <img
+                        <FadeImg
                           alt={name}
                           src={wallets[name].image}
                         />
