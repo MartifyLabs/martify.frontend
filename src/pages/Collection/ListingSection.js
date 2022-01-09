@@ -13,6 +13,7 @@ const ListingSection = ({ state_collection, policyIds }) => {
   const dispatch = useDispatch();
   const [listings, setListings] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
+  const [lastVisible, setLastVisible] = useState(null);
   const [paginationObject, setPaginationObject] = useState(undefined);
   const [policyMetadatas, loadingData] = usePolicyMetadatas(policyIds);
 
@@ -30,28 +31,24 @@ const ListingSection = ({ state_collection, policyIds }) => {
         }
       }
       setListings([]);
+      setLastVisible(null);
       setPaginationObject(tmpPaginationObject);
     }
   }, [policyMetadatas]);
 
   const updateComponentState = (collectionMetadata, loadedAssets) => {
     setListings([...listings, ...loadedAssets]);
+    setLastVisible(loadedAssets[loadedAssets.length - 1]);
     setPaginationObject({
       ...paginationObject,
       [collectionMetadata.policyId]: {
         ...collectionMetadata,
         page: collectionMetadata.page + 1,
-        hasMore: ITEMS_PER_PAGE === loadedAssets.length,
+        hasMore:
+          ITEMS_PER_PAGE * collectionMetadata.page <
+          collectionMetadata.itemsMinted,
       },
     });
-  };
-
-  const getLastVisible = () => {
-    const lastItem = listings[listings.length - 1];
-    if (lastItem) {
-      return lastItem?.details?.readableAssetName;
-    }
-    return "";
   };
 
   const hasMore = () => {
@@ -74,7 +71,7 @@ const ListingSection = ({ state_collection, policyIds }) => {
           collectionMetadata.policyId,
           collectionMetadata.page,
           ITEMS_PER_PAGE,
-          getLastVisible(),
+          lastVisible,
           (res) => {
             if (res.success) {
               updateComponentState(collectionMetadata, res.data);

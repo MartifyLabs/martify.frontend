@@ -38,13 +38,16 @@ const DisplayListing = ({ listings }) => {
 
   const filtered_listing = matchedtokens
     .sort((a, b) => {
-      let a_price = a.listing.price !== undefined ? a.listing.price : 999999;
-      let b_price = b.listing.price !== undefined ? b.listing.price : 999999;
-
-      if (sortby === "lowtohigh") {
-        return a_price - b_price;
+      if (a.status.locked && b.status.locked) {
+        let a_price = a.status.datum.price;
+        let b_price = b.status.datum.price;
+        if (sortby === "lowtohigh") {
+          return a_price - b_price;
+        } else {
+          return b_price - a_price;
+        }
       } else {
-        return b_price - a_price;
+        return a.status.locked > b.status.locked ? -1 : 1;
       }
     })
     .map((this_nft, i) => {

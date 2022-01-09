@@ -2,6 +2,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  padding-top: 1px;
 }
 
 .explore .filter_label{

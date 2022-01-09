@@ -18,8 +18,6 @@ import {
   getLockedAssets,
 } from "../../database/assets";
 
-import { getUsedAddress } from "../../cardano/wallet";
-
 export const load_collection = (callback) => async (dispatch) => {
   let all_collections = {};
 
@@ -209,12 +207,8 @@ export const get_listed_assets =
   };
 
 export const asset_add_offer =
-  (asset_id, price, callback) => async (dispatch) => {
+  (wallet, asset, price, callback) => async (dispatch) => {
     try {
-      let asset = await getAsset(asset_id);
-
-      let wallet_address = await getUsedAddress();
-
       if (!("offers" in asset)) {
         asset.offers = {};
       }
@@ -224,7 +218,7 @@ export const asset_add_offer =
         p: price,
       };
 
-      asset.offers[wallet_address] = offer;
+      asset.offers[wallet.data.address] = offer;
 
       await saveAsset(asset);
 

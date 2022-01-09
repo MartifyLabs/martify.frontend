@@ -1,12 +1,5 @@
 import Cardano from "../../cardano/serialization-lib";
-import {
-  enableWallet,
-  getCollateral,
-  getNetworkId,
-  getOwnedAssets,
-  getUsedAddress,
-  getUtxos,
-} from "../../cardano/wallet";
+import Wallet from "../../cardano/wallet";
 import {
   getAssets,
   lockAsset,
@@ -20,6 +13,7 @@ import {
   listWalletAsset,
   delistWalletAsset,
   relistWalletAsset,
+  walletExists,
 } from "../../database/wallets";
 import { WALLET_STATE, MARKET_TYPE } from "./walletTypes";
 import {
@@ -35,30 +29,45 @@ import {
   purchaseAsset,
 } from "../../cardano/market-contract/";
 import { contractAddress } from "../../cardano/market-contract/validator";
-import { createTxUnspentOutput } from "../../cardano/transaction";
+import {
+  createTxUnspentOutput,
+  serializeTxUnspentOutput,
+  valueToAssets,
+} from "../../cardano/transaction";
 import { getLockedUtxosByAsset } from "../../cardano/blockfrost-api";
 import { collections_add_tokens } from "../collection/collectionActions";
 import { fromBech32 } from "../../utils/converter";
 import { createEvent, createDatum } from "../../utils/factory";
 import { resolveError } from "../../utils/resolver";
 
-export const connectWallet = (isSilent, callback) => async (dispatch) => {
+export const availableWallets = (callback) => async (dispatch) => {
+  await Cardano.load();
+
+  callback({
+    success: true,
+    wallets: await Wallet.getAvailableWallets(),
+    msg: "",
+  });
+};
+
+export const connectWallet = (provider, callback) => async (dispatch) => {
   try {
-    if (!isSilent) dispatch(setWalletLoading(WALLET_STATE.CONNECTING));
+    dispatch(setWalletLoading(WALLET_STATE.CONNECTING));
 
-    if (await enableWallet()) {
-      await Cardano.load();
-
-      const namiNetworkId = await getNetworkId();
+    if (await Wallet.enable(provider)) {
       const usedNetworkId = parseInt(process.env.REACT_APP_CARDANO_NETWORK_ID);
+      const walletNetworkId = await Wallet.getNetworkId();
 
-      if (usedNetworkId === namiNetworkId) {
+      if (usedNetworkId === walletNetworkId) {
+        const usedAddresses = await Wallet.getUsedAddresses();
+        const walletAddress = await getWalletAddress(usedAddresses);
+
         const connectedWallet = {
-          nami: {
-            network: namiNetworkId,
-            collateral: await getCollateral(),
+          provider: {
+            network: walletNetworkId,
+            collateral: await Wallet.getCollateral(),
           },
-          data: await getWallet(await getUsedAddress()),
+          data: await getWallet(walletAddress),
         };
 
         dispatch(walletConnected(connectedWallet));
@@ -90,9 +99,9 @@ export const loadAssets = (wallet, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.GETTING_ASSETS));
 
-    const ownedAssets = await getOwnedAssets();
+    const walletAssets = await getWalletAssets();
 
-    const assets = (await getAssets(ownedAssets)).reduce((map, asset) => {
+    const assets = (await getAssets(walletAssets)).reduce((map, asset) => {
       map[asset.details.asset] = asset;
       return map;
     }, {});
@@ -126,7 +135,7 @@ export const listToken =
       dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
       const collectionDetails = await getCollection(asset.details.policyId);
-      const walletUtxos = await getUtxos();
+      const walletUtxos = await Wallet.getUtxos();
 
       const royaltiesAddress =
         collectionDetails?.royalties?.address ?? wallet.data.address;
@@ -141,10 +150,16 @@ export const listToken =
         price
       );
 
-      const listObj = await listAsset(datum, {
-        address: fromBech32(wallet.data.address),
-        utxos: walletUtxos,
-      });
+      const contractVersion = process.env.REACT_APP_MARTIFY_CONTRACT_VERSION;
+
+      const listObj = await listAsset(
+        datum,
+        {
+          address: fromBech32(wallet.data.address),
+          utxos: walletUtxos,
+        },
+        contractVersion
+      );
 
       if (listObj && listObj.datumHash && listObj.txHash) {
         const updatedAsset = await lockAsset(asset, {
@@ -153,7 +168,7 @@ export const listToken =
           txHash: listObj.txHash,
           address: wallet.data.address,
           artistAddress: royaltiesAddress,
-          contractAddress: contractAddress().to_bech32(),
+          contractVersion,
         });
 
         const event = createEvent(
@@ -210,11 +225,13 @@ export const relistToken =
     try {
       dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
-      const walletUtxos = await getUtxos();
+      const walletUtxos = await Wallet.getUtxos();
+      const currentVersion = resolveContractVersion(asset);
+      const latestVersion = process.env.REACT_APP_MARTIFY_CONTRACT_VERSION;
 
       const assetUtxo = (
         await getLockedUtxosByAsset(
-          contractAddress().to_bech32(),
+          contractAddress(currentVersion).to_bech32(),
           asset.details.asset
         )
       ).find((utxo) => utxo.data_hash === asset.status.datumHash);
@@ -235,7 +252,9 @@ export const relistToken =
             address: fromBech32(wallet.data.address),
             utxos: walletUtxos,
           },
-          createTxUnspentOutput(contractAddress(), assetUtxo)
+          createTxUnspentOutput(contractAddress(currentVersion), assetUtxo),
+          currentVersion,
+          latestVersion
         );
 
         if (updateObj && updateObj.datumHash && updateObj.txHash) {
@@ -245,7 +264,7 @@ export const relistToken =
             txHash: updateObj.txHash,
             address: wallet.data.address,
             artistAddress: asset.status.artistAddress,
-            contractAddress: contractAddress().to_bech32(),
+            contractVersion: latestVersion,
           });
 
           const event = createEvent(
@@ -317,11 +336,12 @@ export const delistToken = (wallet, asset, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
-    const walletUtxos = await getUtxos();
+    const walletUtxos = await Wallet.getUtxos();
+    const contractVersion = resolveContractVersion(asset);
 
     const assetUtxo = (
       await getLockedUtxosByAsset(
-        contractAddress().to_bech32(),
+        contractAddress(contractVersion).to_bech32(),
         asset.details.asset
       )
     ).find((utxo) => utxo.data_hash === asset.status.datumHash);
@@ -333,7 +353,8 @@ export const delistToken = (wallet, asset, callback) => async (dispatch) => {
           address: fromBech32(wallet.data.address),
           utxos: walletUtxos,
         },
-        createTxUnspentOutput(contractAddress(), assetUtxo)
+        createTxUnspentOutput(contractAddress(contractVersion), assetUtxo),
+        contractVersion
       );
 
       if (txHash) {
@@ -405,11 +426,12 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
   try {
     dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
 
-    const walletUtxos = await getUtxos();
+    const walletUtxos = await Wallet.getUtxos();
+    const contractVersion = resolveContractVersion(asset);
 
     const assetUtxo = (
       await getLockedUtxosByAsset(
-        contractAddress().to_bech32(),
+        contractAddress(contractVersion).to_bech32(),
         asset.details.asset
       )
     ).find((utxo) => utxo.data_hash === asset.status.datumHash);
@@ -426,7 +448,8 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
           artist: fromBech32(asset.status.artistAddress),
           market: fromBech32(process.env.REACT_APP_MARTIFY_ADDRESS),
         },
-        createTxUnspentOutput(contractAddress(), assetUtxo)
+        createTxUnspentOutput(contractAddress(contractVersion), assetUtxo),
+        contractVersion
       );
 
       if (txHash) {
@@ -484,7 +507,10 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
       dispatch(setWalletLoading(false));
       dispatch(
         set_error({
-          message: resolveError("TRANSACTION_NOT_CONFIRMED", "Purchasing Asset"),
+          message: resolveError(
+            "TRANSACTION_NOT_CONFIRMED",
+            "Purchasing Asset"
+          ),
           detail: null,
         })
       );
@@ -502,4 +528,37 @@ export const purchaseToken = (wallet, asset, callback) => async (dispatch) => {
       })
     );
   }
+};
+
+const getWalletAddress = async (usedAddresses) => {
+  if (usedAddresses.length > 1) {
+    for (const address of usedAddresses) {
+      if (await walletExists(address)) return address;
+    }
+  }
+
+  return usedAddresses[0];
+};
+
+const getWalletAssets = async () => {
+  const utxos = await Wallet.getUtxos();
+
+  const nativeAssets = utxos
+    .map((utxo) => serializeTxUnspentOutput(utxo).output())
+    .filter((txOut) => txOut.amount().multiasset() !== undefined)
+    .map((txOut) => valueToAssets(txOut.amount()))
+    .flatMap((assets) =>
+      assets
+        .filter((asset) => asset.unit !== "lovelace")
+        .map((asset) => asset.unit)
+    );
+
+  return [...new Set(nativeAssets)];
+};
+
+const resolveContractVersion = (asset) => {
+  if (asset.status.contractVersion) {
+    return asset.status.contractVersion;
+  }
+  return "v1";
 };

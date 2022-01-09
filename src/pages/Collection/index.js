@@ -68,6 +68,7 @@ const Collection = () => {
           dispatch(
             opencnft_get_policy(policy_id, (res) => {
               if (res.data.statusCode === 404) {
+                
               } else {
                 if (!("opencnft" in currentCollectionIterator)) {
                   currentCollectionIterator.opencnft = [];

@@ -15,7 +15,7 @@ const Explore = () => {
   const [listings, setListings] = useState([]);
   const [filteredListings, setFilteredListings] = useState([]);
   const [collections, setCollections] = useState([]);
-  const [lastVisible, setLastVisible] = useState(0);
+  const [lastVisible, setLastVisible] = useState(null);
   const [hasMore, sethasMore] = useState(true);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const Explore = () => {
             sethasMore(res.data.length > 0);
 
             if (res.data.length > 0) {
-              setLastVisible(res.data[res.data.length - 1].status.submittedOn);
+              setLastVisible(res.data[res.data.length - 1]);
             }
 
             let counter = 0;

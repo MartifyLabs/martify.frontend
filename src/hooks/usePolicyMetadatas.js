@@ -9,18 +9,31 @@ export const usePolicyMetadatas = (policyIds) => {
     const fetchMetadatas = async (policyIds) => {
       try {
         const metadatas = await Promise.all(
-          policyIds.map(
-            async (policyId) =>{
-              const response = await fetch(`https://api.opencnft.io/1/policy/${policyId}`);
-              return await response.json();
-            }
-          )
+          policyIds.map(async (policyId) => {
+            const response = await fetch(
+              `https://api.opencnft.io/1/policy/${policyId}`
+            );
+            return await response.json();
+          })
         );
-        setPolicyMetadatas(metadatas);
+
+        if (metadatas.length === 1) {
+          if (metadatas[0].statusCode === 404) {
+            console.log(
+              "usePolicyMetadatas: this collection is not in opencnft",
+              policyIds
+            );
+          }
+        }
+
+        const validMetadatas = metadatas.filter(
+          (metadata) => metadata.policy !== undefined
+        );
+        setPolicyMetadatas(validMetadatas);
       } catch (error) {
-        console.error(
-          `Unexpected error in usePolicyMetadatas. [Message: ${error.message}]`
-        );
+        // console.error(
+        //   `Unexpected error in usePolicyMetadatas. [Message: ${error.message}]`
+        // );
         setLoadingData(false);
         setErrorMessage(error.message);
       }

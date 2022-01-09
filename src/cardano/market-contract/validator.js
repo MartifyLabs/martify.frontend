@@ -1,15 +1,15 @@
 import Cardano from "../serialization-lib";
-import Contract from "./plutus";
+import Contracts from "./plutus";
 import { fromHex } from "../../utils/converter";
 
-export const contractAddress = () => {
-  return Cardano.Instance.Address.from_bech32(Contract.address);
+export const contractAddress = (version) => {
+  return Cardano.Instance.Address.from_bech32(Contracts[version].address);
 };
 
-export const contractScripts = () => {
+export const contractScripts = (version) => {
   const scripts = Cardano.Instance.PlutusScripts.new();
 
-  scripts.add(Cardano.Instance.PlutusScript.new(fromHex(Contract.cborHex)));
+  scripts.add(Cardano.Instance.PlutusScript.new(fromHex(Contracts[version].cborHex)));
 
   return scripts;
 };

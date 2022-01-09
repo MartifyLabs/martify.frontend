@@ -4,6 +4,7 @@ import {usePalette} from 'react-palette'
 
 import CollectionLinks from "../CollectionLinks";
 import { numFormatter, get_asset_image_source } from "../../utils/converter";
+import { FadeImg } from "components/Fades";
 
 const CollectionBanner = ({thisCollection, size, asset, is_collection_page, is_asset_page}) => {
   
@@ -87,7 +88,7 @@ const CollectionBanner = ({thisCollection, size, asset, is_collection_page, is_a
                 thisCollection.style ? thisCollection.style.logo_path ? (
                   <div className="level-item">
                     <figure className="image is-128x128">
-                      <img className="collection_logo is-rounded image is-128x128" src={thisCollection.style.logo_path} alt="" />
+                      <FadeImg className="collection_logo is-rounded image is-128x128" src={thisCollection.style.logo_path} alt="" />
                     </figure>
                   </div>
                 ) : <></>

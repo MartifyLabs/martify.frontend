@@ -1,8 +1,8 @@
 import Cardano from "../serialization-lib";
 import CoinSelection from "./coinSelection";
 import ErrorTypes from "./error.types";
+import Wallet from "../wallet";
 import { languageViews } from "./languageViews";
-import { getCollateral, signTx, submitTx } from "../wallet";
 import { fromHex, toHex } from "../../utils/converter";
 
 export const assetsToValue = (assets) => {
@@ -119,7 +119,7 @@ export const finalizeTx = async ({
       Cardano.Instance.PlutusList.from_bytes(datums.to_bytes())
     );
     txBuilder.set_plutus_scripts(plutusScripts);
-    const collateral = (await getCollateral()).map((utxo) =>
+    const collateral = (await Wallet.getCollateral()).map((utxo) =>
       Cardano.Instance.TransactionUnspentOutput.from_bytes(fromHex(utxo))
     );
 
@@ -219,7 +219,7 @@ export const finalizeTx = async ({
   const size = tx.to_bytes().length * 2;
   if (size > Parameters.maxTxSize) throw new Error(ErrorTypes.MAX_SIZE_REACHED);
 
-  let txVkeyWitnesses = await signTx(toHex(tx.to_bytes()), true);
+  let txVkeyWitnesses = await Wallet.signTx(toHex(tx.to_bytes()), true);
   txVkeyWitnesses = Cardano.Instance.TransactionWitnessSet.from_bytes(
     fromHex(txVkeyWitnesses)
   );
@@ -232,7 +232,7 @@ export const finalizeTx = async ({
     tx.auxiliary_data()
   );
 
-  const txHash = await submitTx(toHex(signedTx.to_bytes()));
+  const txHash = await Wallet.submitTx(toHex(signedTx.to_bytes()));
 
   return txHash;
 };

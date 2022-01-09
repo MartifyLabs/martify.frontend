@@ -59,11 +59,6 @@ export const getAsset = async (assetId) => {
         const assetDetails = await getAssetDetails(assetId);
         if (assetDetails === undefined) return undefined;
 
-        if("Name" in assetDetails.onchainMetadata){
-          assetDetails.onchainMetadata.name = assetDetails.onchainMetadata.Name;
-          delete assetDetails.onchainMetadata.Name;
-        }
-
         const asset = {
           details: assetDetails,
           events: [],
@@ -102,7 +97,7 @@ export const getCollectionAssets = async (
   policyId,
   page = 1,
   count = 100,
-  lastVisible = ""
+  lastVisible
 ) => {
   try {
     if (policyId) {
@@ -110,7 +105,7 @@ export const getCollectionAssets = async (
         collection(firestore, "assets"),
         where("details.policyId", "==", policyId),
         orderBy("details.readableAssetName"),
-        startAfter(lastVisible),
+        startAfter(lastVisible?.details?.readableAssetName ?? ""),
         limit(count)
       );
 
@@ -138,7 +133,7 @@ export const getCollectionAssets = async (
  */
 export const lockAsset = async (
   asset,
-  { datum, datumHash, txHash, address, artistAddress, contractAddress }
+  { datum, datumHash, txHash, address, artistAddress, contractVersion }
 ) => {
   if (
     asset &&
@@ -147,7 +142,7 @@ export const lockAsset = async (
     txHash &&
     address &&
     artistAddress &&
-    contractAddress
+    contractVersion
   ) {
     const assetUpdated = {
       ...asset,
@@ -157,7 +152,7 @@ export const lockAsset = async (
         locked: true,
         txHash,
         artistAddress,
-        contractAddress,
+        contractVersion,
         submittedBy: address,
         submittedOn: new Date().getTime(),
       },
@@ -192,13 +187,13 @@ export const unlockAsset = async (asset, { txHash, address }) => {
 /**
  * @throws COULD_NOT_RETRIEVE_LOCKED_ASSETS_FROM_DB
  */
-export const getLockedAssets = async (count = 100, lastVisible = 0) => {
+export const getLockedAssets = async (count = 100, lastVisible) => {
   try {
     const reference = await query(
       collection(firestore, "assets"),
       where("status.locked", "==", true),
       orderBy("status.submittedOn"),
-      startAfter(lastVisible),
+      startAfter(lastVisible?.status?.submittedOn ?? 0),
       limit(count)
     );
 
