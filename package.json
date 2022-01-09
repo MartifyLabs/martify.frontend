@@ -42,7 +42,7 @@
   "scripts": {
     "start": "craco start",
     "build:testnet": "env-cmd -f .env.development craco build",
-    "build:mainnet": "env-cmd -f .env.production craco build",
+    "build:mainnet": "GENERATE_SOURCEMAP=false env-cmd -f .env.production craco build",
     "deploy:testnet": "yarn run build:testnet && firebase use testnet && firebase deploy --only hosting",
     "deploy:mainnet": "yarn run build:mainnet && firebase use mainnet && firebase deploy --only hosting",
     "test": "craco test",
