@@ -139,10 +139,11 @@ const CollectionBanner = ({thisCollection, size, asset, is_collection_page, is_a
                             <div>
                               <p className="heading has-text-weight-semibold">Floor price</p>
                               <p className="is-size-4">
-                                ₳{
+                                ₳{numFormatter(
                                 thisCollection.opencnft.reduce(function (result, policy){
                                   return Math.min(result, policy.floor_price)
-                                },999999*1000000)/1000000}</p>
+                                },999999*1000000)/1000000)
+                                }</p>
                             </div>
                           </div>
                         </td>
@@ -151,10 +152,10 @@ const CollectionBanner = ({thisCollection, size, asset, is_collection_page, is_a
                             <div>
                               <p className="heading has-text-weight-semibold">Total assets</p>
                               <p className="is-size-4">
-                                {
+                                {numFormatter(
                                   thisCollection.opencnft.reduce(function (result, policy){
                                     return result + policy.asset_minted
-                                  },0)
+                                  },0))
                                 }
                               </p>
                             </div>
@@ -165,10 +166,10 @@ const CollectionBanner = ({thisCollection, size, asset, is_collection_page, is_a
                             <div>
                               <p className="heading has-text-weight-semibold">Number owners</p>
                               <p className="is-size-4">
-                                {
+                                {numFormatter(
                               thisCollection.opencnft.reduce(function (result, policy){
                                   return result + policy.asset_holders
-                                },0)
+                                },0))
                               }
                               </p>
                             </div>
