@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import Moment from "react-moment";
 import SweetAlert from "react-bootstrap-sweetalert";
+import AudioPlayer from "../../components/AudioPlayer";
 
 import { urls } from "config";
 import {
@@ -1067,7 +1068,7 @@ const AssetImage = ({ asset }) => {
     }
     
   }, [asset, show]);
-  
+
   return (
     <div className="block">
       <AssetImageFigure asset={asset} setShow={setShow} show_trigger={true} />
@@ -1078,12 +1079,26 @@ const AssetImage = ({ asset }) => {
             contentType === "html" && contentSource ? 
               <iframe src={contentSource} height="500px" width="100%"></iframe>
             :
-            // contentType == "audio" && contentSource ? 
-            //   <audio controls="" preload="none" style="max-width: 697px; max-height: 387px;">
-            //     <source src={contentSource} type="audio/mpeg"/>
-            //   </audio>
-            // :
-            <AssetImageFigure asset={asset} setShow={setShow} no_figure={true} />
+            contentType == "audio" && contentSource ? 
+              <div>
+                <AudioPlayer tracks={
+                  [
+                    {
+                      title: asset.details.onchainMetadata.name,
+                      artist: "",
+                      audioSrc: contentSource,
+                      image: asset.details.onchainMetadata.image,
+                      color: "#5f9fff"
+                    }
+                  ]
+                } />
+              </div>
+            :
+            <>
+              <p className="image is-1by1">
+                <AssetImageFigure asset={asset} setShow={setShow} no_figure={true} />
+              </p>
+            </>
           }
         </div>
         <button

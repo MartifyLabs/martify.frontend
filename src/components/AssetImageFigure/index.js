@@ -9,7 +9,7 @@ const AssetImageFigure = ({ asset, setShow, show_trigger, width, no_figure, clas
     <>
       {
         no_figure ? (
-          <FadeImg className={className} src={get_asset_image_source(asset.details.onchainMetadata.image)} alt={asset.details.onchainMetadata.name} style={{ width: width, height: width }} />
+          <img className={className} src={get_asset_image_source(asset.details.onchainMetadata.image)} alt={asset.details.onchainMetadata.name} style={{ width: width, height: width }} />
         ) :
           setShow ? (
             <div onClick={() => setShow(show_trigger ? show_trigger : false)} style={{ cursor: "pointer" }}>
