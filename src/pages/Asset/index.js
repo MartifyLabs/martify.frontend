@@ -1046,7 +1046,7 @@ const AssetImage = ({ asset }) => {
   const [show, setShow] = useState(false);
   const [contentType, setContentType] = useState("image");
   const [contentSource, setContentSource] = useState(null);
-  const videoPlayerRef = useRef();
+  const playerRef = useRef();
 
   useEffect(() => {
     // detect html, require cleaning
@@ -1060,8 +1060,20 @@ const AssetImage = ({ asset }) => {
             thisContentType = "html";
           } else if (
             asset.details.onchainMetadata.files[0].mediaType == "audio/mpeg"
+            || asset.details.onchainMetadata.files[0].mediaType == "audio/wave"
+            || asset.details.onchainMetadata.files[0].mediaType == "audio/wav"
+            || asset.details.onchainMetadata.files[0].mediaType == "audio/x-wav"
+            || asset.details.onchainMetadata.files[0].mediaType == "audio/x-pn-wav"
+            || asset.details.onchainMetadata.files[0].mediaType == "audio/webm"
+            || asset.details.onchainMetadata.files[0].mediaType == "audio/ogg"
           ) {
             thisContentType = "audio";
+          } else if (
+            asset.details.onchainMetadata.files[0].mediaType == "video/mp4" 
+            || asset.details.onchainMetadata.files[0].mediaType == "video/webm"
+            || asset.details.onchainMetadata.files[0].mediaType == "video/ogg"
+          ) {
+            thisContentType = "video";
           }
 
           if (thisContentType != "image") {
@@ -1088,16 +1100,43 @@ const AssetImage = ({ asset }) => {
     <div className="block">
       <AssetImageFigure asset={asset} setShow={setShow} show_trigger={true} />
       <div className={"modal " + (show ? "is-active" : "")}>
-        <div className="modal-background" onClick={() => { setShow(false); if (videoPlayerRef != undefined) {
-                videoPlayerRef.current.videoEl.pause();
-                videoPlayerRef.current.videoEl.currentTime = 0;
-              } } }></div>
+        <div className="modal-background"
+          onClick={
+            () => {
+              setShow(false);
+              if (playerRef.current != undefined) {
+                if (contentType == 'audio') {
+                  playerRef.current.audioEl.pause();
+                  playerRef.current.audioEl.currentTime = 0;
+                }
+              }
+              if (playerRef.current != undefined) {
+                if (contentType == 'video') {
+                  playerRef.current.videoEl.pause();
+                  playerRef.current.videoEl.currentTime = 0;
+                } 
+              }
+            }
+          }
+        ></div>
         <div className="modal-content">
           {contentType === "html" && contentSource ? (
             <iframe src={contentSource} height="500px" width="100%"></iframe>
           ) : contentType == "audio" && contentSource ? (
             <div>
-              <Video ref={videoPlayerRef} autoPlay loop
+              <p className="image is-1by1">
+                <AssetImageFigure
+                  asset={asset}
+                  setShow={setShow}
+                  no_figure={true}
+                />
+              </p>
+              <audio controls src={contentSource}>
+              </audio>
+            </div>
+          ) : contentType == "video" && contentSource ? (
+            <div>
+              <Video ref={playerRef} autoPlay
                 controls={['PlayPause', 'Seek', 'Time', 'Volume', 'Fullscreen']}
                 poster={asset.details.onchainMetadata.image}
                 onCanPlayThrough={() => {
@@ -1123,9 +1162,17 @@ const AssetImage = ({ asset }) => {
           onClick={
             () => {
               setShow(false);
-              if (videoPlayerRef != undefined) {
-                videoPlayerRef.current.videoEl.pause();
-                videoPlayerRef.current.videoEl.currentTime = 0;
+              if (playerRef.current != undefined) {
+                if (contentType == 'audio') {
+                  playerRef.current.audioEl.pause();
+                  playerRef.current.audioEl.currentTime = 0;
+                }
+              }
+              if (playerRef.current != undefined) {
+                if (contentType == 'video') {
+                  playerRef.current.videoEl.pause();
+                  playerRef.current.videoEl.currentTime = 0;
+                } 
               }
             }
           }
