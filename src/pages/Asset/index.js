@@ -255,21 +255,30 @@ const Listing = ({
   purchase_token,
   asset_add_offer,
 }) => {
-  let is_owner = false;
-  if (asset.details.asset in state_wallet.data.assets) {
-    is_owner = true;
-  }
-  if (asset.status && state_wallet.connected) {
-    if (asset.status.locked) {
-      if (asset.status.submittedBy === state_wallet.data.address) {
-        is_owner = true;
+  const [isOwner, setIsOwner] = useState(false);
+
+  useEffect(() => {
+    if (asset.details.asset in state_wallet.data.assets) {
+      setIsOwner(true);
+    } else if (asset.status && state_wallet.connected) {
+      if (asset.status.locked) {
+        if (asset.status.submittedBy === state_wallet.data.address) {
+          setIsOwner(true);
+        }
       }
+    } else {
+      setIsOwner(false);
     }
-  }
+  }, [
+    asset,
+    state_wallet.connected,
+    state_wallet.data.address,
+    state_wallet.data.assets,
+  ]);
 
   return (
     <div className="block">
-      {is_owner ? (
+      {isOwner ? (
         <OwnerListAsset
           state_wallet={state_wallet}
           asset={asset}
@@ -1039,34 +1048,38 @@ const AssetImage = ({ asset }) => {
 
   useEffect(() => {
     // detect html, require cleaning
-    if(asset&&show&&contentSource==null){
+    if (asset && show && contentSource == null) {
       setContentSource(false);
       let ipfs_root = "https://infura-ipfs.io/ipfs/";
-      if(asset.details.onchainMetadata.files){
-        if(asset.details.onchainMetadata.files.length){
+      if (asset.details.onchainMetadata.files) {
+        if (asset.details.onchainMetadata.files.length) {
           let thisContentType = false;
-          if(asset.details.onchainMetadata.files[0].mediaType == "text/html"){
+          if (asset.details.onchainMetadata.files[0].mediaType == "text/html") {
             thisContentType = "html";
-          }
-          else if(asset.details.onchainMetadata.files[0].mediaType == "audio/mpeg"){
+          } else if (
+            asset.details.onchainMetadata.files[0].mediaType == "audio/mpeg"
+          ) {
             thisContentType = "audio";
           }
 
-          if(thisContentType!="image"){
+          if (thisContentType != "image") {
             setContentType(thisContentType);
             // prepare src link
-            if(asset.details.onchainMetadata.files[0].src.includes("ipfs://")){
-              let s = ipfs_root + asset.details.onchainMetadata.files[0].src.split("ipfs://")[1];
+            if (
+              asset.details.onchainMetadata.files[0].src.includes("ipfs://")
+            ) {
+              let s =
+                ipfs_root +
+                asset.details.onchainMetadata.files[0].src.split("ipfs://")[1];
               setContentSource(s);
-            }else{
+            } else {
               let s = ipfs_root + asset.details.onchainMetadata.files[0].src;
               setContentSource(s);
             }
           }
-        }  
+        }
       }
     }
-    
   }, [asset, show]);
 
   return (
@@ -1075,31 +1088,33 @@ const AssetImage = ({ asset }) => {
       <div className={"modal " + (show ? "is-active" : "")}>
         <div className="modal-background" onClick={() => setShow(false)}></div>
         <div className="modal-content">
-          {
-            contentType === "html" && contentSource ? 
-              <iframe src={contentSource} height="500px" width="100%"></iframe>
-            :
-            contentType == "audio" && contentSource ? 
-              <div>
-                <AudioPlayer tracks={
-                  [
-                    {
-                      title: asset.details.onchainMetadata.name,
-                      artist: "",
-                      audioSrc: contentSource,
-                      image: asset.details.onchainMetadata.image,
-                      color: "#5f9fff"
-                    }
-                  ]
-                } />
-              </div>
-            :
+          {contentType === "html" && contentSource ? (
+            <iframe src={contentSource} height="500px" width="100%"></iframe>
+          ) : contentType == "audio" && contentSource ? (
+            <div>
+              <AudioPlayer
+                tracks={[
+                  {
+                    title: asset.details.onchainMetadata.name,
+                    artist: "",
+                    audioSrc: contentSource,
+                    image: asset.details.onchainMetadata.image,
+                    color: "#5f9fff",
+                  },
+                ]}
+              />
+            </div>
+          ) : (
             <>
               <p className="image is-1by1">
-                <AssetImageFigure asset={asset} setShow={setShow} no_figure={true} />
+                <AssetImageFigure
+                  asset={asset}
+                  setShow={setShow}
+                  no_figure={true}
+                />
               </p>
             </>
-          }
+          )}
         </div>
         <button
           className="modal-close is-large"
