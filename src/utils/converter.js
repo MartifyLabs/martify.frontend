@@ -21,6 +21,7 @@ export const toString = (bytes) => String.fromCharCode.apply(String, bytes);
 
 export const convertMetadataPropToString = (src) => {
   if (typeof src === "string") return src;
+  else if (typeof src === "object") return Object.values(src).join("");
   else if (Array.isArray(src)) return src.join("");
   return null;
 };
@@ -69,8 +70,10 @@ export const get_asset_image_source = (image) => {
   // return "";
 
   if (image) {
-    if (image.includes("ipfs/")) {
-      image = "ipfs://" + image.split("ipfs/")[1];
+    if (typeof image === 'string') {
+      if (image.includes("ipfs/")) {
+        image = "ipfs://" + image.split("ipfs/")[1];
+      }
     }
     return linkToSrc(convertMetadataPropToString(image));
   }
