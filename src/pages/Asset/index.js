@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import Moment from "react-moment";
 import SweetAlert from "react-bootstrap-sweetalert";
-import AudioPlayer from "../../components/AudioPlayer";
+import { DefaultPlayer as Video } from 'react-html5video';
+import 'react-html5video/dist/styles.css';
 
 import { urls } from "config";
 import {
@@ -1045,6 +1046,7 @@ const AssetImage = ({ asset }) => {
   const [show, setShow] = useState(false);
   const [contentType, setContentType] = useState("image");
   const [contentSource, setContentSource] = useState(null);
+  const videoPlayerRef = useRef();
 
   useEffect(() => {
     // detect html, require cleaning
@@ -1086,23 +1088,22 @@ const AssetImage = ({ asset }) => {
     <div className="block">
       <AssetImageFigure asset={asset} setShow={setShow} show_trigger={true} />
       <div className={"modal " + (show ? "is-active" : "")}>
-        <div className="modal-background" onClick={() => setShow(false)}></div>
+        <div className="modal-background" onClick={() => { setShow(false); if (videoPlayerRef != undefined) {
+                videoPlayerRef.current.videoEl.pause();
+                videoPlayerRef.current.videoEl.currentTime = 0;
+              } } }></div>
         <div className="modal-content">
           {contentType === "html" && contentSource ? (
             <iframe src={contentSource} height="500px" width="100%"></iframe>
           ) : contentType == "audio" && contentSource ? (
             <div>
-              <AudioPlayer
-                tracks={[
-                  {
-                    title: asset.details.onchainMetadata.name,
-                    artist: "",
-                    audioSrc: contentSource,
-                    image: asset.details.onchainMetadata.image,
-                    color: "#5f9fff",
-                  },
-                ]}
-              />
+              <Video ref={videoPlayerRef} autoPlay loop
+                controls={['PlayPause', 'Seek', 'Time', 'Volume', 'Fullscreen']}
+                poster={asset.details.onchainMetadata.image}
+                onCanPlayThrough={() => {
+                }}>
+                <source src={contentSource} />
+              </Video>
             </div>
           ) : (
             <>
@@ -1119,7 +1120,15 @@ const AssetImage = ({ asset }) => {
         <button
           className="modal-close is-large"
           aria-label="close"
-          onClick={() => setShow(false)}
+          onClick={
+            () => {
+              setShow(false);
+              if (videoPlayerRef != undefined) {
+                videoPlayerRef.current.videoEl.pause();
+                videoPlayerRef.current.videoEl.currentTime = 0;
+              }
+            }
+          }
         ></button>
       </div>
     </div>
