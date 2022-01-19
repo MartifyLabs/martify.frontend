@@ -10,7 +10,8 @@ import {
   Guide,
   GuideBuy,
   GuideSell,
-  Explore
+  //Explore, 
+  Marketplace
 } from 'pages'
 
 import { MainLayout } from "layouts";
@@ -42,9 +43,14 @@ const RenderRoutes = () => {
           <Account />
         </MainLayout>
       </Route>
-      <Route exact path="/explore">
+      {/* <Route exact path="/explore">
         <MainLayout>
           <Explore />
+        </MainLayout>
+      </Route> */}
+      <Route exact path="/marketplace">
+        <MainLayout>
+          <Marketplace />
         </MainLayout>
       </Route>
       <Route exact path="/about">

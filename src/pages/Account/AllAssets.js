@@ -258,7 +258,7 @@ const NoAssetFound = ({ state_wallet }) => {
               <p className="title">No assets</p>
               <p className="subtitle">
                 Looks like your wallet is empty,{" "}
-                <a href="/explore">start browsing</a>!
+                <a href="/marketplace">Start browsing marketplace</a>!
               </p>
             </>
           ) : (

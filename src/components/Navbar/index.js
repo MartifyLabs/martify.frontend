@@ -18,8 +18,8 @@ const Navbar = () => {
 
       <div className="navbar-menu">
         <div className="navbar-start">
-          <Link className="navbar-item" to="/explore">
-            Explore
+          <Link className="navbar-item" to="/marketplace">
+            Marketplace
           </Link>
 
           <div className="navbar-item has-dropdown is-hoverable">
