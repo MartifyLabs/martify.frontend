@@ -1,11 +1,11 @@
-.explore .filter .field{
+.marketplace .filter .field{
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   padding-top: 1px;
 }
 
-.explore .filter_label{
+.marketplace .filter_label{
   cursor: pointer
 }
 

@@ -73,7 +73,7 @@ const Marketplace = () => {
   };
 
   return (
-    <div className="section explore">
+    <div className="section marketplace">
       <div className="columns">
         <div className="column is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
           <Filter
