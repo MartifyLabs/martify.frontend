@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import Moment from "react-moment";
 import SweetAlert from "react-bootstrap-sweetalert";
-import AudioPlayer from "../../components/AudioPlayer";
+import { DefaultPlayer as Video } from "react-html5video";
+import "react-html5video/dist/styles.css";
 
 import { urls } from "config";
 import {
@@ -1042,6 +1043,7 @@ const AssetRawMetaData = ({ asset }) => {
 };
 
 const AssetImage = ({ asset }) => {
+  const mediaPlayerRef = useRef();
   const [show, setShow] = useState(false);
   const [contentType, setContentType] = useState("image");
   const [contentSource, setContentSource] = useState(null);
@@ -1054,55 +1056,92 @@ const AssetImage = ({ asset }) => {
       if (asset.details.onchainMetadata.files) {
         if (asset.details.onchainMetadata.files.length) {
           let thisContentType = false;
-          if (asset.details.onchainMetadata.files[0].mediaType == "text/html") {
+          if (
+            asset.details.onchainMetadata.files[0].mediaType === "text/html"
+          ) {
             thisContentType = "html";
           } else if (
-            asset.details.onchainMetadata.files[0].mediaType == "audio/mpeg"
+            asset.details.onchainMetadata.files[0].mediaType === "audio/mpeg"     ||
+            asset.details.onchainMetadata.files[0].mediaType === "audio/wave"     ||
+            asset.details.onchainMetadata.files[0].mediaType === "audio/wav"      ||
+            asset.details.onchainMetadata.files[0].mediaType === "audio/x-wav"    ||
+            asset.details.onchainMetadata.files[0].mediaType === "audio/x-pn-wav" ||
+            asset.details.onchainMetadata.files[0].mediaType === "audio/webm"     ||
+            asset.details.onchainMetadata.files[0].mediaType === "audio/ogg"
           ) {
             thisContentType = "audio";
+          } else if (
+            asset.details.onchainMetadata.files[0].mediaType === "video/mp4"  ||
+            asset.details.onchainMetadata.files[0].mediaType === "video/webm" ||
+            asset.details.onchainMetadata.files[0].mediaType === "video/ogg"
+          ) {
+            thisContentType = "video";
           }
 
-          if (thisContentType != "image") {
+          if (thisContentType !== "image") {
             setContentType(thisContentType);
-            // prepare src link
-            if (
-              asset.details.onchainMetadata.files[0].src.includes("ipfs://")
-            ) {
-              let s =
-                ipfs_root +
-                asset.details.onchainMetadata.files[0].src.split("ipfs://")[1];
-              setContentSource(s);
+            const src = typeof asset.details.onchainMetadata.files[0].src === "string"
+              ? asset.details.onchainMetadata.files[0].src
+              : asset.details.onchainMetadata.files[0].src[0];
+            
+            if (src.includes("ipfs://")) {
+              setContentSource(ipfs_root + src.split("ipfs://")[1]);
             } else {
-              let s = ipfs_root + asset.details.onchainMetadata.files[0].src;
-              setContentSource(s);
+              setContentSource(ipfs_root + src);
             }
           }
         }
       }
     }
-  }, [asset, show]);
+  }, [asset, contentSource, show]);
+
+  useEffect(() => {
+    if (show === false && mediaPlayerRef.current !== undefined) {
+      if (contentType === "audio") {
+        mediaPlayerRef.current.pause();
+        mediaPlayerRef.current.currentTime = 0;
+      } else if (contentType === "video") {
+        mediaPlayerRef.current.videoEl.pause();
+        mediaPlayerRef.current.videoEl.currentTime = 0;
+      }
+    }
+  }, [contentType, show]);
 
   return (
     <div className="block">
       <AssetImageFigure asset={asset} setShow={setShow} show_trigger={true} />
       <div className={"modal " + (show ? "is-active" : "")}>
-        <div className="modal-background" onClick={() => setShow(false)}></div>
+        <div
+          className="modal-background"
+          onClick={() => {
+            setShow(false);
+          }}
+        ></div>
         <div className="modal-content">
           {contentType === "html" && contentSource ? (
-            <iframe src={contentSource} height="500px" width="100%"></iframe>
-          ) : contentType == "audio" && contentSource ? (
+            <iframe title="asset" src={contentSource} height="500px" width="100%"></iframe>
+          ) : contentType === "audio" && contentSource ? (
             <div>
-              <AudioPlayer
-                tracks={[
-                  {
-                    title: asset.details.onchainMetadata.name,
-                    artist: "",
-                    audioSrc: contentSource,
-                    image: asset.details.onchainMetadata.image,
-                    color: "#5f9fff",
-                  },
-                ]}
-              />
+              <p className="image is-1by1">
+                <AssetImageFigure
+                  asset={asset}
+                  setShow={setShow}
+                  no_figure={true}
+                />
+              </p>
+              <audio controls src={contentSource} ref={mediaPlayerRef}></audio>
+            </div>
+          ) : contentType === "video" && contentSource ? (
+            <div>
+              <Video
+                autoPlay
+                controls={["PlayPause", "Seek", "Time", "Volume", "Fullscreen"]}
+                poster={asset.details.onchainMetadata.image}
+                onCanPlayThrough={() => {}}
+                ref={mediaPlayerRef}
+              >
+                <source src={contentSource} />
+              </Video>
             </div>
           ) : (
             <>
@@ -1119,7 +1158,9 @@ const AssetImage = ({ asset }) => {
         <button
           className="modal-close is-large"
           aria-label="close"
-          onClick={() => setShow(false)}
+          onClick={() => {
+            setShow(false);
+          }}
         ></button>
       </div>
     </div>

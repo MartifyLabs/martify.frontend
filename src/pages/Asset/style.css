@@ -21,3 +21,14 @@
 .asset .image img{
   object-fit: contain;
 }
+
+.asset .rh5v-Volume_icon {
+  padding: 4px;
+}
+
+.asset audio {
+  max-width: none;
+  margin-left: 1rem;
+  width: calc(100% - 2rem);
+  transform: translateY(calc(-100% - 1rem));
+}
