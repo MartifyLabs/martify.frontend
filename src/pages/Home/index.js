@@ -86,7 +86,7 @@ const Splash = ({ listProjects }) => {
                         </li>
                         <li>
                           <span className="tag is-primary is-large">
-                            Explore
+                            Marketplace
                           </span>
                         </li>
                       </ul>

@@ -2,7 +2,8 @@ import About from "./About";
 import Account from "./Account";
 import Asset from "./Asset";
 import Collection from "./Collection";
-import Explore from "./Explore";
+//import Explore from "./Explore";
+import Marketplace from "./Marketplace";
 import FAQ from "./FAQ";
 import Guide from "./Guide";
 import GuideBuy from "./GuideBuy";
@@ -14,7 +15,8 @@ export {
     Account,
     Asset,
     Collection,
-    Explore,
+    //Explore,
+    Marketplace,
     FAQ,
     Guide,
     GuideBuy,
