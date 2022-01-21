@@ -86,8 +86,8 @@ export const getOpencnftTopProjects = async (time) => {
     if (snapshot.exists()){
       let data = snapshot.data();
       // console.log("gotten data", data);
+      // console.log("get existing top projects", time_now, data.last_updated, (time_now - data.last_updated) < time_outdated);
       if((time_now - data.last_updated) < time_outdated){
-        // console.log("get existing top projects", time_now, data.last_updated, (time_now - data.last_updated) < time_outdated);
         return_top_projects = data.rankings;
       }else{
         backup_return_top_projects = data.rankings;
@@ -95,16 +95,14 @@ export const getOpencnftTopProjects = async (time) => {
     }
 
     if(return_top_projects == false){
-      
       const top_projects = await fetch(`https://api.opencnft.io/1/rank?window=${time}` , {})
         .then((res) => res.json())
         .then((res) => {
-          return res.ranking;
+          return res.ranking ? res.ranking : res;
         })
         .catch((err) => {
           return false;
         });
-      
       if(top_projects){
         let to_db = {
           last_updated: time_now,
@@ -112,13 +110,11 @@ export const getOpencnftTopProjects = async (time) => {
         }
         
         await saveOpencnft(to_db, "_top_projects_"+time);
-        // console.log("updated top projects");
         return_top_projects = top_projects;
       }
       else if(backup_return_top_projects){ // for some reason opencnft is down, but lucky we have records in our own database
         return_top_projects = backup_return_top_projects;
       }
-      
     }
     return return_top_projects;
   
