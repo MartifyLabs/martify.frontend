@@ -28,6 +28,39 @@ export const createDatum = (
   }
 };
 
+export const createTradeListDatum = (
+  owner,
+  cstns
+) => {
+  if (
+    owner &&
+    cstns
+  ) {
+    return {
+      owner: owner,
+      cstns: cstns,
+    };
+  }
+};
+
+export const createTradeOfferDatum = (
+  cstns,
+  offTokens,
+  offerer
+) => {
+  if (
+    cstns &&
+    offTokens &&
+    offerer
+  ) {
+    return {
+      cstns: cstns,
+      offTokens: offTokens,
+      offerer: offerer,
+    };
+  }
+};
+
 /**
  * @param {string} byWallet - a wallet address needs to be in bech32 format.
  */
