@@ -22,7 +22,7 @@ export const CANCEL = (index) => {
   return redeemer;
 };
 
-export const ACCEPT = (index, offTokens) => { //offTokens is a list of tuples (PolicyId, TokenName)
+export const ACCEPT = (offTokens, index) => { //offTokens is a list of tuples (PolicyId, TokenName)
   const fields = Cardano.Instance.PlutusList.new();
   const list = Cardano.Instance.PlutusList.new();
 
