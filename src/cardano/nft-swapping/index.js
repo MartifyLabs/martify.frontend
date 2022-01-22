@@ -115,23 +115,23 @@ export const listOffer = async (
 
 export const cancelOffer = async (
   datum,
-  seller: { address: BaseAddress, utxos: [] },
+  offerer: { address: BaseAddress, utxos: [] },
   offerUtxo,
   version
 ) => {
   try {
     const { txBuilder, datums, outputs } = initializeTx();
-    const utxos = seller.utxos.map((utxo) => serializeTxUnspentOutput(utxo));
+    const utxos = offerer.utxos.map((utxo) => serializeTxUnspentOutput(utxo));
 
     const cancelListingDatum = serializeSale(datum);
     datums.add(cancelListingDatum);
 
     outputs.add(
-      createTxOutput(seller.address.to_address(), offerUtxo.output().amount())
+      createTxOutput(offerer.address.to_address(), offerUtxo.output().amount())
     );
 
     const requiredSigners = Cardano.Instance.Ed25519KeyHashes.new();
-    requiredSigners.add(seller.address.payment_cred().to_keyhash());
+    requiredSigners.add(offerer.address.payment_cred().to_keyhash());
     txBuilder.set_required_signers(requiredSigners);
 
     const txHash = await finalizeTx({
@@ -139,7 +139,7 @@ export const cancelOffer = async (
       datums,
       utxos,
       outputs,
-      changeAddress: seller.address,
+      changeAddress: offerer.address,
       offerUtxo,
       plutusScripts: contractScripts(version),
       action: CANCEL,
@@ -285,6 +285,44 @@ export const acceptOffer = async (
     return txHash;
   } catch (error) {
     handleError(error, "acceptOffer");
+  }
+};
+
+export const cancelBundle = async (
+  datum,
+  owner: { address: BaseAddress, utxos: [] },
+  offerUtxo,
+  version
+) => {
+  try {
+    const { txBuilder, datums, outputs } = initializeTx();
+    const utxos = owner.utxos.map((utxo) => serializeTxUnspentOutput(utxo));
+
+    const cancelListingDatum = serializeSale(datum);
+    datums.add(cancelListingDatum);
+
+    outputs.add(
+      createTxOutput(owner.address.to_address(), offerUtxo.output().amount())
+    );
+
+    const requiredSigners = Cardano.Instance.Ed25519KeyHashes.new();
+    requiredSigners.add(owner.address.payment_cred().to_keyhash());
+    txBuilder.set_required_signers(requiredSigners);
+
+    const txHash = await finalizeTx({
+      txBuilder,
+      datums,
+      utxos,
+      outputs,
+      changeAddress: owner.address,
+      offerUtxo,
+      plutusScripts: contractScripts(version),
+      action: CANCEL,
+    });
+
+    return txHash;
+  } catch (error) {
+    handleError(error, "cancelBundle");
   }
 };
 
