@@ -123,8 +123,8 @@ export const cancelOffer = async (
     const { txBuilder, datums, outputs } = initializeTx();
     const utxos = offerer.utxos.map((utxo) => serializeTxUnspentOutput(utxo));
 
-    const cancelListingDatum = serializeSale(datum);
-    datums.add(cancelListingDatum);
+    const cancelOfferDatum = serializeOffer(datum);
+    datums.add(cancelOfferDatum);
 
     outputs.add(
       createTxOutput(offerer.address.to_address(), offerUtxo.output().amount())
@@ -152,7 +152,8 @@ export const cancelOffer = async (
 };
 
 export const refuseOffer = async (
-  datum,
+  datumOffer,
+  datumList,
   offerer: { address: BaseAddress, utxos: [] },
   owner: { address: BaseAddress, utxos: [] },
   assetUtxo,
@@ -162,13 +163,15 @@ export const refuseOffer = async (
     const { txBuilder, datums, outputs } = initializeTx();
     const utxos = owner.utxos.map((utxo) => serializeTxUnspentOutput(utxo));
 
-    const purchaseAssetDatum = serializeSale(datum);
-    datums.add(purchaseAssetDatum);
+    const offerDatum = serializeOffer(datumOffer);
+    const listDatum = serializeList(datumList);
+    datums.add(offerDatum);
+    datums.add(listDatum);
 
     const assets = [];
-    for (let i = 0; i < datum.offTokens.length; i++) {
+    for (let i = 0; i < datumOffer.offTokens.length; i++) {
       assets.push({
-        unit: `${datum.offTokens[i][0]}${datum.offTokens[i][1]}`,
+        unit: `${datumOffer.offTokens[i][0]}${datumOffer.offTokens[i][1]}`,
         quantity: "1",
       })
     };
@@ -211,7 +214,8 @@ export const refuseOffer = async (
 };
 
 export const acceptOffer = async (
-  datum,
+  datumOffer,
+  datumList,
   offerer: { address: BaseAddress, utxos: [] },
   owner: { address: BaseAddress, utxos: [] },
   market: { address: BaseAddress, utxos: [] },
@@ -222,13 +226,15 @@ export const acceptOffer = async (
     const { txBuilder, datums, outputs } = initializeTx();
     const utxos = owner.utxos.map((utxo) => serializeTxUnspentOutput(utxo));
 
-    const purchaseAssetDatum = serializeSale(datum);
-    datums.add(purchaseAssetDatum);
+    const offerDatum = serializeOffer(datumOffer);
+    const listDatum = serializeList(datumList);
+    datums.add(offerDatum);
+    datums.add(listDatum);
 
     const offer = [];
     for (let i = 0; i < datum.offTokens.length; i++) {
       offer.push({
-        unit: `${datum.offTokens[i][0]}${datum.offTokens[i][1]}`,
+        unit: `${datumOffer.offTokens[i][0]}${datumOffer.offTokens[i][1]}`,
         quantity: "1",
       })
     };
@@ -244,7 +250,7 @@ export const acceptOffer = async (
     const bundle = [];
     for (let i = 0; i < datum.cstns.length; i++) {
       bundle.push({
-        unit: `${datum.cstns[i][0]}${datum.cstns[i][1]}`,
+        unit: `${datumOffer.cstns[i][0]}${datumOffer.cstns[i][1]}`,
         quantity: "1",
       })
     };
@@ -298,7 +304,7 @@ export const cancelBundle = async (
     const { txBuilder, datums, outputs } = initializeTx();
     const utxos = owner.utxos.map((utxo) => serializeTxUnspentOutput(utxo));
 
-    const cancelListingDatum = serializeSale(datum);
+    const cancelListingDatum = serializeList(datum);
     datums.add(cancelListingDatum);
 
     outputs.add(
