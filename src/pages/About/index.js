@@ -75,14 +75,14 @@ const About = () => {
             assets in a secure manner. Want to get in touch with us? You can
             write at
             <a href="mailto:contact@martify.io">
-              <i class="icon fas fa-envelope"></i>contact@martify.io
+              <i className="icon fas fa-envelope"></i>contact@martify.io
             </a>
             , on
-            <a href="twitter.com/MartifyLabs" target="_blank" rel="noreferrer">
+            <a href="https://twitter.com/MartifyLabs" target="_blank" rel="noreferrer">
               <i className="icon fab fa-twitter"></i>@MartifyLabs
             </a>
             , or join our
-            <a href="discord.gg/Z6AH9dahdH" target="_blank" rel="noreferrer">
+            <a href="https://discord.gg/Z6AH9dahdH" target="_blank" rel="noreferrer">
               <i className="icon fab fa-discord"></i>Discord
             </a>{" "}
             and participate in community discussions about the digital universe
@@ -128,6 +128,7 @@ const About = () => {
             <div className="content is-medium">
               <ul>
                 <li>Handle Audio & Video Assets.</li>
+                <li>Add Support for More Wallets (GeroWallet, ccvault.io...).</li>
                 <li>Build The Martify Backend APIs.</li>
                 <li>Implement Trading & Bundle Swaps for NFTs.</li>
                 <li>Enable Buying & Selling NFTs Using Native Tokens.</li>
@@ -150,10 +151,10 @@ const About = () => {
             <div className="content is-medium">
               <ul>
                 <li>Implement On-Chain Auctions & Bidding.</li>
-                <li>Add Support to More Wallets (Yoroi, ccvault.io...).</li>
+                <li>Add Support for More Wallets (Yoroi...).</li>
                 <li>Create & Launch a Stake Pool for Martify.</li>
                 <li>
-                  Write a Whitepaper for Smart Contract On-Chain Gouvernance.
+                  Write a Whitepaper for Smart Contract On-Chain Governance.
                 </li>
                 <li>Design the Tokennomics.</li>
               </ul>
@@ -189,7 +190,7 @@ const About = () => {
             <div className="content is-medium">
               <ul>
                 <li>Martify Integration with Unity Game Engine.</li>
-                <li>Implement the Smart Contract On-Chain Gouvernance.</li>
+                <li>Implement the Smart Contract On-Chain Governance.</li>
                 <li>Create an Automatic Verification System for Creators.</li>
               </ul>
             </div>
