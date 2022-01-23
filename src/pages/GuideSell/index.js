@@ -13,25 +13,31 @@ const GuideSell = () => {
       <div className="content">
         <h2>Overview</h2>
         <ol>
-          <li><b>Setup Nami Wallet</b>: Download Nami Wallet.</li>
-          <li><b>Connect Nami Wallet on Martify and add collateral</b>: That is easy!</li>
-          <li><b>List your first NFT</b>: Transfer your assets from Yoroi to your Nami Wallet and list them on Martify.</li>
+          <li><b>Setup your cryptocurrency wallet (Nami Wallet, GeroWallet or ccvault.io</b>: Download Nami Wallet, GeroWallet or ccvault.io.</li>
+          <li><b>Connect your wallet on Martify and add collateral</b>: That is easy!</li>
+          <li><b>List your first NFT</b>: Transfer your assets from Yoroi to your Nami Wallet, GeroWallet or ccvault.io and list them on Martify.</li>
         </ol>
 
-        <h2>Step 1: Setup Nami Wallet</h2>
+        <h2>Step 1: Setup Nami Wallet, GeroWallet or ccvault.io</h2>
         
         <ol>
-          <li><b>Download Nami Wallet</b>: Download the <a href="https://namiwallet.io/">Nami Wallet</a> browser extension, which will be your own personal "digital wallet". With Nami Wallet, you get to store and use your cryptocurrency and digital assets (like NFTs).</li>
-          <li><b>Setup Nami Wallet</b>: Write down and confirm your seed phrase, and input a new password.</li>
+          <li><b>Download your cryptocurrency wallet</b>: Download one of the browser extension which will be your own personal "digital wallet" : <br/>
+          <a href="https://namiwallet.io/" target="_blank">Nami Wallet</a> (Chrome, Brave and Edge compatible), <br/>
+          <a href="https://gerowallet.io/" target="_blank">GeroWallet</a> (Chrome, Brave and Edge compatible) or <br/>
+          <a href="https://ccvault.io/" target="_blank">ccvault.io</a> (Chrome, Brave, Edge and Opera compatible). <br/>
+          With your "digital wallet", you get to store and use your cryptocurrency and digital assets (like NFTs).</li>
+          <li><b>Setup your cryptocurrency wallet</b>: Write down and confirm your seed phrase, and input a new password.</li>
         </ol>
 
-        <p>Go to <a href="https://namiwallet.io/">Nami Wallet</a> to download the browser extension. <b>Important</b>: To avoid any scam, we recommend you to visit their official page and then select the desired browser type to install the application. If you click on Chrome, you will be automatically taken to the Google Chrome web store. Click "Add extension" and it will be downloaded and installed. Once installed, you will be able to view the Nami Wallet icon (a blue "N") in the top right corner of your browser.</p>
+        <p>Go to <a href="https://namiwallet.io/" target="_blank">Nami Wallet</a>, <a href="https://gerowallet.io/" target="_blank">GeroWallet</a> or <a href="https://ccvault.io/" target="_blank">ccvault.io</a> to download the browser extension. <b>Important</b>: To avoid any scam, we recommend you to visit their official page and then select the desired browser type to install the application. If you click on Chrome, you will be automatically taken to the Google Chrome web store. Click "Add extension" and it will be downloaded and installed. Once installed, you will be able to view the Nami Wallet icon (a blue "N") in the top right corner of your browser.</p>
+
+        <p><b>The following instructions (for Nami Wallet) apply more or less to all wallets. </b></p>
 
         <p>If you open up the Nami Wallet for the first time. Make sure no one is watching your screen and click on "New Wallet". Then, it will show you 24-words sequence, these words are called "seed phrase", these sequence of words are the access to your wallet. Remember, this must be hidden and never shared with anyone. Do not take a picture or screenshot of your seed phrase. Instead, write it down immediately on a piece of paper and put it in a secret and safe location. Even better, write your seed phrase down on 2-3 pieces of paper and store each paper in a separate secure location (like one in a personal safe and one in a bank safety deposit box). Alternatively, you can download the seed phrase and keep it offline on an encrypted hard drive. Having multiple backups of your seed phrase is good practice just in case one copy is ever lost or destroyed. After documenting your seed phrase, click "Next".</p>
 
         <p>Nami Wallet will prompt you to input all those words in the next step. You confirm your seed phrase in the correct order of your 24-word sequence. You will also be prompt to input a password, which is needed whenever you have to sign a transaction. You can now access your Nami Wallet via "N" icon in your browser.</p>
 
-        <h2>Step 2: Connect Nami Wallet on Martify and add collateral</h2>
+        <h2>Step 2: Connect your cryptocurrency wallet on Martify and add collateral</h2>
 
         <ol>
           <li><b>Connect wallet</b>: Click on connect and allow access.</li>
