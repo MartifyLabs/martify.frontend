@@ -192,8 +192,8 @@ export const getLockedAssets = async (count = 100, lastVisible) => {
     const reference = await query(
       collection(firestore, "assets"),
       where("status.locked", "==", true),
-      orderBy("status.submittedOn"),
-      startAfter(lastVisible?.status?.submittedOn ?? 0),
+      orderBy("status.submittedOn", "desc"),
+      startAfter(lastVisible?.status?.submittedOn ?? Number.MAX_VALUE),
       limit(count)
     );
 
