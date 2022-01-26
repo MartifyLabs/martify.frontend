@@ -73,7 +73,9 @@ export const finalizeTx = async ({
   datums,
   metadata,
   action,
+  action2,
   assetUtxo,
+  assetUtxo2,
   plutusScripts,
 }) => {
   const Parameters = getProtocolParameters();
@@ -89,6 +91,10 @@ export const finalizeTx = async ({
   let inputs = [...utxos];
 
   if (assetUtxo) {
+    inputs.push(assetUtxo);
+  }
+
+  if (assetUtxo2) {
     inputs.push(assetUtxo);
   }
 
@@ -112,6 +118,10 @@ export const finalizeTx = async ({
       .index_of_input(assetUtxo.input())
       .toString();
     redeemers.add(action(redeemerIndex));
+    const redeemerIndex2 = txBuilder
+      .index_of_input(assetUtxo2.input())
+      .toString();
+    redeemers.add(action(redeemerIndex2));
     txBuilder.set_redeemers(
       Cardano.Instance.Redeemers.from_bytes(redeemers.to_bytes())
     );

@@ -156,7 +156,8 @@ export const refuseOffer = async (
   datumList,
   offerer: { address: BaseAddress, utxos: [] },
   owner: { address: BaseAddress, utxos: [] },
-  assetUtxo,
+  bundleUtxo,
+  offerUtxo,
   version
 ) => {
   try {
@@ -186,7 +187,7 @@ export const refuseOffer = async (
 
     outputs.add(
       createTxOutput(
-        market.address.to_address(),
+        owner.address.to_address(),
         assetsToValue([{ unit: "lovelace", quantity: "1100000" }])
       )
     );
@@ -202,9 +203,11 @@ export const refuseOffer = async (
       outputs,
       datums,
       changeAddress: owner.address,
-      assetUtxo,
+      assetUtxo: bundleUtxo,
+      assetUtxo2: offerUtxo,
       plutusScripts: contractScripts(version),
       action: REFUSE,
+      action2: REFUSE,
     });
 
     return txHash;
@@ -219,7 +222,8 @@ export const acceptOffer = async (
   offerer: { address: BaseAddress, utxos: [] },
   owner: { address: BaseAddress, utxos: [] },
   market: { address: BaseAddress, utxos: [] },
-  assetUtxo,
+  bundleUtxo,
+  offerUtxo,
   version
 ) => {
   try {
@@ -232,7 +236,7 @@ export const acceptOffer = async (
     datums.add(listDatum);
 
     const offer = [];
-    for (let i = 0; i < datum.offTokens.length; i++) {
+    for (let i = 0; i < datumOffer.offTokens.length; i++) {
       offer.push({
         unit: `${datumOffer.offTokens[i][0]}${datumOffer.offTokens[i][1]}`,
         quantity: "1",
@@ -248,7 +252,7 @@ export const acceptOffer = async (
     );
 
     const bundle = [];
-    for (let i = 0; i < datum.cstns.length; i++) {
+    for (let i = 0; i < datumOffer.cstns.length; i++) {
       bundle.push({
         unit: `${datumOffer.cstns[i][0]}${datumOffer.cstns[i][1]}`,
         quantity: "1",
@@ -275,7 +279,7 @@ export const acceptOffer = async (
     requiredSigners.add(owner.address.payment_cred().to_keyhash());
     txBuilder.set_required_signers(requiredSigners);
 
-    const accept = index => ACCEPT(datum.offTokens, index)
+    const accept = index => ACCEPT(datumOffer.offTokens, index)
 
     const txHash = await finalizeTx({
       txBuilder,
@@ -283,9 +287,11 @@ export const acceptOffer = async (
       outputs,
       datums,
       changeAddress: owner.address,
-      assetUtxo,
+      assetUtxo: bundleUtxo,
+      assetUtxo2: offerUtxo,
       plutusScripts: contractScripts(version),
       action: accept,
+      action2: accept
     });
 
     return txHash;
