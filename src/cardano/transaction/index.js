@@ -118,10 +118,12 @@ export const finalizeTx = async ({
       .index_of_input(assetUtxo.input())
       .toString();
     redeemers.add(action(redeemerIndex));
-    const redeemerIndex2 = txBuilder
+    if (assetUtxo2) {
+      const redeemerIndex2 = txBuilder
       .index_of_input(assetUtxo2.input())
       .toString();
-    redeemers.add(action(redeemerIndex2));
+      redeemers.add(action(redeemerIndex2));
+    }
     txBuilder.set_redeemers(
       Cardano.Instance.Redeemers.from_bytes(redeemers.to_bytes())
     );
