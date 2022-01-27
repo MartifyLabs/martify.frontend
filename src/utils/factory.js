@@ -101,13 +101,10 @@ const getAddressKeyHash = (address) => {
   );
 };
 
+/* NFT Swap */
+
 export const nftSwapCreateDatum = (
-  // tokenName,
-  // currencySymbol,
   sellerAddress,
-  // royaltiesAddress,
-  // royaltiesPercentage,
-  // price
   tokens,
 ) => {
   if (
@@ -115,13 +112,25 @@ export const nftSwapCreateDatum = (
     tokens.length>0
   ) {
     return {
-      // tn: tokenName,
-      // cs: currencySymbol,
       owner: getAddressKeyHash(sellerAddress),
-      // ra: getAddressKeyHash(royaltiesAddress),
-      // rp: royaltiesPercentage ? royaltiesPercentage : 0,
-      // price: toLovelace(price),
       cstns: tokens,
+    };
+  }
+};
+
+export const nftSwapCreateOffer = (
+  sellerAddress,
+  tokens,
+  offerTokens,
+) => {
+  if (
+    sellerAddress &&
+    tokens.length>0
+  ) {
+    return {
+      cstns: tokens,
+      offTokens: offerTokens,
+      offerer: getAddressKeyHash(sellerAddress),
     };
   }
 };

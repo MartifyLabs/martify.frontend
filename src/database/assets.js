@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { getAssetDetails, getMintedAssets } from "../cardano/blockfrost-api";
 import { firestore } from "../firebase";
+import { MARKET_TYPE } from "../store/wallet/walletTypes";
 
 /**
  * @throws COULD_NOT_SAVE_ASSET_TO_DB
@@ -133,7 +134,7 @@ export const getCollectionAssets = async (
  */
 export const lockAsset = async (
   asset,
-  { datum, datumHash, txHash, address, artistAddress, contractVersion }
+  { datum, datumHash, txHash, address, artistAddress, contractVersion, state }
 ) => {
   if (
     asset &&
@@ -142,7 +143,8 @@ export const lockAsset = async (
     txHash &&
     address &&
     artistAddress &&
-    contractVersion
+    contractVersion &&
+    state
   ) {
     const assetUpdated = {
       ...asset,
@@ -155,6 +157,7 @@ export const lockAsset = async (
         contractVersion,
         submittedBy: address,
         submittedOn: new Date().getTime(),
+        state: state
       },
     };
     await saveAsset(assetUpdated);

@@ -15,7 +15,7 @@ import {
   relistWalletAsset,
   walletExists,
 } from "../../database/wallets";
-import { WALLET_STATE, MARKET_TYPE } from "./walletTypes";
+import { WALLET_STATE, MARKET_TYPE, ASSET_STATE } from "./walletTypes";
 import {
   walletConnected,
   setWalletLoading,
@@ -45,7 +45,7 @@ import {
 import { getLockedUtxosByAsset } from "../../cardano/blockfrost-api";
 import { collections_add_tokens } from "../collection/collectionActions";
 import { fromBech32 } from "../../utils/converter";
-import { createEvent, createDatum, nftSwapCreateDatum } from "../../utils/factory";
+import { createEvent, createDatum, nftSwapCreateDatum, nftSwapCreateOffer } from "../../utils/factory";
 import { resolveError } from "../../utils/resolver";
 
 export const availableWallets = (callback) => async (dispatch) => {
@@ -176,7 +176,8 @@ export const listToken =
           txHash: listObj.txHash,
           address: wallet.data.address,
           artistAddress: royaltiesAddress,
-          contractVersion,
+          contractVersion: contractVersion,
+          state: ASSET_STATE.MARKET_LISTED,
         });
 
         const event = createEvent(
@@ -273,6 +274,7 @@ export const relistToken =
             address: wallet.data.address,
             artistAddress: asset.status.artistAddress,
             contractVersion: latestVersion,
+            state: ASSET_STATE.MARKET_LISTED,
           });
 
           const event = createEvent(
@@ -604,7 +606,7 @@ export const nftSwapCreateBundle =
       if (listObj && listObj.datumHash && listObj.txHash) {
 
         const event = createEvent(
-          MARKET_TYPE.CREATE_NFTSWAP_BUNDLE,
+          MARKET_TYPE.NFTSWAP_CREATE_BUNDLE,
           datum,
           listObj.txHash,
           wallet.data.address
@@ -618,7 +620,8 @@ export const nftSwapCreateBundle =
             txHash: listObj.txHash,
             address: wallet.data.address,
             artistAddress: "",
-            contractVersion,
+            contractVersion: contractVersion,
+            state: ASSET_STATE.SWAP_LISTED,
           });
 
           const updatedWallet = await listWalletAsset(
@@ -640,7 +643,7 @@ export const nftSwapCreateBundle =
         }
         
         dispatch(setWalletLoading(false));
-        callback({ success: true, type: MARKET_TYPE.CREATE_NFTSWAP_BUNDLE });
+        callback({ success: true, type: MARKET_TYPE.NFTSWAP_CREATE_BUNDLE });
       } else {
         callback({ success: false });
         dispatch(setWalletLoading(false));
@@ -653,13 +656,113 @@ export const nftSwapCreateBundle =
       }
     } catch (error) {
       console.error(
-        `Unexpected error in listToken. [Message: ${error.message}]`
+        `Unexpected error in nftSwapCreateBundle. [Message: ${error.message}]`
       );
       callback({ success: false });
       dispatch(setWalletLoading(false));
       dispatch(
         set_error({
           message: resolveError(error.message, "Create NFT Swap Bundle"),
+          detail: error,
+        })
+      );
+    }
+  };
+
+  export const nftSwapCreateOrder =
+  (wallet, assets, offerAssets, callback) => async (dispatch) => {
+    try {
+      dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
+
+      const walletUtxos = await Wallet.getUtxos();
+
+      let tokens = [];
+      for(var i in assets){
+        tokens.push((assets[i].details.policyId, assets[i].details.assetName))
+      }
+
+      let offerTokens = [];
+      for(var i in offerAssets){
+        offerTokens.push((offerAssets[i].details.policyId, offerAssets[i].details.assetName))
+      }
+
+      const datum = nftSwapCreateOffer(
+        wallet.data.address,
+        tokens,
+        offerTokens,
+      )
+
+      const contractVersion = process.env.REACT_APP_MARTIFY_CONTRACT_NFTSWAP_VERSION;
+
+      const listObj = await listOffer(
+        datum,
+        {
+          address: fromBech32(wallet.data.address),
+          utxos: walletUtxos,
+        },
+        contractVersion
+      );
+
+      if (listObj && listObj.datumHash && listObj.txHash) {
+
+        const event = createEvent(
+          MARKET_TYPE.NFTSWAP_CREATE_OFFER,
+          datum,
+          listObj.txHash,
+          wallet.data.address
+        );
+
+        for(var i in tokens){
+          let asset = tokens[i];
+          const updatedAsset = await lockAsset(asset, {
+            datum: datum,
+            datumHash: listObj.datumHash,
+            txHash: listObj.txHash,
+            address: wallet.data.address,
+            artistAddress: "",
+            contractVersion: contractVersion,
+            state: ASSET_STATE.SWAP_OFFERED,
+          });
+
+          const updatedWallet = await listWalletAsset(
+            wallet.data,
+            updatedAsset,
+            event
+          );
+
+          const output = {
+            policy_id: updatedAsset.details.policyId,
+            listing: {
+              [updatedAsset.details.asset]: updatedAsset,
+            },
+          };
+
+          output.listing[updatedAsset.details.asset] = updatedAsset;
+          dispatch(setWalletData(updatedWallet));
+          dispatch(collections_add_tokens(output));
+        }
+        
+        dispatch(setWalletLoading(false));
+        callback({ success: true, type: MARKET_TYPE.NFTSWAP_CREATE_OFFER });
+      } else {
+        callback({ success: false });
+        dispatch(setWalletLoading(false));
+        dispatch(
+          set_error({
+            message: resolveError("TRANSACTION_FAILED", "Create NFT Swap offer"),
+            detail: null,
+          })
+        );
+      }
+    } catch (error) {
+      console.error(
+        `Unexpected error in nftSwapCreateOrder. [Message: ${error.message}]`
+      );
+      callback({ success: false });
+      dispatch(setWalletLoading(false));
+      dispatch(
+        set_error({
+          message: resolveError(error.message, "Create NFT Swap offer"),
           detail: error,
         })
       );
