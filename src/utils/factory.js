@@ -100,3 +100,28 @@ const getAddressKeyHash = (address) => {
       .to_bytes()
   );
 };
+
+export const nftSwapCreateDatum = (
+  // tokenName,
+  // currencySymbol,
+  sellerAddress,
+  // royaltiesAddress,
+  // royaltiesPercentage,
+  // price
+  tokens,
+) => {
+  if (
+    sellerAddress &&
+    tokens.length>0
+  ) {
+    return {
+      // tn: tokenName,
+      // cs: currencySymbol,
+      owner: getAddressKeyHash(sellerAddress),
+      // ra: getAddressKeyHash(royaltiesAddress),
+      // rp: royaltiesPercentage ? royaltiesPercentage : 0,
+      // price: toLovelace(price),
+      cstns: tokens,
+    };
+  }
+};

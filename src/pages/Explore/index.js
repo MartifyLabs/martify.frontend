@@ -104,7 +104,7 @@ const Explore = () => {
             }
             scrollableTarget="body"
           >
-            <ListingSection listings={filteredListings} />
+            <ListingSection listings={filteredListings} isFetching={isFetching} />
           </InfiniteScroll>
         </div>
       </div>
@@ -243,12 +243,31 @@ const Filter = ({ collections, listings, setFilteredListings }) => {
   );
 };
 
-const ListingSection = ({ listings }) => {
+const ListingSection = ({ listings, isFetching}) => {
   return (
     <>
       {listings.length > 0 ? (
         <ListingDisplayListing listings={listings} />
-      ) : (
+      ) : 
+      isFetching ? (
+        <section className="hero is-medium">
+          <div className="hero-body">
+            <div className="container has-text-centered">
+              <h1>
+                <span
+                  className="icon"
+                  style={{ fontSize: "100px", marginBottom: "50px" }}
+                >
+                  <i className="fas fa-truck"></i>
+                </span>
+              </h1>
+              <p className="title">Fetching Assets</p>
+              <p className="subtitle">Please wait...</p>
+            </div>
+          </div>
+        </section>
+      ) :
+      (
         <section className="hero is-medium">
           <div className="hero-body">
             <div className="container has-text-centered">
