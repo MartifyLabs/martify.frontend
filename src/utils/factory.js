@@ -118,7 +118,7 @@ export const nftSwapCreateDatum = (
   }
 };
 
-export const nftSwapCreateOffer = (
+export const nftSwapCreateOfferDatum = (
   sellerAddress,
   tokens,
   offerTokens,
