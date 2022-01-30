@@ -669,7 +669,7 @@ export const nftSwapCreateBundle =
     }
   };
 
-  export const nftSwapCreateOffer =
+export const nftSwapCreateOffer =
   (wallet, assets, offerAssets, callback) => async (dispatch) => {
     try {
       dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
@@ -877,7 +877,7 @@ export const nftSwapAcceptOffer =
   };
 
 export const nftSwapCancelBundle =
-  (wallet, assets, offerAssets, callback) => async (dispatch) => {
+  (wallet, assets, callback) => async (dispatch) => {
     
     callback({ success: true});
   };
