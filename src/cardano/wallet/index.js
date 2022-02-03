@@ -78,6 +78,24 @@ class Wallet {
   async submitTx(tx) {
     return await this._provider.submitTx(tx);
   }
+
+  // TODO: test submit on node
+  // async submitTx(tx) {
+  //   try {
+  //     const result = await fetch("http://66.94.107.131:8090/api/submit/tx", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/cbor" },
+  //       body: Buffer.from(tx, "hex"),
+  //     });
+  //     if (result.ok) {
+  //       return await result.json();
+  //     }
+  //     return result;
+  //   } catch (error) {
+  //     console.log("error", error);
+  //   }
+  // }
+
 }
 
 export default new Wallet();

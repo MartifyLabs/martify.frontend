@@ -587,7 +587,7 @@ export const nftSwapCreateBundle =
         tokens.push((assets[i].details.policyId,assets[i].details.assetName))
       }
 
-      const datum = nftSwapCreateDatum(
+      const listDatum = nftSwapCreateDatum(
         wallet.data.address,
         tokens
       )
@@ -595,7 +595,7 @@ export const nftSwapCreateBundle =
       const contractVersion = process.env.REACT_APP_MARTIFY_CONTRACT_NFTSWAP_VERSION;
 
       const listObj = await listBundle(
-        datum,
+        listDatum,
         {
           address: fromBech32(wallet.data.address),
           utxos: walletUtxos,
@@ -695,7 +695,7 @@ export const nftSwapCreateOffer =
       const contractVersion = process.env.REACT_APP_MARTIFY_CONTRACT_NFTSWAP_VERSION;
 
       const listObj = await listOffer(
-        datum,
+        offerDatum,
         {
           address: fromBech32(wallet.data.address),
           utxos: walletUtxos,
@@ -707,7 +707,7 @@ export const nftSwapCreateOffer =
 
         const event = createEvent(
           MARKET_TYPE.NFTSWAP_CREATE_OFFER,
-          datum,
+          offerDatum,
           listObj.txHash,
           wallet.data.address
         );
@@ -786,7 +786,7 @@ export const nftSwapCancelOffer =
         offerTokens.push((offerAssets[i].details.policyId, offerAssets[i].details.assetName))
       }
 
-      const datum = nftSwapCreateOfferDatum(
+      const offerDatum = nftSwapCreateOfferDatum(
         wallet.data.address,
         tokens,
         offerTokens,
@@ -794,12 +794,15 @@ export const nftSwapCancelOffer =
 
       const contractVersion = process.env.REACT_APP_MARTIFY_CONTRACT_NFTSWAP_VERSION;
 
+      const offerUtxo = null; // TODO
+
       const listObj = await cancelOffer(
-        datum,
+        offerDatum,
         {
           address: fromBech32(wallet.data.address),
           utxos: walletUtxos,
         },
+        offerUtxo,
         contractVersion
       );
 
@@ -867,7 +870,112 @@ export const nftSwapCancelOffer =
 export const nftSwapRefuseOffer =
   (wallet, assets, offerAssets, callback) => async (dispatch) => {
     
-    callback({ success: true});
+    try {
+      dispatch(setWalletLoading(WALLET_STATE.AWAITING_SIGNATURE));
+
+      const walletUtxos = await Wallet.getUtxos();
+
+      let tokens = [];
+      for(var i in assets){
+        tokens.push((assets[i].details.policyId, assets[i].details.assetName))
+      }
+
+      let offerTokens = [];
+      for(var i in offerAssets){
+        offerTokens.push((offerAssets[i].details.policyId, offerAssets[i].details.assetName))
+      }
+
+      const listDatum = nftSwapCreateDatum(
+        wallet.data.address,
+        tokens
+      )
+
+      const offerDatum = nftSwapCreateOfferDatum(
+        wallet.data.address,
+        tokens,
+        offerTokens,
+      )
+
+      const offerer = {
+        address: fromBech32(wallet.data.address),
+        utxos: walletUtxos,
+      };
+
+      const owner = {}; // TODO
+      const bundleUtxo = {}; // TODO
+      const offerUtxo = {}; // TODO
+
+      const contractVersion = process.env.REACT_APP_MARTIFY_CONTRACT_NFTSWAP_VERSION;
+
+      const listObj = await refuseOffer(
+        offerDatum,
+        listDatum,
+        offerer,
+        owner,
+        bundleUtxo,
+        offerUtxo,
+        contractVersion
+      );
+
+      if (listObj && listObj.datumHash && listObj.txHash) {
+
+        const event = createEvent(
+          MARKET_TYPE.NFTSWAP_REFUSE_OFFER,
+          datum,
+          listObj.txHash,
+          wallet.data.address
+        );
+
+        for(var i in offerTokens){
+          let asset = offerTokens[i];
+          const updatedAsset = await unlockAsset(asset, {
+            txHash: listObj.txHash,
+            address: wallet.data.address,
+          });
+
+          const updatedWallet = await delistWalletAsset(
+            wallet.data,
+            updatedAsset,
+            event
+          );
+
+          const output = {
+            policy_id: updatedAsset.details.policyId,
+            listing: {
+              [updatedAsset.details.asset]: updatedAsset,
+            },
+          };
+
+          output.listing[updatedAsset.details.asset] = updatedAsset;
+          dispatch(setWalletData(updatedWallet));
+          dispatch(collections_add_tokens(output));
+        }
+        
+        dispatch(setWalletLoading(false));
+        callback({ success: true, type: MARKET_TYPE.NFTSWAP_REFUSE_OFFER });
+      } else {
+        callback({ success: false });
+        dispatch(setWalletLoading(false));
+        dispatch(
+          set_error({
+            message: resolveError("TRANSACTION_FAILED", "NFT Swap refuse offer"),
+            detail: null,
+          })
+        );
+      }
+    } catch (error) {
+      console.error(
+        `Unexpected error in nftSwapCancelOffer. [Message: ${error.message}]`
+      );
+      callback({ success: false });
+      dispatch(setWalletLoading(false));
+      dispatch(
+        set_error({
+          message: resolveError(error.message, "NFT Swap cancel offer"),
+          detail: error,
+        })
+      );
+    }
   };
 
 export const nftSwapAcceptOffer =
