@@ -34,10 +34,14 @@ const Navbar = () => {
             </div>
           </div>
 
-          <Link className="navbar-item" to="/about">
+          <a
+            className="navbar-item"
+            href="https://martify.io"
+            target="_blank"
+            rel="noreferrer"
+          >
             About Us
-          </Link>
-          
+          </a>
         </div>
 
         <div className="navbar-end">
