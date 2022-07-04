@@ -17,19 +17,26 @@ export const usePolicyMetadatas = (policyIds) => {
           })
         );
 
+        let validMetadatas = [];
+
         if (metadatas.length === 1) {
           if (metadatas[0].statusCode === 404) {
             console.log(
               "usePolicyMetadatas: this collection is not in opencnft",
               policyIds
             );
+            validMetadatas.push({policy: policyIds[0]});
           }
         }
 
-        const validMetadatas = metadatas.filter(
-          (metadata) => metadata.policy !== undefined
-        );
+        if(validMetadatas.length==0){
+          validMetadatas = metadatas.filter(
+            (metadata) => metadata.policy !== undefined
+          );
+        }
+
         setPolicyMetadatas(validMetadatas);
+        
       } catch (error) {
         // console.error(
         //   `Unexpected error in usePolicyMetadatas. [Message: ${error.message}]`

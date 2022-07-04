@@ -8,7 +8,7 @@ import { ListingDisplayListing } from "components";
 import "bulma-checkradio/dist/css/bulma-checkradio.min.css";
 import "./style.css";
 
-const Explore = () => {
+const Marketplace = () => {
   const ITEMS_PER_PAGE = 48;
   const dispatch = useDispatch();
   const [isFetching, setIsFetching] = useState(false);
@@ -73,7 +73,7 @@ const Explore = () => {
   };
 
   return (
-    <div className="section explore">
+    <div className="section marketplace">
       <div className="columns">
         <div className="column is-one-quarter-tablet one-fifth-desktop is-one-fifth-widescreen is-one-fifth-fullhd">
           <Filter
@@ -270,4 +270,4 @@ const ListingSection = ({ listings }) => {
   );
 };
 
-export default Explore;
+export default Marketplace;

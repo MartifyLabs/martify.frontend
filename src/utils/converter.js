@@ -21,6 +21,7 @@ export const toString = (bytes) => String.fromCharCode.apply(String, bytes);
 
 export const convertMetadataPropToString = (src) => {
   if (typeof src === "string") return src;
+  else if (typeof src === "object") return Object.values(src).join("");
   else if (Array.isArray(src)) return src.join("");
   return null;
 };
@@ -69,19 +70,21 @@ export const get_asset_image_source = (image) => {
   // return "";
 
   if (image) {
-    if (image.includes("ipfs/")) {
-      image = "ipfs://" + image.split("ipfs/")[1];
+    if (typeof image === 'string') {
+      if (image.includes("ipfs/")) {
+        image = "ipfs://" + image.split("ipfs/")[1];
+      }
     }
     return linkToSrc(convertMetadataPropToString(image));
   }
 };
 
 export const numFormatter = (num) => {
-  if (num > 999 && num < 1000000) {
+  if (num >= 1000 && num < 1000000) {
     return (num / 1000).toFixed(1) + "K"; // convert to K for number from > 1000 < 1 million
   } else if (num > 1000000) {
     return (num / 1000000).toFixed(1) + "M"; // convert to M for number from > 1 million
-  } else if (num < 900) {
+  } else if (num < 1000) {
     return num; // if value < 1000, nothing to do
   }
 };

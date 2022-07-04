@@ -62,7 +62,7 @@ const Collection = () => {
         if (currentCollectionIterator.hasOwnProperty("policy_id")) {
           setPolicyIds([currentCollectionIterator.policy_id]);
         }
-
+        
         for (let policyIdx in policy_ids) {
           let policy_id = policy_ids[policyIdx];
           dispatch(

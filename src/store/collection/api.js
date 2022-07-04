@@ -18,6 +18,12 @@ import {
   getLockedAssets,
 } from "../../database/assets";
 
+import {
+  getOpencnftTopProjects,
+  getOpencnftPolicy,
+} from "../../database/collections";
+
+
 export const load_collection = (callback) => async (dispatch) => {
   let all_collections = {};
 
@@ -237,26 +243,37 @@ export const asset_add_offer =
 
 export const opencnft_get_top_projects =
   (time, callback) => async (dispatch) => {
-    fetch("https://api.opencnft.io/1/rank?window=" + time, {})
-      .then((res) => res.json())
-      .then((res) => {
-        callback({ success: true, data: res.ranking });
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+
+    let rankings = await getOpencnftTopProjects(time);
+    callback({ success: true, data: rankings });
+
+    // old - to be removed - query opencnft without caching
+    // fetch("https://api.opencnft.io/1/rank?window=" + time, {})
+    //   .then((res) => res.json())
+    //   .then((res) => {
+    //     callback({ success: true, data: res.ranking });
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //   });
   };
 
 export const opencnft_get_policy =
   (policy_id, callback) => async (dispatch) => {
-    fetch(`https://api.opencnft.io/1/policy/${policy_id}`, {})
-      .then((res) => res.json())
-      .then((res) => {
-        callback({ success: true, data: res });
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+
+    let project_stats = await getOpencnftPolicy(policy_id);
+    callback({ success: true, data: project_stats });
+
+    // old - to be removed - query opencnft without caching
+    // fetch(`https://api.opencnft.io/1/policy/${policy_id}`, {})
+    //   .then((res) => res.json())
+    //   .then((res) => {
+    //     console.log(res);
+    //     callback({ success: true, data: res });
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //   });
   };
 
 export const opencnft_get_asset_tx =

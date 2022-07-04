@@ -16,7 +16,7 @@ const ListingSection = ({ state_collection, policyIds }) => {
   const [lastVisible, setLastVisible] = useState(null);
   const [paginationObject, setPaginationObject] = useState(undefined);
   const [policyMetadatas, loadingData] = usePolicyMetadatas(policyIds);
-
+  
   const resetComponentState = useCallback(() => {
     if (policyMetadatas.length > 0) {
       let tmpPaginationObject = {};
